@@ -1,0 +1,7 @@
+{
+    "clientId": "1124513810812772422",
+    "guildId": "1124504171115192320",
+    "token": "MTEyNDUxMzgxMDgxMjc3MjQyMg.GAnFOf.Hd9SrzvQykVALpanY3B7wlEbKmGC7D8j87W6M4",
+    "localDbUrl": "mongodb://127.0.0.1:27017/bot",
+    "AtlasDbUrl": "mongodb+srv://Admin:Bumbalo92@cluster0.imnfyb5.mongodb.net/immersionbot?retryWrites=true&w=majority"
+}
