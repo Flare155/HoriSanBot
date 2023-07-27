@@ -35,7 +35,7 @@ module.exports = {
                     )),
     async execute(interaction) {
         const medium = interaction.options.getString('medium');
-
+        const guildId = interaction.guild.id
                         
         // Get the data from the time period
         const timePeriod = interaction.options.getString('period');
@@ -74,6 +74,7 @@ module.exports = {
         const topUsers = await Log.aggregate([
             matchStage,
             { $match: { timestamp: { $gte: startDate } } },
+            { $match: { guildId: guildId } },
             { $group: { _id: "$userId", totalPoints: { $sum: "$points" } } },
             { $sort: { totalPoints: -1 } },
             { $limit: 10 }
