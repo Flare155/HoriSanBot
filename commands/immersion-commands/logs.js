@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { AttachmentBuilder, SlashCommandBuilder } = require('discord.js');
-const Log = require('../../models/log');
+const Log = require('../../models/Log');
 
 module.exports = {
   data: new SlashCommandBuilder()
