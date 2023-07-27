@@ -2,7 +2,7 @@ const { mongoose } = require('mongoose');
 const { localDbUrl } = require('../config.json');
 const { AtlasDbUrl } = require('../config.json');
 const User = require("../models/User");
-const Log = require("../models/log");
+const Log = require("../models/Log");
 
 module.exports = {
     name: 'ready',
