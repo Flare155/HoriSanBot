@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "better-sqlite3": "^8.4.0",
+    "discord.js": "^14.11.0",
+    "mongodb": "^5.6.0",
+    "mongoose": "^7.3.1",
+    "quick.db": "^9.1.6"
+  },
+  "name": "horisanbot",
+  "version": "1.0.0",
+  "description": "immersion tracking bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Flare",
+  "license": "ISC",
+  "keywords": []
+}
