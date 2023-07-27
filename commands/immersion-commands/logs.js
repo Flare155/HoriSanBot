@@ -1,6 +1,7 @@
 const fs = require('fs');
 const { AttachmentBuilder, SlashCommandBuilder } = require('discord.js');
 const Log = require('../../models/Log');
+const { testingServerId } = require('../../config.json');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -8,7 +9,10 @@ module.exports = {
     .setDescription('Sends your log history!'),
   async execute(interaction) {
     try {
-      const logs = await Log.find({ userId: interaction.user.id });
+      const logs = await Log.find({ 
+        userId: interaction.user.id,
+        guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId } 
+    });
 
       // Runs for every log in logs and saves them to an array
       const formattedLogs = logs.map((log) => {
