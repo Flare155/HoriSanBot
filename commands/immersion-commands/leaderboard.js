@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Log = require('../../models/Log');
+const { testingServerId } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -69,12 +70,20 @@ module.exports = {
         // Only add medium condition if medium is not 'All'
         if (medium !== 'All') {
             matchStage.$match.medium = medium;
-        }        
+        }
+
+        // Seperate leaderbaords from testing server data
+        let testGuildExcludeMatch;
+        if (guildId === testingServerId) {
+            testGuildExcludeMatch = { $match: { guildId: testingServerId} }
+        } else {
+            testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } }
+        };
 
         const topUsers = await Log.aggregate([
+            testGuildExcludeMatch,
             matchStage,
             { $match: { timestamp: { $gte: startDate } } },
-            { $match: { guildId: guildId } },
             { $group: { _id: "$userId", totalPoints: { $sum: "$points" } } },
             { $sort: { totalPoints: -1 } },
             { $limit: 10 }
