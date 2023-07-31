@@ -45,6 +45,12 @@ module.exports = {
         const title = interaction.options.getString('title');
         const notes = interaction.options.getString('notes');
 
+        // Make sure amount entered is possible
+        if (amountImmersed <= 0) {
+            interaction.reply("Amount cannot be negative silly")
+            return
+        };
+
         // Find medium of the log
         const mediumUnits = {
             Anime: "Episodes",
@@ -60,6 +66,7 @@ module.exports = {
         let mediumUnit = mediumUnits[medium];
         if (!mediumUnit) {
             interaction.reply("Error finding medium of log");
+            return
         }
         
         // Calculate points
