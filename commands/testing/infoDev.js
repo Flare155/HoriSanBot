@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder} = require('discord.js');
 const { mongoose } = require('mongoose');
 const User = require("../../models/User");
 const Log = require("../../models/Log");
@@ -6,7 +6,7 @@ const { testingServerId } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('info')
+        .setName('info_dev')
         .setDescription('Replies with your immersion info!'),
     async execute(interaction) {
         const userId = interaction.user.id;
@@ -22,7 +22,7 @@ module.exports = {
             testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } }
         };
 
-
+        // Find total points
         if (exists) {
             totalPoints = await Log.aggregate([
                 testGuildExcludeMatch,
@@ -38,8 +38,21 @@ module.exports = {
             }
         }
 
+        // Reply
         if (exists) {
-            await interaction.reply(`You have ${totalPoints} points!`);
+            // Embed response:
+            const userAvatarURL = interaction.user.displayAvatarURL();
+        
+            // Make embed for log message
+            const profileEmbed = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle(`${interaction.user.username}'s Profile`)
+            .setDescription(`You have ${totalPoints} points!`)
+            // .setDescription(descripton)
+            .setThumbnail(userAvatarURL)
+            
+            // Send embed
+            await interaction.reply({ embeds: [profileEmbed] });
         } else {
             await interaction.reply('User not found :(');
         };

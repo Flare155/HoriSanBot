@@ -4,7 +4,7 @@ const { testingServerId } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('leaderboard')
+        .setName('leaderboard_dev')
         .setDescription('Show a leaderboard of the top players')
         .addStringOption(option =>
             option.setName('period')
@@ -72,7 +72,7 @@ module.exports = {
             matchStage.$match.medium = medium;
         }
 
-        // Seperate leaderbaords from testing server data
+        // Seperate leaderboards from testing server data
         let testGuildExcludeMatch;
         if (guildId === testingServerId) {
             testGuildExcludeMatch = { $match: { guildId: testingServerId} }
