@@ -30,7 +30,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName('title')
             .setDescription('The title of the media (OPTIONAL)')
-            .setRequired(false)
+            .setRequired(true)
             )
         .addStringOption(option =>
             option.setName('notes')
