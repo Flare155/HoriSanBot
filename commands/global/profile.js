@@ -5,7 +5,7 @@ const Log = require("../../models/Log");
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('log')
+		.setName('profile')
 		.setDescription('Log your immersion!')
         .addStringOption(option =>
             option.setName('medium')
@@ -48,8 +48,8 @@ module.exports = {
         // Find medium of the log
         const mediumUnits = {
             Anime: "Episodes",
-            Drama: "Episodes",
             Manga: "Pages",
+            Drama: "Episodes",
             YouTube: "Minutes",
             "Light Novel": "Chars",
             "Visual Novel": "Chars",

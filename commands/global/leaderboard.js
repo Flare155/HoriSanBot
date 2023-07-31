@@ -16,7 +16,6 @@ module.exports = {
                     { name: 'Monthly', value: 'Monthly'},
                     { name: 'Weekly', value: 'Weekly' },
                     { name: 'Daily', value: 'Daily' },
-                    { name: 'Custom', value: 'Custom' },
                     ))
         .addStringOption(option =>
             option.setName('medium')

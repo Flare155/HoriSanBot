@@ -48,8 +48,8 @@ module.exports = {
         // Find medium of the log
         const mediumUnits = {
             Anime: "Episodes",
-            Drama: "Episodes",
             Manga: "Pages",
+            Drama: "Episodes",
             YouTube: "Minutes",
             "Light Novel": "Chars",
             "Visual Novel": "Chars",
