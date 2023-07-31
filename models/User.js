@@ -12,4 +12,4 @@ const User = mongoose.model('User', userSchema);
 module.exports = User;
 
 
-// leaderboard needs to be able to display users in order of points, or the individual mediums anime episodes, youtube watch minutes, etc
+
