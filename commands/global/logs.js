@@ -37,7 +37,7 @@ module.exports = {
         return logString;
       });
       const logText = formattedLogs.join('\n');
-      fs.writeFileSync('logs.txt', logText);
+      fs.writeFileSync('logs.txt', logText, 'utf8');
       const attachment = new AttachmentBuilder('./logs.txt');
       interaction.reply({ files: [attachment] });
     } catch (error) {
