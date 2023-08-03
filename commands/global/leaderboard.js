@@ -4,7 +4,7 @@ const { testingServerId } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('leaderboard_dev')
+        .setName('leaderboard')
         .setDescription('Show a leaderboard of the top players')
         .addStringOption(option =>
             option.setName('period')
