@@ -4,7 +4,7 @@ const { testingServerId } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('leaderboard')
+        .setName('leaderboard_dev')
         .setDescription('Show a leaderboard of the top players')
         .addStringOption(option =>
             option.setName('period')
@@ -39,7 +39,8 @@ module.exports = {
                         
         // Get the data from the time period
         const timePeriod = interaction.options.getString('period');
-        let startDate = new Date();
+        let startDate = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()));
+
 
         switch(timePeriod) {
             case 'All Time':

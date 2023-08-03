@@ -5,7 +5,7 @@ const Log = require("../../models/Log");
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('log')
+		.setName('log_dev')
 		.setDescription('Log your immersion!')
         .addStringOption(option =>
             option.setName('medium')
@@ -90,32 +90,39 @@ module.exports = {
         async function saveLog() {
             let user;
             let log;
-            const userExists = await User.exists({ userId: interaction.user.id });
         
-            if (!userExists) {
-                user = new User({ 
+            try {
+                const userExists = await User.exists({ userId: interaction.user.id });
+            
+                if (!userExists) {
+                    user = new User({ 
+                        userId: interaction.user.id, 
+                        guildId: interaction.guild.id, 
+                        timestamp: Date(),
+                    });
+                    await user.save();
+                };
+        
+                log = new Log({
                     userId: interaction.user.id, 
                     guildId: interaction.guild.id, 
                     timestamp: Date(),
+                    medium: medium,
+                    unit: mediumUnit,
+                    amount: amountImmersed,
+                    points: points,
+                    title: title,
+                    notes: notes    
+                
                 });
-                await user.save();
-            };
-
-            log = new Log({
-                userId: interaction.user.id, 
-                guildId: interaction.guild.id, 
-                timestamp: Date(),
-                medium: medium,
-                unit: mediumUnit,
-                amount: amountImmersed,
-                points: points,
-                title: title,
-                notes: notes    
-            
-            });
-            await log.save();
+                await log.save();
+            } catch (error) {
+                console.error("Error saving log:", error);
+            }
         };
-        saveLog();
+        
+        await saveLog();
+        
 
         // Embed response:
         const userAvatarURL = interaction.user.displayAvatarURL();
