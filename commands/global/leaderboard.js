@@ -47,21 +47,13 @@ module.exports = {
             case 'All Time':
                 startDate = new Date(0); // Beginning of Unix time
                 break;
-            case 'Yearly':
-                startDate = new Date(startDate.getUTCFullYear(), 0); // Start of this year
-                break;
-            case 'Monthly':
-                startDate = new Date(startDate.getUTCFullYear(), startDate.getUTCMonth(), 1); // Start of this month
-                break;
-            case 'Weekly':
-                // We're using the getDay() function, which returns the day of the week (0 for Sunday, 1 for Monday, etc.)
-                // By subtracting this from the current date, we get the last Sunday
-                startDate = new Date(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate() - startDate.getUTCDay());
-                break;
-            case 'Daily':
-                startDate = new Date(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate()); // Start of today
+            case 'Today':
+                // For 'Today', we just want to start from the beginning of the current day.
+                // We use UTC to avoid timezone issues.
+                startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())); // Start of today
                 break;
         };
+        
 
         // Build $match stage
         let matchStage = {
