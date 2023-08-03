@@ -38,8 +38,8 @@ module.exports = {
         const guildId = interaction.guild.id
                         
         // Get the data from the time period
-        const timePeriod = interaction.options.getString('period');
-        let startDate = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()));
+        let now = new Date();
+        let startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));        
 
 
         switch(timePeriod) {
