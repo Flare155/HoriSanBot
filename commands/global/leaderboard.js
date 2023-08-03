@@ -39,7 +39,8 @@ module.exports = {
                         
         // Get the data from the time period
         const timePeriod = interaction.options.getString('period');
-        let startDate = new Date();
+        let startDate = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()));
+
 
         switch(timePeriod) {
             case 'All Time':
