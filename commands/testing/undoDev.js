@@ -4,7 +4,7 @@ const { testingServerId } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('undo')
+        .setName('undo_dev')
         .setDescription('Removes your most recent log'),
     async execute(interaction) {
         // Determine which guildId to search for
