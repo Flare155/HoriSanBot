@@ -54,7 +54,7 @@ module.exports = {
         
             // Make embed for log message
             const profileEmbed = new EmbedBuilder()
-                .setColor(0x0099FF)
+                .setColor('#c3e0e8')
                 .setTitle(`${interaction.user.username}'s Profile`)
                 .setThumbnail(userAvatarURL);
             let fields = [];

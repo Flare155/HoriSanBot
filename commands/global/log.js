@@ -122,7 +122,7 @@ module.exports = {
         
         // Make embed for log message
         const logEmbed = new EmbedBuilder()
-        .setColor(0x0099FF)
+        .setColor('#c3e0e8')
         .setTitle(` Logged ${amountImmersed} ${mediumUnit} of ${medium}!!`,)
         .setDescription(descripton)
         .setThumbnail(userAvatarURL)

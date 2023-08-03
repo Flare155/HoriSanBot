@@ -4,7 +4,7 @@ const { testingServerId } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('leaderboard')
+        .setName('leaderboard_dev')
         .setDescription('Show a leaderboard of the top players')
         .addStringOption(option =>
             option.setName('period')
@@ -46,18 +46,16 @@ module.exports = {
                 startDate = new Date(0); // Beginning of Unix time
                 break;
             case 'Yearly':
-                startDate = new Date(startDate.getFullYear(), 0); // Start of this year
+                startDate.setFullYear(startDate.getFullYear() - 1); // One year ago
                 break;
             case 'Monthly':
-                startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1); // Start of this month
+                startDate.setMonth(startDate.getMonth() - 1); // One month ago
                 break;
             case 'Weekly':
-                // We're using the getDay() function, which returns the day of the week (0 for Sunday, 1 for Monday, etc.)
-                // By subtracting this from the current date, we get the last Sunday
-                startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() - startDate.getDay());
+                startDate.setDate(startDate.getDate() - 7); // One week ago
                 break;
             case 'Daily':
-                startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()); // Start of today
+                startDate.setDate(startDate.getDate() - 1); // One day ago
                 break;
         };
 
@@ -101,10 +99,10 @@ module.exports = {
 
         // Make embed for log message
         const leaderboardEmbed = new EmbedBuilder()
-        .setColor(0x0099FF)
+        .setColor('#c3e0e8')
         .setTitle(`${timePeriod} ${medium} Immersion Leaderboard`)
         .setAuthor({ name: interaction.guild.name, iconURL: interaction.guild.iconURL() })
-        .setThumbnail('https://media.giphy.com/media/1jgLDGD1Bn27e/giphy.gif')
+        .setThumbnail('https://media.giphy.com/media/vNY0UZX11LcNW/giphy.gif')
         .setTimestamp()
         .addFields(
             topFiveNamesAndPoints.map((user, index) => ({

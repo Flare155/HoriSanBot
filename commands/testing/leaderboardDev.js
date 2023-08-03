@@ -99,10 +99,10 @@ module.exports = {
 
         // Make embed for log message
         const leaderboardEmbed = new EmbedBuilder()
-        .setColor(0x0099FF)
+        .setColor('#c3e0e8')
         .setTitle(`${timePeriod} ${medium} Immersion Leaderboard`)
         .setAuthor({ name: interaction.guild.name, iconURL: interaction.guild.iconURL() })
-        .setThumbnail('https://media.giphy.com/media/1jgLDGD1Bn27e/giphy.gif')
+        .setThumbnail('https://media.giphy.com/media/vNY0UZX11LcNW/giphy.gif')
         .setTimestamp()
         .addFields(
             topFiveNamesAndPoints.map((user, index) => ({
