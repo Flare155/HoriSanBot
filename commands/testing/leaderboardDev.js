@@ -4,7 +4,7 @@ const { testingServerId } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('leaderboard_dev')
+        .setName('leaderboard')
         .setDescription('Show a leaderboard of the top players')
         .addStringOption(option =>
             option.setName('period')
@@ -39,7 +39,8 @@ module.exports = {
                         
         // Get the data from the time period
         const timePeriod = interaction.options.getString('period');
-        let startDate = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()));
+        let now = new Date();
+        let startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));        
 
 
         switch(timePeriod) {
@@ -47,18 +48,18 @@ module.exports = {
                 startDate = new Date(0); // Beginning of Unix time
                 break;
             case 'Yearly':
-                startDate = new Date(startDate.getFullYear(), 0); // Start of this year
+                startDate = new Date(startDate.getUTCFullYear(), 0); // Start of this year
                 break;
             case 'Monthly':
-                startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1); // Start of this month
+                startDate = new Date(startDate.getUTCFullYear(), startDate.getUTCMonth(), 1); // Start of this month
                 break;
             case 'Weekly':
                 // We're using the getDay() function, which returns the day of the week (0 for Sunday, 1 for Monday, etc.)
                 // By subtracting this from the current date, we get the last Sunday
-                startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() - startDate.getDay());
+                startDate = new Date(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate() - startDate.getUTCDay());
                 break;
             case 'Daily':
-                startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()); // Start of today
+                startDate = new Date(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate()); // Start of today
                 break;
         };
 
@@ -77,10 +78,10 @@ module.exports = {
         // Seperate leaderboards from testing server data
         let testGuildExcludeMatch;
         if (guildId === testingServerId) {
-            testGuildExcludeMatch = { $match: { guildId: testingServerId} }
+            testGuildExcludeMatch = { $match: { guildId: testingServerId} };
         } else {
-            testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } }
-        };
+            testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } };
+        }
 
         const topUsers = await Log.aggregate([
             testGuildExcludeMatch,
