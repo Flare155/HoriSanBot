@@ -46,16 +46,18 @@ module.exports = {
                 startDate = new Date(0); // Beginning of Unix time
                 break;
             case 'Yearly':
-                startDate.setFullYear(startDate.getFullYear() - 1); // One year ago
+                startDate = new Date(startDate.getFullYear(), 0); // Start of this year
                 break;
             case 'Monthly':
-                startDate.setMonth(startDate.getMonth() - 1); // One month ago
+                startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1); // Start of this month
                 break;
             case 'Weekly':
-                startDate.setDate(startDate.getDate() - 7); // One week ago
+                // We're using the getDay() function, which returns the day of the week (0 for Sunday, 1 for Monday, etc.)
+                // By subtracting this from the current date, we get the last Sunday
+                startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() - startDate.getDay());
                 break;
             case 'Daily':
-                startDate.setDate(startDate.getDate() - 1); // One day ago
+                startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()); // Start of today
                 break;
         };
 
