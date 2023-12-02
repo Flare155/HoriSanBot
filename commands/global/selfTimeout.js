@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('selftimeout_dev')
+		.setName('selftimeout')
 		.setDescription('Use to time yourself out!')
 		.addIntegerOption(option =>
             option.setName('unit')
