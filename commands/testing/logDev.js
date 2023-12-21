@@ -5,7 +5,7 @@ const Log = require("../../models/Log");
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('log')
+		.setName('log_dev')
 		.setDescription('Log your immersion!')
         .addStringOption(option =>
             option.setName('medium')
@@ -19,7 +19,8 @@ module.exports = {
                     { name: 'LN', value: 'Light Novel' },
                     { name: 'VN', value: 'Visual Novel' },
                     { name: 'Podcast', value: 'Podcast' },
-                    { name: 'Reading Minutes', value: 'Reading'},
+                    { name: 'Reading Characters', value: 'Reading_Char'},
+                    { name: 'Reading Minutes', value: 'Reading_Min'},
                     { name: 'Listening Minutes', value: 'Listening'},
                     ))
         .addNumberOption(option =>
@@ -54,7 +55,8 @@ module.exports = {
             "Light Novel": "Chars",
             "Visual Novel": "Chars",
             Podcast: "Minutes",
-            Reading: "Minutes",
+            Reading_Char: "Chars",
+            Reading_Min: "Minutes",
             Listening: "Minutes",
         };
         let mediumUnit = mediumUnits[medium];

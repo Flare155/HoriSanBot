@@ -1,5 +1,5 @@
 const { REST, Routes } = require('discord.js');
-const { clientId, testingServerId, token } = require('./config.json');
+const { clientIdTest, clientIdMain, testingServerId, token } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -29,7 +29,7 @@ for (const file of globalCommandFiles) {
 	try {
 		console.log(`Started refreshing ${commands.length} global application (/) commands.`);
 		const data = await rest.put(
-			Routes.applicationCommands(clientId),
+			Routes.applicationCommands(clientIdMain),
 			{ body: commands },
 		);
 		console.log(`Successfully reloaded ${data.length} global application (/) commands.`);
@@ -57,7 +57,7 @@ for (const file of testingCommandFiles) {
 	try {
 		console.log(`Started refreshing ${commands.length} testing application (/) commands.`);
 		const data = await rest.put(
-			Routes.applicationGuildCommands(clientId, testingServerId),
+			Routes.applicationGuildCommands(clientIdTest, testingServerId),
 			{ body: commands },
 		);
 		console.log(`Successfully reloaded ${data.length} testing application (/) commands.`);
