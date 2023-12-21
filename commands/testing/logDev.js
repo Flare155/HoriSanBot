@@ -5,7 +5,7 @@ const Log = require("../../models/Log");
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('log_dev')
+		.setName('log')
 		.setDescription('Log your immersion!')
         .addStringOption(option =>
             option.setName('medium')
@@ -59,7 +59,8 @@ module.exports = {
         };
         let mediumUnit = mediumUnits[medium];
         if (!mediumUnit) {
-            interaction.reply("Error finding medium of log");
+            await interaction.reply("Error finding medium of log");
+            return;
         }
         
         // Calculate points
@@ -84,6 +85,7 @@ module.exports = {
             descripton = `0.005 points/character → +${points} points`
         } else {
             await interaction.reply("Error in calculating points for medium");
+            return;
         };
 
         // Save info to database
