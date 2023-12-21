@@ -1,5 +1,5 @@
 const { REST, Routes } = require('discord.js');
-const { clientIdTest, clientIdMain, testingServerId, token } = require('./config.json');
+const { clientIdTest, clientIdMain, testingServerId, token, token2 } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -37,6 +37,8 @@ for (const file of globalCommandFiles) {
 		console.error(error);
 	}
 })();
+
+rest.setToken(token);
 
 // Deploy TESTING commands
 commands.length = 0; // Clear the commands array

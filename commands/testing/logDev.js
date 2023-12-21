@@ -19,7 +19,7 @@ module.exports = {
                     { name: 'LN', value: 'Light Novel' },
                     { name: 'VN', value: 'Visual Novel' },
                     { name: 'Podcast', value: 'Podcast' },
-                    { name: 'Reading Characters', value: 'Reading_Char'},
+                    { name: 'Reading Characters', value: 'Reading Char'},
                     { name: 'Reading Minutes', value: 'Reading_Min'},
                     { name: 'Listening Minutes', value: 'Listening'},
                     ))
@@ -55,7 +55,7 @@ module.exports = {
             "Light Novel": "Chars",
             "Visual Novel": "Chars",
             Podcast: "Minutes",
-            Reading_Char: "Chars",
+            "Reading Char": "Chars",
             Reading_Min: "Minutes",
             Listening: "Minutes",
         };
