@@ -8,6 +8,7 @@ module.exports = {
     .setName('logs')
     .setDescription('Sends your log history!'),
   async execute(interaction) {
+    await interaction.deferReply();
     try {
       const logs = await Log.find({ 
         userId: interaction.user.id,
@@ -42,7 +43,7 @@ module.exports = {
       interaction.reply({ files: [attachment] });
     } catch (error) {
       console.error(error);
-      interaction.reply('Error fetching logs');
+      interaction.editReply('Error fetching logs');
     }
   },
 };
