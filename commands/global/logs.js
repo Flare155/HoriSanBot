@@ -40,7 +40,7 @@ module.exports = {
       const logText = formattedLogs.join('\n');
       fs.writeFileSync('logs.txt', logText, 'utf8');
       const attachment = new AttachmentBuilder('./logs.txt');
-      interaction.reply({ files: [attachment] });
+      interaction.editReply({ files: [attachment] });
     } catch (error) {
       console.error(error);
       interaction.editReply('Error fetching logs');
