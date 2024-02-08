@@ -35,6 +35,7 @@ module.exports = {
                     { name: 'Listening Minutes', value: 'Listening'},
                     )),
     async execute(interaction) {
+        await interaction.deferReply();
         const medium = interaction.options.getString('medium');
         const guildId = interaction.guild.id
                         
@@ -124,6 +125,6 @@ module.exports = {
             }))
         )
         // Send embed
-        await interaction.reply({ embeds: [leaderboardEmbed] });
+        await interaction.editReply({ embeds: [leaderboardEmbed] });
     },
 };
