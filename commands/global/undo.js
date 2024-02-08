@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 const Log = require('../../models/Log');
 const { testingServerId } = require('../../config.json');
 
+// test
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('undo')
