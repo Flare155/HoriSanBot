@@ -30,6 +30,7 @@ module.exports = {
                     { name: 'LN', value: 'Light Novel' },
                     { name: 'VN', value: 'Visual Novel' },
                     { name: 'Podcast', value: 'Podcast' },
+                    { name: 'Reading Characters', value: 'Reading Char'},
                     { name: 'Reading Minutes', value: 'Reading'},
                     { name: 'Listening Minutes', value: 'Listening'},
                     )),
