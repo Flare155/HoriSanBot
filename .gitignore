@@ -1,3 +1,4 @@
 # .gitignore
 config.json
 node_modules
+logs.txt
