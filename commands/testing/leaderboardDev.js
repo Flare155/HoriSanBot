@@ -101,15 +101,28 @@ module.exports = {
             { $limit: 10 }
         ]);
         
+        // Find all users logs and sort by points, save as currentUser
+        const currentUser = await Log.aggregate([
+            testGuildExcludeMatch,
+            matchStage,
+            { $group: { _id: "$userId", totalPoints: { $sum: "$points" } } },
+            { $sort: { totalPoints: -1 } }
+        ]);
 
-        const topFiveNamesAndPoints = await Promise.all(topUsers.map(async user => {
+        const topTenNamesAndPoints = await Promise.all(topUsers.map(async user => {
             let discordUser = await interaction.client.users.fetch(user._id);
             return {
-                username: discordUser.username,
+                displayName: discordUser.displayName,
                 totalPoints: user.totalPoints
             };
         }));
+
         
+        
+        // Find position of current user, find their total points, get their displayName
+        const currentUserPosition = currentUser.findIndex(user => user._id === interaction.user.id) + 1;
+        const currentUserPoints = currentUser.find(user => user._id === interaction.user.id)?.totalPoints || 0;
+        const currentdisplayName = interaction.user.displayName;
 
         // Make embed for log message
         const leaderboardEmbed = new EmbedBuilder()
@@ -119,11 +132,20 @@ module.exports = {
         .setThumbnail('https://media.giphy.com/media/vNY0UZX11LcNW/giphy.gif')
         .setTimestamp()
         .addFields(
-            topFiveNamesAndPoints.map((user, index) => ({
-                name: `${index + 1}. ${user.username}`,
-                value: `\`${user.totalPoints} points\``
+            // Zerio space unicode character after last name to add a space
+            topTenNamesAndPoints.map((user, index) => ({
+                name: `${index + 1}. ${user.displayName}`,
+                value: `\`${user.totalPoints} points\`${index==9 ? "\n‎  " : ""}`
             }))
-        )
+        );
+
+        if (currentUserPosition > 10) {
+            leaderboardEmbed.addFields({ 
+                name: `${currentUserPosition}. ${currentdisplayName}`, 
+                value: `\`${currentUserPoints} points\``
+            });
+        }
+        
         // Send embed
         await interaction.editReply({ embeds: [leaderboardEmbed] });
     },
