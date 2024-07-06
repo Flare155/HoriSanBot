@@ -83,7 +83,7 @@ module.exports = {
             descripton = `1 points/minute → +${points} points`
         // Chars
         } else if (mediumUnit == "Chars") {
-            points = Math.round(amountImmersed / 200);
+            points = Math.round(amountImmersed / 400);
             descripton = `0.0025 points/character → +${points} points`
         } else {
             await interaction.reply("Error in calculating points for medium");
