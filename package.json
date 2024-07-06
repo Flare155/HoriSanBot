@@ -7,7 +7,7 @@
     "quick.db": "^9.1.6"
   },
   "name": "horisanbot",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "immersion tracking bot",
   "main": "index.js",
   "scripts": {
