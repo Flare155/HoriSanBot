@@ -124,6 +124,12 @@ module.exports = {
         const currentUserPoints = currentUser.find(user => user._id === interaction.user.id)?.totalPoints || 0;
         const currentdisplayName = interaction.user.displayName;
 
+        // if not in top 10, dont make a space to prevent useless space at bottom of leaderboard
+        let endspace = ""
+        if (currentUserPosition > 10) {
+            endspace = "\n‎"
+        }
+
         // Make embed for log message
         const leaderboardEmbed = new EmbedBuilder()
         .setColor('#c3e0e8')
@@ -132,10 +138,10 @@ module.exports = {
         .setThumbnail('https://media.giphy.com/media/vNY0UZX11LcNW/giphy.gif')
         .setTimestamp()
         .addFields(
-            // Zerio space unicode character after last name to add a space
+            // Zero space unicode character after last name to add a space
             topTenNamesAndPoints.map((user, index) => ({
                 name: `${index + 1}. ${user.displayName}`,
-                value: `\`${user.totalPoints} points\`${index==9 ? "\n‎  " : ""}`
+                value: `\`${user.totalPoints} points\`${index==9 ? endspace : ""}`
             }))
         );
 
@@ -144,7 +150,7 @@ module.exports = {
                 name: `${currentUserPosition}. ${currentdisplayName}`, 
                 value: `\`${currentUserPoints} points\``
             });
-        }
+        };
         
         // Send embed
         await interaction.editReply({ embeds: [leaderboardEmbed] });
