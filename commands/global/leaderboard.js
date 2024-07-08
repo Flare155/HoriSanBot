@@ -8,32 +8,32 @@ module.exports = {
         .setDescription('Show a leaderboard of the top players')
         .addStringOption(option =>
             option.setName('period')
-            .setDescription('Time period of the leaderboard')
-            .setRequired(true)
-            .addChoices(
-                { name: 'All Time', value: 'All Time' },
-                { name: 'Yearly', value: 'Yearly'},
-                { name: 'Monthly', value: 'Monthly'},
-                { name: 'Weekly', value: 'Weekly' },
-                { name: 'Daily', value: 'Daily' },
-                ))
-    .addStringOption(option =>
-        option.setName('medium')
-            .setDescription('The medium of the leaderboard')
-            .setRequired(true)
-            .addChoices(
-                { name: 'All', value: 'All' },
-                { name: 'Anime', value: 'Anime' },
-                { name: 'Drama', value: 'Drama'},
-                { name: 'Manga', value: 'Manga' },
-                { name: 'YouTube', value: 'YouTube' },
-                { name: 'LN', value: 'Light Novel' },
-                { name: 'VN', value: 'Visual Novel' },
-                { name: 'Podcast', value: 'Podcast' },
-                { name: 'Reading Characters', value: 'Reading Char'},
-                { name: 'Reading Minutes', value: 'Reading'},
-                { name: 'Listening Minutes', value: 'Listening'},
-                )),
+                .setDescription('Time period of the leaderboard')
+                .setRequired(true)
+                .addChoices(
+                    { name: 'All Time', value: 'All Time' },
+                    { name: 'Yearly', value: 'Yearly'},
+                    { name: 'Monthly', value: 'Monthly'},
+                    { name: 'Weekly', value: 'Weekly' },
+                    { name: 'Daily', value: 'Daily' },
+                    ))
+        .addStringOption(option =>
+            option.setName('medium')
+                .setDescription('The medium of the leaderboard')
+                .setRequired(true)
+                .addChoices(
+                    { name: 'All', value: 'All' },
+                    { name: 'Anime', value: 'Anime' },
+                    { name: 'Drama', value: 'Drama'},
+                    { name: 'Manga', value: 'Manga' },
+                    { name: 'YouTube', value: 'YouTube' },
+                    { name: 'LN', value: 'Light Novel' },
+                    { name: 'VN', value: 'Visual Novel' },
+                    { name: 'Podcast', value: 'Podcast' },
+                    { name: 'Reading Characters', value: 'Reading Char'},
+                    { name: 'Reading Minutes', value: 'Reading'},
+                    { name: 'Listening Minutes', value: 'Listening'},
+                    )),
 async execute(interaction) {
     await interaction.deferReply();
     const medium = interaction.options.getString('medium');
@@ -124,6 +124,12 @@ async execute(interaction) {
     const currentUserPoints = currentUser.find(user => user._id === interaction.user.id)?.totalPoints || 0;
     const currentdisplayName = interaction.user.displayName;
 
+    // if not in top 10, dont make a space to prevent useless space at bottom of leaderboard
+    let endspace = ""
+    if (currentUserPosition > 10) {
+        endspace = "\n‎"
+    }
+
     // Make embed for log message
     const leaderboardEmbed = new EmbedBuilder()
     .setColor('#c3e0e8')
@@ -132,10 +138,10 @@ async execute(interaction) {
     .setThumbnail('https://media.giphy.com/media/vNY0UZX11LcNW/giphy.gif')
     .setTimestamp()
     .addFields(
-        // Zerio space unicode character after last name to add a space
+        // Zero space unicode character after last name to add a space
         topTenNamesAndPoints.map((user, index) => ({
             name: `${index + 1}. ${user.displayName}`,
-            value: `\`${user.totalPoints} points\`${index==9 ? "\n‎  " : ""}`
+            value: `\`${user.totalPoints} points\`${index==9 ? endspace : ""}`
         }))
     );
 
@@ -144,7 +150,7 @@ async execute(interaction) {
             name: `${currentUserPosition}. ${currentdisplayName}`, 
             value: `\`${currentUserPoints} points\``
         });
-    }
+    };
     
     // Send embed
     await interaction.editReply({ embeds: [leaderboardEmbed] });
