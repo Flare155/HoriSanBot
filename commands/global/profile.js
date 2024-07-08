@@ -14,25 +14,35 @@ module.exports = {
         const exists = await User.exists({ userId: userId });
 
         let logStats = [];
+        let totalPoints = 0;
 
         // Exclude testing server data
         let testGuildExcludeMatch;
         if (guildId === testingServerId) {
-            testGuildExcludeMatch = { $match: { guildId: testingServerId} }
+            testGuildExcludeMatch = { $match: { guildId: testingServerId } };
         } else {
-            testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } }
-        };
+            testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } };
+        }
 
         // Find total points
         if (exists) {
+            // Query for total points
+            const totalPointsResult = await Log.aggregate([
+                testGuildExcludeMatch,
+                { $match: { userId: userId } },
+                { $group: { _id: null, total: { $sum: "$points" } } }
+            ]);
+
+            // If no points assign zero, to ensure is never unassigned
+            totalPoints = totalPointsResult.length > 0 ? totalPointsResult[0].total : 0;
+
+            // Query for genres and their amounts
             logStats = await Log.aggregate([
                 testGuildExcludeMatch,
-                { $match: { userId: userId } },  // Only consider logs for this user
-                { $group: { _id: { medium: "$medium", user: "$userId" }, 
-                            total: { $sum: "$amount" }, 
-                            units: { $push: "$unit" } } } // Store all units in an array
+                { $match: { userId: userId } },
+                { $group: { _id: { medium: "$medium", user: "$userId" }, total: { $sum: "$amount" }, units: { $push: "$unit" } } }
             ]);
-        }
+        }   
 
         const fieldOrder = {
             Anime: "Episodes",
@@ -45,7 +55,6 @@ module.exports = {
             Reading: "Minutes",
             Listening: "Minutes"
         };
-        
 
         // Reply
         if (exists) {
@@ -57,6 +66,11 @@ module.exports = {
                 .setColor('#c3e0e8')
                 .setTitle(`${interaction.user.username}'s Profile`)
                 .setThumbnail(userAvatarURL);
+
+            // Add total points field
+            profileEmbed.addFields([{ name: "Total Points", value: `${totalPoints}`, inline: false }]);
+            
+            // Add genre-specific fields
             let fields = [];
             for (let medium in fieldOrder) {
                 let stat = logStats.find(s => s._id.medium === medium && s._id.user === userId);
@@ -71,6 +85,6 @@ module.exports = {
             await interaction.reply({ embeds: [profileEmbed] });
         } else {
             await interaction.reply('User not found :(');
-        };
+        }
     },
 };
