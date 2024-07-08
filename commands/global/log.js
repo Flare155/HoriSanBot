@@ -90,6 +90,11 @@ module.exports = {
             return;
         };
 
+        if (points <= 0) {
+            await interaction.reply("Amount too low to log!");
+            return
+        }
+
         // Save info to database
         async function saveLog() {
             let user;
