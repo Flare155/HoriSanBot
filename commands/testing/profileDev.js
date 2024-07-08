@@ -33,6 +33,7 @@ module.exports = {
                 { $group: { _id: null, total: { $sum: "$points" } } }
             ]);
 
+            // If no points assign zero, to ensure is never unassigned
             totalPoints = totalPointsResult.length > 0 ? totalPointsResult[0].total : 0;
 
             // Query for genres and their amounts
