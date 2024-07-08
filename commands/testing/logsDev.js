@@ -15,6 +15,9 @@ module.exports = {
         guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId } 
     });
 
+      // Sort logs by timestamp in descending order (newest first)
+      logs.sort((a, b) => b.timestamp - a.timestamp);
+
       // Runs for every log in logs and saves them to an array
       const formattedLogs = logs.map((log) => {
 
