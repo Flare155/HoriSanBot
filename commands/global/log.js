@@ -20,7 +20,7 @@ module.exports = {
                     { name: 'VN', value: 'Visual Novel' },
                     { name: 'Podcast', value: 'Podcast' },
                     { name: 'Reading Characters', value: 'Reading Char'},
-                    { name: 'Reading Minutes', value: 'Reading_Min'},
+                    { name: 'Reading Minutes', value: 'Reading Min'},
                     { name: 'Listening Minutes', value: 'Listening'},
                     ))
         .addNumberOption(option =>
@@ -56,7 +56,7 @@ module.exports = {
             "Visual Novel": "Chars",
             Podcast: "Minutes",
             "Reading Char": "Chars",
-            Reading_Min: "Minutes",
+            "Reading Min": "Minutes",
             Listening: "Minutes",
         };
         let mediumUnit = mediumUnits[medium];
