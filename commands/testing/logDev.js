@@ -12,16 +12,22 @@ module.exports = {
                 .setDescription('The type of material you immersed in')
                 .setRequired(true)
                 .addChoices(
+                    // Audio
+                    { name: 'Listening', value: 'Listening'},
+                    { name: 'Podcast', value: 'Podcast' },
+                    { name: 'Audiobook', value: 'Audiobook' },
+                    // Audio-Visual
+                    { name: 'Watchtime', value: 'Watchtime' },
+                    { name: 'YouTube', value: 'YouTube' },
                     { name: 'Anime', value: 'Anime' },
                     { name: 'Drama', value: 'Drama'},
-                    { name: 'Manga', value: 'Manga' },
-                    { name: 'YouTube', value: 'YouTube' },
+                    { name: 'Movie', value: 'Movie'},
+                    // Reading
+                    { name: 'Readtime', value: 'Readtime'},
+                    { name: 'Reading', value: 'Reading Char'},
                     { name: 'Light Novel', value: 'Light Novel' },
                     { name: 'Visual Novel', value: 'Visual Novel' },
-                    { name: 'Podcast', value: 'Podcast' },
-                    { name: 'Reading Characters', value: 'Reading Char'},
-                    { name: 'Reading Minutes', value: 'Reading Min'},
-                    { name: 'Listening', value: 'Listening'},
+                    { name: 'Manga', value: 'Manga' },
                     ))
         .addNumberOption(option =>
             option.setName('amount')

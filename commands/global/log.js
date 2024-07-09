@@ -21,7 +21,7 @@ module.exports = {
                     { name: 'Podcast', value: 'Podcast' },
                     { name: 'Reading Characters', value: 'Reading Char'},
                     { name: 'Reading Minutes', value: 'Reading Min'},
-                    { name: 'Listening Minutes', value: 'Listening'},
+                    { name: 'Listening', value: 'Listening'},
                     ))
         .addNumberOption(option =>
             option.setName('amount')
