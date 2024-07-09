@@ -5,7 +5,7 @@ const Log = require("../../models/Log");
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('log_dev')
+		.setName('log_dev_depreciated')
 		.setDescription('Log your immersion!')
         .addStringOption(option =>
             option.setName('medium')
