@@ -5,16 +5,44 @@ const { testingServerId } = require('../../config.json');
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('logs')
-    .setDescription('Sends your log history!'),
+    .setName('logs_dev')
+    .setDescription('Sends your log history!')
+    .addStringOption(option =>
+      option.setName('medium')
+        .setDescription('Medium for filtering')
+        .setRequired(true)
+        .addChoices(
+            { name: 'All', value: 'All' },
+            { name: 'Anime', value: 'Anime' },
+            { name: 'Drama', value: 'Drama'},
+            { name: 'Manga', value: 'Manga' },
+            { name: 'YouTube', value: 'YouTube' },
+            { name: 'LN', value: 'Light Novel' },
+            { name: 'VN', value: 'Visual Novel' },
+            { name: 'Podcast', value: 'Podcast' },
+            { name: 'Reading Characters', value: 'Reading Char'},
+            { name: 'Reading Minutes', value: 'Reading Min'},
+            { name: 'Listening', value: 'Listening'},
+            )),
   async execute(interaction) {
     await interaction.deferReply();
     try {
-      const logs = await Log.find({ 
-        userId: interaction.user.id,
-        guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId } 
-    });
-
+      let logs;
+      const medium = interaction.options.getString('medium');
+      if (medium == "All") {
+        console.log("hello");
+        logs = await Log.find({ 
+          userId: interaction.user.id,
+          guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId } 
+        });
+      } else {
+        logs = await Log.find({ 
+          userId: interaction.user.id,
+          guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId },
+          medium: medium
+        });
+      };
+      
       // Sort logs by timestamp in descending order (newest first)
       logs.sort((a, b) => b.timestamp - a.timestamp);
 
@@ -41,7 +69,7 @@ module.exports = {
         return logString;
       });
       const logText = formattedLogs.join('\n');
-      fs.writeFileSync('logs.txt', logText, 'utf8');
+      fs.writeFileSync('logs.txt', logText);
       const attachment = new AttachmentBuilder('./logs.txt');
       interaction.editReply({ files: [attachment] });
     } catch (error) {

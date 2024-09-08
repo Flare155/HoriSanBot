@@ -62,7 +62,7 @@ module.exports = {
             "Visual Novel": "Chars",
             Podcast: "Minutes",
             "Reading Char": "Chars",
-            "Reading Min": "Minutes",
+            "Readtime": "Minutes",
             Listening: "Minutes",
         };
         let mediumUnit = mediumUnits[medium];
