@@ -30,7 +30,6 @@ module.exports = {
       let logs;
       const medium = interaction.options.getString('medium');
       if (medium == "All") {
-        console.log("hello");
         logs = await Log.find({ 
           userId: interaction.user.id,
           guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId } 
