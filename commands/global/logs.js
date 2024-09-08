@@ -5,7 +5,7 @@ const { testingServerId } = require('../../config.json');
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('logs_dev')
+    .setName('logs')
     .setDescription('Sends your log history!')
     .addStringOption(option =>
       option.setName('medium')
