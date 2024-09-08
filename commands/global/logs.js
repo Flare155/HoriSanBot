@@ -41,6 +41,10 @@ module.exports = {
           medium: medium
         });
       };
+
+      if (logs == undefined)  {
+        interaction.editReply(`No logs of medium ${medium} found`);
+      }
       
       // Sort logs by timestamp in descending order (newest first)
       logs.sort((a, b) => b.timestamp - a.timestamp);

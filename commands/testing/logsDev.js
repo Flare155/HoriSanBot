@@ -30,7 +30,6 @@ module.exports = {
       let logs;
       const medium = interaction.options.getString('medium');
       if (medium == "All") {
-        console.log("hello");
         logs = await Log.find({ 
           userId: interaction.user.id,
           guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId } 
@@ -42,6 +41,10 @@ module.exports = {
           medium: medium
         });
       };
+
+      if (logs == undefined)  {
+        interaction.editReply(`No logs of medium ${medium} found`);
+      }
       
       // Sort logs by timestamp in descending order (newest first)
       logs.sort((a, b) => b.timestamp - a.timestamp);
