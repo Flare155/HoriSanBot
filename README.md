@@ -14,7 +14,7 @@ HorisanBot helps you log your immersive activities and earn points for your dedi
 
 ## Getting Started 🚀
 
-1. **Invite HorisanBot** to your Discord server and start your immersion adventure! [Invite Link Here]
+1. **Invite HorisanBot** to your Discord server.
 2. Use `/log` to start tracking your activities. The more you log, the more points you earn!
 3. Keep an eye on your progress with `/profile` or see how you rank with `/leaderboard`.
 
@@ -33,7 +33,7 @@ Learning languages should be fun and engaging! With HorisanBot, you can share yo
 
 ## Contributing 🛠️
 
-We'd love your contributions! Feel free to fork, star, and improve HorisanBot. If you have ideas for new features or improvements, submit a pull request or open an issue.
+Currently a solo project
 
 ## License 📜
 
