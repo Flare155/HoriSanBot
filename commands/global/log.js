@@ -75,7 +75,7 @@ module.exports = {
             descripton = `20 points/episode → +${points} points`
         // Pages
         } else if (mediumUnit == "Pages") {
-            points = Math.round(amountImmersed * 0.8);
+            points = Math.round(amountImmersed * 0.2);
             descripton = `0.2 points/page → +${points} points`
         // Minutes
         } else if (mediumUnit == "Minutes") {
