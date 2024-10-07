@@ -42,8 +42,8 @@ module.exports = {
         });
       };
 
-      if (logs == undefined)  {
-        interaction.editReply(`No logs of medium ${medium} found`);
+      if (!logs || logs.length === 0) {
+        return interaction.editReply(`No logs of medium ${medium} found`);
       }
       
       // Sort logs by timestamp in descending order (newest first)
@@ -62,7 +62,7 @@ module.exports = {
         let title = log.title || 'N/A';
         let notes = log.notes || 'N/A';
 
-        let logString = `⏤⏤⏤⏤⏤⏤\n${formattedDate}\nMedium: ${log.medium} ${formattedAmount}`;
+        let logString = `⏤⏤⏤⏤⏤⏤\nID: ${log._id}\n${formattedDate}\nMedium: ${log.medium} ${formattedAmount}`;
         if (title != 'N/A') {
           logString += `\nTitle: ${title}`;
         };
