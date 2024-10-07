@@ -76,7 +76,7 @@ module.exports = {
         // Pages
         } else if (mediumUnit == "Pages") {
             points = Math.round(amountImmersed * 0.8);
-            descripton = `0.8 points/page → +${points} points`
+            descripton = `0.2 points/page → +${points} points`
         // Minutes
         } else if (mediumUnit == "Minutes") {
             points = amountImmersed;
