@@ -1,3 +1,7 @@
+const { mongoose } = require('mongoose');
+const { AtlasDbUrl } = require('./config.json');
+const Log = require('./models/Log');
+
 (async () => {
     try {
         console.log("Starting Conversion Process");
@@ -9,50 +13,29 @@
         });
         console.log("Connected to Database");
 
-        // Get all logs that need unit conversion
-        const allLogs = await Log.find({ unit: { $in: ["Pages", "Episodes", "Chars"] } }).exec();
-        console.log(`Found ${allLogs.length} logs to update.`);
+        // Get all logs that have medium as "Reading Min"
+        const readingMinLogs = await Log.find({ medium: "Reading Min" }).exec();
+        console.log(`Found ${readingMinLogs.length} logs with medium 'Reading Min' to update.`);
 
-        // Go through logs and calculate new values for points and unit conversion
-        const updateQueries = allLogs.map((item) => {
-            let newAmount = item.amount;
-            let newPoints = item.points;
-
-            switch (item.unit) {
-                case "Pages":
-                    // Convert pages to minutes (assuming 1 page = 0.2 minutes)
-                    newAmount = item.amount * 0.2;
-                    newPoints = Math.round(newAmount); // Keep the points consistent with new amount
-                    break;
-                case "Episodes":
-                    // Convert episodes to minutes (assuming 1 episode = 20 minutes)
-                    newAmount = item.amount * 20;
-                    newPoints = newAmount; // 1 point per minute
-                    break;
-                case "Chars":
-                    // Convert characters to minutes (assuming 400 characters = 1 minute)
-                    newAmount = item.amount / 400;
-                    newPoints = Math.round(newAmount); // Keep the points consistent with new amount
-                    break;
-                default:
-                    break;
-            }
-
+        // Create bulk update operations for Reading Min logs
+        const readingMinUpdates = readingMinLogs.map(log => {
+            const newAmount = log.points; // Use points as the new amount
             return {
                 updateOne: {
-                    filter: { _id: item._id },
-                    update: { amount: newAmount, points: newPoints, unit: "Minutes" }
+                    filter: { _id: log._id },
+                    update: { amount: newAmount, unit: "Minutes", medium: "Readtime" }
                 }
             };
         });
 
-        // Perform bulk update
-        if (updateQueries.length > 0) {
-            await Log.bulkWrite(updateQueries);
-            console.log("Conversion completed successfully.");
+        // Perform bulk update for Reading Min
+        if (readingMinUpdates.length > 0) {
+            await Log.bulkWrite(readingMinUpdates);
+            console.log("Reading Min conversion completed successfully.");
         } else {
-            console.log("No logs found for conversion.");
+            console.log("No logs found for Reading Min conversion.");
         }
+
     } catch (error) {
         console.error("Error during conversion process:", error);
     } finally {

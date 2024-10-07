@@ -12,20 +12,20 @@ module.exports = {
                 .setDescription('The type of material you immersed in')
                 .setRequired(true)
                 .addChoices(
-                    { name: 'Anime', value: 'Anime' },
-                    { name: 'Drama', value: 'Drama'},
-                    { name: 'Manga', value: 'Manga' },
-                    { name: 'YouTube', value: 'YouTube' },
-                    { name: 'LN', value: 'Light Novel' },
-                    { name: 'VN', value: 'Visual Novel' },
-                    { name: 'Podcast', value: 'Podcast' },
-                    { name: 'Reading Characters', value: 'Reading Char'},
-                    { name: 'Reading Minutes', value: 'Reading Min'},
+                    // Audio
                     { name: 'Listening', value: 'Listening'},
+                    // Audio-Visual
+                    { name: 'Watchtime', value: 'Watchtime' },
+                    { name: 'YouTube', value: 'YouTube' },
+                    { name: 'Anime', value: 'Anime' },
+                    // Reading
+                    { name: 'Readtime', value: 'Readtime'},
+                    { name: 'Visual Novel', value: 'Visual Novel' },
+                    { name: 'Manga', value: 'Manga' },
                     ))
         .addNumberOption(option =>
             option.setName('amount')
-                .setDescription('The amount of immersion i.e. episodes, minutes watched, characters read')
+                .setDescription('The amount of minutes immersed or episodes of anime')
                 .setRequired(true)
             )
         .addStringOption(option =>
@@ -48,16 +48,16 @@ module.exports = {
 
         // Find medium of the log
         const mediumUnits = {
-            Anime: "Episodes",
-            Manga: "Pages",
-            Drama: "Episodes",
-            YouTube: "Minutes",
-            "Light Novel": "Chars",
-            "Visual Novel": "Chars",
-            Podcast: "Minutes",
-            "Reading Char": "Chars",
-            "Reading Min": "Minutes",
+            // Audio
             Listening: "Minutes",
+            // Audio-Visual
+            Watchtime: "Minutes",
+            YouTube: "Minutes",
+            Anime: "Episodes",
+            // Reading
+            Readtime: "Minutes",
+            "Visual Novel": "Minutes",
+            Manga: "Minutes",
         };
         let mediumUnit = mediumUnits[medium];
         if (!mediumUnit) {
@@ -65,34 +65,26 @@ module.exports = {
             return;
         }
         
-        // Calculate points
+        // Calculate points and description for embed
         let points;
-        let descripton;
-
-        // Episodes
-        if (mediumUnit == "Episodes") {
+        let description;
+        
+        if (mediumUnit === "Episodes") {
             points = amountImmersed * 20;
-            descripton = `20 points/episode → +${points} points`
-        // Pages
-        } else if (mediumUnit == "Pages") {
-            points = Math.round(amountImmersed * 0.2);
-            descripton = `0.2 points/page → +${points} points`
-        // Minutes
-        } else if (mediumUnit == "Minutes") {
-            points = amountImmersed;
-            descripton = `1 points/minute → +${points} points`
-        // Chars
-        } else if (mediumUnit == "Chars") {
-            points = Math.round(amountImmersed / 400);
-            descripton = `0.0025 points/character → +${points} points`
+            description = `20 points/episode → +${points} points`;
         } else {
-            await interaction.reply("Error in calculating points for medium");
-            return;
-        };
-
+            points = amountImmersed;
+            description = `1 point/minute → +${points} points`;
+        }
+        
         if (points <= 0) {
             await interaction.reply("Amount too low to log!");
-            return
+            return;
+        }
+
+        if (points > 1200) {
+            await interaction.reply("The maximum log size is 1200 minutes (20hrs)");
+            return;
         }
 
         // Save info to database
@@ -140,14 +132,12 @@ module.exports = {
         const logEmbed = new EmbedBuilder()
         .setColor('#c3e0e8')
         .setTitle(` Logged ${amountImmersed} ${mediumUnit} of ${medium}!!`,)
-        .setDescription(descripton)
+        .setDescription(description)
         .setThumbnail(userAvatarURL)
-        if (title != null) {
-            logEmbed.addFields({ name: 'Title', value: title, inline: true });
-        };
-        if (notes != null) {
+        logEmbed.addFields({ name: 'Title', value: title, inline: true });
+        if (notes) {
             logEmbed.addFields({ name: 'Notes', value: notes, inline: true });
-        };
+        }
         
         // Send embed
         await interaction.reply({ embeds: [logEmbed] });
