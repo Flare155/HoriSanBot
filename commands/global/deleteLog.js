@@ -4,7 +4,7 @@ const Log = require('../../models/Log');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('delete_log')
+		.setName('deleteLog')
 		.setDescription('Deletes a specific log by its ID.')
 		.addStringOption(option =>
 			option.setName('log_id')
