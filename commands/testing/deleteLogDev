@@ -1,0 +1,75 @@
+const { SlashCommandBuilder, MessageActionRow, MessageButton } = require('discord.js');
+const Log = require('../../models/Log');
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName('delete_log_dev')
+    .setDescription('Deletes a specific log by its ID.')
+    .addStringOption(option =>
+      option.setName('log_id')
+        .setDescription('The ID of the log to delete')
+        .setRequired(true)),
+  async execute(interaction) {
+    await interaction.deferReply();
+    try {
+      // Step 1: Get the log ID from the user's input
+      const logId = interaction.options.getString('log_id');
+
+      // Step 2: Find the log in the database without deleting it
+      const log = await Log.findOne({ _id: logId });
+
+      if (log) {
+        // Log was found, display details and ask for confirmation
+        const logDetails = `Are you sure you want to delete the following log?
+Details:
+- Medium: ${log.medium}
+- Amount: ${log.amount} ${log.unit}
+- Title: ${log.title || 'N/A'}
+- Notes: ${log.notes || 'N/A'}`;
+
+        // Create buttons for confirmation
+        const row = new MessageActionRow()
+          .addComponents(
+            new MessageButton()
+              .setCustomId('confirm_delete')
+              .setLabel('Confirm')
+              .setStyle('DANGER'),
+            new MessageButton()
+              .setCustomId('cancel_delete')
+              .setLabel('Cancel')
+              .setStyle('SECONDARY')
+          );
+
+        // Send the message with buttons
+        await interaction.editReply({ content: logDetails, components: [row] });
+
+        // Create a collector to handle button interactions
+        const filter = i => i.user.id === interaction.user.id;
+        const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
+
+        collector.on('collect', async i => {
+          if (i.customId === 'confirm_delete') {
+            // User confirmed the deletion
+            await Log.findByIdAndDelete(logId);
+            await i.update({ content: `Log with ID ${logId} has been deleted.`, components: [] });
+          } else if (i.customId === 'cancel_delete') {
+            // User canceled the deletion
+            await i.update({ content: 'Deletion canceled.', components: [] });
+          }
+        });
+
+        collector.on('end', collected => {
+          if (collected.size === 0) {
+            interaction.editReply({ content: 'No response received. Deletion canceled.', components: [] });
+          }
+        });
+      } else {
+        // No log found with that ID
+        await interaction.editReply(`No log found with ID ${logId}`);
+      }
+    } catch (error) {
+      console.error(error);
+      interaction.editReply('Error deleting the log');
+    }
+  },
+};
