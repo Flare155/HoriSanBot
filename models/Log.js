@@ -6,8 +6,8 @@ const logSchema = new mongoose.Schema({
     timestamp: { type: Date, required: true },
     medium: { type: String, required: true},
     unit: { type: String, required: true},
-    amount: { type: Number, required: true, default: 0 },
-    points: { type: Number, required: true, default: 0 },
+    amount: { type: Number, required: true, default: 0, min: 0 },
+    points: { type: Number, required: true, default: 0, min: 0 },
     title: { type: String, required: true},
     notes: { type: String, required: false},
 });
