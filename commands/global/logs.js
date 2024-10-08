@@ -64,8 +64,7 @@ module.exports = {
       // Display the first 3 logs in a detailed embed
       const embed = new EmbedBuilder()
         .setColor('#c3e0e8')
-        .setTitle(`${interaction.user.username}'s Recent Logs`)
-        .setDescription(`Here are your latest 3 logs for: **${medium}**`)
+        .setTitle(`${interaction.user.displayName}'s Recent Logs (${medium})`)
         .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
         .setFooter({ text: 'Use /undo or /deletelog to remove a log' });
 
@@ -78,12 +77,12 @@ module.exports = {
         const notes = log.notes || 'N/A';
 
         embed.addFields({
-          name: `**Date**: ${formattedDate}`,
+          name: `\`${formattedDate}\``,
           value: `**Medium**: ${log.medium}
           **Amount**: ${formattedAmount}
           **Title**: ${title}
           **Notes**: ${notes !== 'N/A' ? notes : 'No notes provided'}
-          **ID**: ${log._id}`
+          **ID**: ${log._id}\n`
         });
       });
 
