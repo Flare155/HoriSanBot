@@ -98,7 +98,6 @@ module.exports = {
                 .setColor('#c3e0e8')
                 .setTitle(`${interaction.user.displayName}'s Immersion Profile`)
                 .setThumbnail(userAvatarURL)
-                .setDescription("Here's a summary of your progress so far!")
                 .setTimestamp()
                 .setFooter({ text: 'Keep up the great work!', iconURL: userAvatarURL });
 
