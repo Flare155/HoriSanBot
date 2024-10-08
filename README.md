@@ -11,6 +11,9 @@ HorisanBot helps you log your immersive activities and earn points for your dedi
 - **Profiles**: View your immersion stats in one place and witness your progress! 📊
 - **Self Timeout**: Feeling distracted? Use the self-timeout feature to take a break and stay on track! ⏱️
 - **Undo Logs**: Made a mistake? No problem! Undo your most recent log hassle-free. 🔄
+- **Delete Logs**: Want to delete a specific log in the past? use this simpe command. 🔄
+- **Help Command**: A help command that displays all the commands and thier uses! 🔄
+- **Timezones!**: All times in the bot are stored in UTC and localized to your time when displayed! 🔄
 
 ## Getting Started 🚀
 
@@ -21,15 +24,6 @@ HorisanBot helps you log your immersive activities and earn points for your dedi
 ## Why Use HorisanBot? 🤓
 
 Learning languages should be fun and engaging! With HorisanBot, you can share your progress with friends and stay motivated through friendly competition. Watching your points stack up makes your hard work feel more rewarding. Plus, who doesn't love a bit of gamification?
-
-## Commands Cheat Sheet ✨
-
-- **`/log`** - Log an immersion activity.
-- **`/leaderboard`** - Display the top players and see who’s leading.
-- **`/profile`** - View your personal stats and track your growth.
-- **`/logs`** - Retrieve a history of all your logs.
-- **`/selftimeout`** - Take a break with the self-timeout feature.
-- **`/undo`** - Remove your last logged activity.
 
 ## Contributing 🛠️
 
