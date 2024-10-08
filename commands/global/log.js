@@ -108,7 +108,7 @@ async function saveLog(interaction, medium, mediumUnit, amount, points, title, n
 // Function to create and send the embed message
 async function sendLogEmbed(interaction, medium, mediumUnit, amount, description, title, notes) {
     const logEmbed = new EmbedBuilder()
-        .setColor('#5dade2')
+        .setColor('#c3e0e8')
         .setTitle(`🎉 ${interaction.user.displayName} Logged ${amount} ${mediumUnit} of ${medium}!`)
         .setDescription(description)
         .setThumbnail(interaction.user.displayAvatarURL())
