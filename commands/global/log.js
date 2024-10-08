@@ -131,7 +131,7 @@ module.exports = {
         // Make embed for log message
         const logEmbed = new EmbedBuilder()
         .setColor('#c3e0e8')
-        .setTitle(` Logged ${amountImmersed} ${mediumUnit} of ${medium}!!`,)
+        .setTitle(`${interaction.user.displayName} Logged ${amountImmersed} ${mediumUnit} of ${medium}!!`,)
         .setDescription(description)
         .setThumbnail(userAvatarURL)
         logEmbed.addFields({ name: 'Title', value: title, inline: true });
