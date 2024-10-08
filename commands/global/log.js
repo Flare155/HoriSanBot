@@ -68,7 +68,7 @@ module.exports = {
         await saveLog(interaction, medium, mediumUnit, amount, points, title, notes);
 
         // Generate and send an embed message with the log details
-        await sendLogEmbed(interaction, medium, mediumUnit, amount, description, title, notes);
+        await sendLogEmbed(interaction, medium, mediumUnit, amount, description, title, notes, points);
     },
 };
 
@@ -105,18 +105,45 @@ async function saveLog(interaction, medium, mediumUnit, amount, points, title, n
     }
 }
 
+// Function to calculate the embed color based on points
+function calculateEmbedColor(points) {
+    // Cap points at 1200 (extend the range as requested)
+    const cappedPoints = Math.min(points, 1200);
+    
+    // Normalize the points for each color transition:
+    // From white (#ffffff) → cyan (#00ffff) → dark blue (#0000ff) → black (#000000)
+    if (cappedPoints <= 400) {
+        // From white to cyan
+        const intensity = 255 - Math.floor((cappedPoints / 400) * 255);
+        return `#${intensity.toString(16).padStart(2, '0')}ffff`; // White → Cyan
+    } else if (cappedPoints <= 800) {
+        // From cyan to dark blue
+        const intensity = Math.floor(((cappedPoints - 400) / 400) * 255);
+        return `#00${(255 - intensity).toString(16).padStart(2, '0')}${(255 - intensity).toString(16).padStart(2, '0')}`; // Cyan → Dark Blue
+    } else {
+        // From dark blue to black
+        const intensity = Math.floor(((cappedPoints - 800) / 400) * 255);
+        return `#0000${(255 - intensity).toString(16).padStart(2, '0')}`; // Dark Blue → Black
+    }
+}
+
 // Function to create and send the embed message
-async function sendLogEmbed(interaction, medium, mediumUnit, amount, description, title, notes) {
+async function sendLogEmbed(interaction, medium, mediumUnit, amount, description, title, notes, points) {
+    // Calculate the embed color based on the points
+    const embedColor = calculateEmbedColor(points);
+
     const logEmbed = new EmbedBuilder()
-        .setColor('#c3e0e8')
+        .setColor(embedColor)
         .setTitle(`🎉 ${interaction.user.displayName} Logged ${amount} ${mediumUnit} of ${medium}!`)
         .setDescription(description)
         .setThumbnail(interaction.user.displayAvatarURL())
-        .addFields({ name: '📺 Title', value: title, inline: true });
+        .addFields({ name: '📖 Title', value: title, inline: true });
 
     if (notes) {
         logEmbed.addFields({ name: '📝 Notes', value: notes, inline: true });
     }
+
+    logEmbed.setFooter({ text: 'Keep up the great immersion!', iconURL: interaction.user.displayAvatarURL() });
 
     // Send the embed
     await interaction.reply({ embeds: [logEmbed] });
