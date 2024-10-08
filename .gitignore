@@ -4,3 +4,4 @@ node_modules
 logs.txt
 commands/testing/
 bulkRewrite.js
+depreciated
