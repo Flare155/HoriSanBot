@@ -21,20 +21,23 @@ const calculateStreak = async (userId) => {
 
         let currentStreak = 0;
         const today = moment.tz(userTimezone).startOf('day').add(4, 'hours'); // "Start of today" is 4 AM in user's timezone
+        const yesterday = today.clone().subtract(1, 'day'); // "Start of yesterday" is also based on 4 AM
 
         // Convert the first log's timestamp to the adjusted "day" (4 AM start)
-        let previousTimestamp = moment.tz(logs[0].timestamp, userTimezone).startOf('day').add(4, 'hours');
+        let mostRecentLogTime = moment.tz(logs[0].timestamp, userTimezone).startOf('day').add(4, 'hours');
 
-        // Check if the first log is from today (in the adjusted 4 AM timeframe)
-        if (previousTimestamp.isSameOrBefore(today)) {
-            currentStreak = 1; // Start streak with 1 if the most recent log is within today's window
+        // Check if the most recent log is from today or yesterday (with the 4 AM reset)
+        if (mostRecentLogTime.isSameOrAfter(yesterday)) {
+            currentStreak = 1; // Start streak if most recent log is within today or yesterday's window
+        } else {
+            return 0; // If the most recent log is older than yesterday, reset streak to 0
         }
 
         // Loop through the remaining logs to check for consecutive "days"
         for (let i = 1; i < logs.length; i++) {
-            let currentTimestamp = moment.tz(logs[i].timestamp, userTimezone).startOf('day').add(4, 'hours');
+            let currentLogTime = moment.tz(logs[i].timestamp, userTimezone).startOf('day').add(4, 'hours');
 
-            const daysDifference = previousTimestamp.diff(currentTimestamp, 'days');
+            const daysDifference = mostRecentLogTime.diff(currentLogTime, 'days');
 
             if (daysDifference === 1) {
                 // Logs are on consecutive days (adjusted for 4 AM window), increment streak
@@ -44,7 +47,7 @@ const calculateStreak = async (userId) => {
                 break;
             }
 
-            previousTimestamp = currentTimestamp;
+            mostRecentLogTime = currentLogTime;
         }
 
         return currentStreak;
