@@ -4,7 +4,7 @@ const { testingServerId } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('leaderboard')
+        .setName('leaderboard_dev')
         .setDescription('Show a leaderboard of the top players')
         .addStringOption(option =>
             option.setName('period')
@@ -23,16 +23,16 @@ module.exports = {
                 .setRequired(true)
                 .addChoices(
                     { name: 'All', value: 'All' },
-                    { name: 'Anime', value: 'Anime' },
-                    { name: 'Drama', value: 'Drama'},
-                    { name: 'Manga', value: 'Manga' },
+                    // Audio
+                    { name: 'Listening', value: 'Listening' },
+                    // Audio-Visual
+                    { name: 'Watchtime', value: 'Watchtime' },
                     { name: 'YouTube', value: 'YouTube' },
-                    { name: 'LN', value: 'Light Novel' },
-                    { name: 'VN', value: 'Visual Novel' },
-                    { name: 'Podcast', value: 'Podcast' },
-                    { name: 'Reading Characters', value: 'Reading Char'},
-                    { name: 'Reading Minutes', value: 'Reading'},
-                    { name: 'Listening Minutes', value: 'Listening'},
+                    { name: 'Anime', value: 'Anime' },
+                    // Reading
+                    { name: 'Readtime', value: 'Readtime' },
+                    { name: 'Visual Novel', value: 'Visual Novel' },
+                    { name: 'Manga', value: 'Manga' },
                     )),
 async execute(interaction) {
     await interaction.deferReply();
@@ -73,17 +73,26 @@ async execute(interaction) {
     
     
 
-    // Build $match stage
+    // Define subcategories for Watchtime and Readtime
+    const watchtimeSubcategories = ['Watchtime', 'YouTube', 'Anime'];
+    const readtimeSubcategories = ['Readtime', 'Manga', 'Visual Novel'];
+
     let matchStage = {
         $match: { 
             timestamp: { $gte: startDate },
-        } 
+        }
     };
 
-    // Only add medium condition if medium is not 'All'
-    if (medium !== 'All') {
+    // Adjust the match condition to include subcategories for Watchtime and Readtime
+    if (medium === 'Watchtime') {
+        matchStage.$match.medium = { $in: watchtimeSubcategories };
+    } else if (medium === 'Readtime') {
+        matchStage.$match.medium = { $in: readtimeSubcategories };
+    } else if (medium !== 'All') {
+        // For any other specific medium, just match that one medium
         matchStage.$match.medium = medium;
-    }
+}
+
 
     // Seperate leaderboards from testing server data
     let testGuildExcludeMatch;
