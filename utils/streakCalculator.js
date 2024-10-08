@@ -1,4 +1,3 @@
-// utils/streakCalculator.js
 const Log = require("../models/Log");
 const User = require("../models/User");
 const moment = require('moment-timezone');
@@ -21,17 +20,21 @@ const calculateStreak = async (userId) => {
         }
 
         let currentStreak = 1;
-        let previousTimestamp = moment.tz(logs[0].timestamp, userTimezone);
+        let previousTimestamp = moment.tz(logs[0].timestamp, userTimezone).startOf('day'); // Start of the day for first log
 
         for (let i = 1; i < logs.length; i++) {
-            let currentTimestamp = moment.tz(logs[i].timestamp, userTimezone);
-            const timeDifference = previousTimestamp.diff(currentTimestamp, 'hours');
+            let currentTimestamp = moment.tz(logs[i].timestamp, userTimezone).startOf('day');
 
-            if (timeDifference <= 28) { // Allow for 28-hour window for leniency
+            const daysDifference = previousTimestamp.diff(currentTimestamp, 'days');
+
+            if (daysDifference === 1) {
+                // Logs are on consecutive days, increment streak
                 currentStreak++;
-            } else {
+            } else if (daysDifference > 1) {
+                // Non-consecutive day found, break the streak
                 break;
             }
+
             previousTimestamp = currentTimestamp;
         }
 
