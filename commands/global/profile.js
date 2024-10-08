@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const User = require("../../models/User");
 const Log = require("../../models/Log");
 const { testingServerId } = require('../../config.json');
-const { calculateStreak } = require('../../utils/streakCalculator'); // Import streak utility
+const { calculateStreak } = require('../../utils/streakCalculator');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -53,7 +53,8 @@ module.exports = {
                 { $group: { _id: { medium: "$medium", user: "$userId" }, total: { $sum: "$amount" }, units: { $push: "$unit" } } }
             ]);
         }
-
+        
+        // Audio
         const fieldOrder = {
             // Audio
             Listening: "Minutes",
