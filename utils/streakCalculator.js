@@ -19,16 +19,25 @@ const calculateStreak = async (userId) => {
             return 0; // No logs mean no streak
         }
 
-        let currentStreak = 1;
-        let previousTimestamp = moment.tz(logs[0].timestamp, userTimezone).startOf('day'); // Start of the day for first log
+        let currentStreak = 0;
+        const today = moment.tz(userTimezone).startOf('day').add(4, 'hours'); // "Start of today" is 4 AM in user's timezone
 
+        // Convert the first log's timestamp to the adjusted "day" (4 AM start)
+        let previousTimestamp = moment.tz(logs[0].timestamp, userTimezone).startOf('day').add(4, 'hours');
+
+        // Check if the first log is from today (in the adjusted 4 AM timeframe)
+        if (previousTimestamp.isSameOrBefore(today)) {
+            currentStreak = 1; // Start streak with 1 if the most recent log is within today's window
+        }
+
+        // Loop through the remaining logs to check for consecutive "days"
         for (let i = 1; i < logs.length; i++) {
-            let currentTimestamp = moment.tz(logs[i].timestamp, userTimezone).startOf('day');
+            let currentTimestamp = moment.tz(logs[i].timestamp, userTimezone).startOf('day').add(4, 'hours');
 
             const daysDifference = previousTimestamp.diff(currentTimestamp, 'days');
 
             if (daysDifference === 1) {
-                // Logs are on consecutive days, increment streak
+                // Logs are on consecutive days (adjusted for 4 AM window), increment streak
                 currentStreak++;
             } else if (daysDifference > 1) {
                 // Non-consecutive day found, break the streak
