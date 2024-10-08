@@ -49,7 +49,7 @@ module.exports = {
             const userAvatarURL = interaction.user.displayAvatarURL();
             const embed = new EmbedBuilder()
                 .setColor('#c3e0e8')
-                .setTitle(`${interaction.user.username}'s Timezone`)
+                .setTitle(`${interaction.user.displayName}'s Timezone`)
                 .setThumbnail(userAvatarURL)
                 .addFields([{ name: "Timezone Set", value: `${timezoneInput}`, inline: false }])
                 .setFooter({ text: 'Timezone has been successfully set.' });
