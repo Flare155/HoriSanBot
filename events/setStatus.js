@@ -17,6 +17,6 @@ module.exports = {
       status: 'online', // Options: 'online', 'idle', 'dnd', 'invisible'
     });
 
-    console.log(`Status set to: /help | Active in ${serverCount} servers`);
+    console.log(`✅ Status set to: /help | Active in ${serverCount} servers`);
   },
 };
