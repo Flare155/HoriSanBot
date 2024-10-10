@@ -112,17 +112,17 @@ function calculateEmbedColor(points) {
     
     // Normalize the points for each color transition:
     // From white (#ffffff) → cyan (#00ffff) → dark blue (#0000ff) → black (#000000)
-    if (cappedPoints <= 400) {
+    if (cappedPoints <= 100) {
         // From white to cyan
-        const intensity = 255 - Math.floor((cappedPoints / 400) * 255);
+        const intensity = 255 - Math.floor((cappedPoints / 100) * 255);
         return `#${intensity.toString(16).padStart(2, '0')}ffff`; // White → Cyan
-    } else if (cappedPoints <= 800) {
+    } else if (cappedPoints <= 200) {
         // From cyan to dark blue
-        const intensity = Math.floor(((cappedPoints - 400) / 400) * 255);
+        const intensity = Math.floor(((cappedPoints - 100) / 100) * 255);
         return `#00${(255 - intensity).toString(16).padStart(2, '0')}${(255 - intensity).toString(16).padStart(2, '0')}`; // Cyan → Dark Blue
     } else {
         // From dark blue to black
-        const intensity = Math.floor(((cappedPoints - 800) / 400) * 255);
+        const intensity = Math.floor(((cappedPoints - 200) / 100) * 255);
         return `#0000${(255 - intensity).toString(16).padStart(2, '0')}`; // Dark Blue → Black
     }
 }
