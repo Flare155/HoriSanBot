@@ -13,7 +13,6 @@ const calculateStreak = async (userId, guildId) => {
             testGuildExcludeMatch = { guildId: { $ne: testingServerId } };
         }
 
-        console.log(guildId);
 
         // Find the user to get their timezone
         const user = await User.findOne({ userId: userId });
