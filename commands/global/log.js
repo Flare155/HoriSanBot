@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 const User = require("../../models/User");
 const Log = require("../../models/Log");
+const { footerCreator } = require('../../utils/logFooterCreator.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -22,7 +23,7 @@ module.exports = {
                 ))
         .addNumberOption(option =>
             option.setName('amount')
-                .setDescription('Minutes immersed or episodes watched')
+                .setDescription('Minutes immersed or episodes watched (Episodes can be a decimal for non-standard length episodes)')
                 .setRequired(true)
             )
         .addStringOption(option =>
@@ -107,34 +108,66 @@ async function saveLog(interaction, medium, mediumUnit, amount, points, title, n
 
 // Function to calculate the embed color based on points
 function calculateEmbedColor(points) {
-    // Cap points at 1200 (extend the range as requested)
+    // Cap points at 1200
     const cappedPoints = Math.min(points, 1200);
-    
-    // Normalize the points for each color transition:
-    // From white (#ffffff) → cyan (#00ffff) → dark blue (#0000ff) → black (#000000)
-    if (cappedPoints <= 100) {
-        // From white to cyan
-        const intensity = 255 - Math.floor((cappedPoints / 100) * 255);
-        return `#${intensity.toString(16).padStart(2, '0')}ffff`; // White → Cyan
-    } else if (cappedPoints <= 200) {
-        // From cyan to dark blue
-        const intensity = Math.floor(((cappedPoints - 100) / 100) * 255);
-        return `#00${(255 - intensity).toString(16).padStart(2, '0')}${(255 - intensity).toString(16).padStart(2, '0')}`; // Cyan → Dark Blue
+
+    let r, g, b;
+
+    if (cappedPoints <= 60) {
+        // Points 0 to 60: White to Cyan
+        const ratio = cappedPoints / 60;
+        r = Math.round(255 - (255 * ratio));
+        g = 255;
+        b = 255;
+    } else if (cappedPoints <= 150) {
+        // Points 60 to 150: Cyan to Bright Green
+        const ratio = (cappedPoints - 60) / (150 - 60);
+        r = 0;
+        g = Math.round(255 - (55 * ratio)); // Green: 255 to 200
+        b = Math.round(255 - (155 * ratio)); // Blue: 255 to 100
+    } else if (cappedPoints <= 250) {
+        // Points 150 to 250: Bright Green to Red
+        const ratio = (cappedPoints - 150) / (250 - 150);
+        r = Math.round(255 * ratio);
+        g = Math.round(200 - (200 * ratio)); // Green: 200 to 0
+        b = Math.round(100 - (100 * ratio)); // Blue: 100 to 0
+    } else if (cappedPoints <= 400) {
+        // Points 250 to 400: Red to Black
+        const ratio = (cappedPoints - 250) / (400 - 250);
+        r = Math.round(255 - (255 * ratio));
+        g = 0;
+        b = 0;
     } else {
-        // From dark blue to black
-        const intensity = Math.floor(((cappedPoints - 200) / 100) * 255);
-        return `#0000${(255 - intensity).toString(16).padStart(2, '0')}`; // Dark Blue → Black
+        // Points above 400: Gold color
+        r = 255;
+        g = 215;
+        b = 0;
     }
+
+    // Convert RGB to hex
+    const rgbToHex = (r, g, b) => {
+        return '#' + [r, g, b].map(x => {
+            const hex = x.toString(16).padStart(2, '0');
+            return hex;
+        }).join('');
+    }
+
+    return rgbToHex(r, g, b);
 }
+
 
 // Function to create and send the embed message
 async function sendLogEmbed(interaction, medium, mediumUnit, amount, description, title, notes, points) {
+    
     // Calculate the embed color based on the points
     const embedColor = calculateEmbedColor(points);
 
+    // Create footer message
+    const footer = footerCreator(interaction, points);
+
     const logEmbed = new EmbedBuilder()
         .setColor(embedColor)
-        .setTitle(`🎉 ${interaction.user.displayName} Logged ${amount} ${mediumUnit} of ${medium}!`)
+        .setTitle(`🎉 ${interaction.user.username} Logged ${amount} ${mediumUnit} of ${medium}!`)
         .setDescription(description)
         .setThumbnail(interaction.user.displayAvatarURL())
         .addFields({ name: '📖 Title', value: title, inline: true });
@@ -143,7 +176,7 @@ async function sendLogEmbed(interaction, medium, mediumUnit, amount, description
         logEmbed.addFields({ name: '📝 Notes', value: notes, inline: true });
     }
 
-    logEmbed.setFooter({ text: 'Keep up the great immersion!', iconURL: interaction.user.displayAvatarURL() });
+    logEmbed.setFooter(footer);
 
     // Send the embed
     await interaction.reply({ embeds: [logEmbed] });

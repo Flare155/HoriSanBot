@@ -8,7 +8,7 @@ module.exports = {
         .setDescription('Sets your timezone for streak tracking.')
         .addStringOption(option =>
             option.setName('timezone')
-                .setDescription('Your timezone (e.g., America/New_York)')
+                .setDescription('Start typing to find your timezone! (Continent/City OR City)')
                 .setAutocomplete(true) // Enable autocomplete
                 .setRequired(true)
         ),
