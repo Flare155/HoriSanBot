@@ -17,3 +17,6 @@ logSchema.index({ timestamp: -1 });
 
 const Log = mongoose.model('Log', logSchema);
 module.exports = Log;
+
+
+"SELECT "
