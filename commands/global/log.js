@@ -167,7 +167,7 @@ async function sendLogEmbed(interaction, medium, mediumUnit, amount, description
 
     const logEmbed = new EmbedBuilder()
         .setColor(embedColor)
-        .setTitle(`🎉 ${interaction.user.username} Logged ${amount} ${mediumUnit} of ${medium}!`)
+        .setTitle(`🎉 ${interaction.user.displayName} Logged ${amount} ${mediumUnit} of ${medium}!`)
         .setDescription(description)
         .setThumbnail(interaction.user.displayAvatarURL())
         .addFields({ name: '📖 Title', value: title, inline: true });
