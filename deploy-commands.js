@@ -38,7 +38,7 @@ for (const file of globalCommandFiles) {
 	}
 })();
 
-rest = new REST().setToken(token); 
+REST().setToken(token); 
 
 // Deploy TESTING commands
 commands.length = 0; // Clear the commands array
