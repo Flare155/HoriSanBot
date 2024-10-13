@@ -38,12 +38,11 @@ for (const file of globalCommandFiles) {
 	}
 })();
 
-rest.setToken(token);
+rest = new REST().setToken(token); 
 
 // Deploy TESTING commands
 commands.length = 0; // Clear the commands array
 const testingCommandFiles = fs.readdirSync(testingFoldersPath).filter(file => file.endsWith('.js'));
-
 for (const file of testingCommandFiles) {
   const filePath = path.join(testingFoldersPath, file);
   const command = require(filePath);
@@ -53,7 +52,6 @@ for (const file of testingCommandFiles) {
     console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
   }
 }
-
 // Deploy the commands to the testing server
 (async () => {
 	try {

@@ -17,7 +17,7 @@ module.exports = {
         .catch((error) => {
             console.error('Failed to connect to the database:', error);
         });
-        User.createIndexes({ userId: 1 });
-        Log.createIndexes({ userId: 1 }, { timestamp: -1 });
+        // User.createIndexes({ userId: 1 });
+        // Log.createIndexes({ userId: 1 }, { timestamp: -1 });
     },
 };
