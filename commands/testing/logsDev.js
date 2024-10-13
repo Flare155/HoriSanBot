@@ -41,11 +41,7 @@ module.exports = {
       if (medium == "All") {
         logs = await Log.find({
           userId: interaction.user.id,
-<<<<<<< HEAD
           guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId },
-=======
-          guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId }
->>>>>>> origin/main
         });
       } else {
         logs = await Log.find({
