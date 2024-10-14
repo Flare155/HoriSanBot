@@ -75,6 +75,7 @@ async function buildImage(route, data){
 
     const image = await page.screenshot({
     type: "png",
+    path: "./image.png",
     clip: {
         width: 500,
         height: 500,
@@ -85,5 +86,6 @@ async function buildImage(route, data){
     return image;
 }
 
+buildImage("/immersionTime", { data: [] });
 
 
