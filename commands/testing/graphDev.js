@@ -15,34 +15,32 @@ module.exports = {
         .setName('graph_dev')
         .setDescription('dev :3'),
     async execute(interaction) {
-       
+        await interaction.deferReply();
+        const userId = interaction.user.id; // Replace with the actual user ID
+        const days = 30; // Number of days to look back
+        const userData = await User.findOne({ userId: interaction.user.id });
+        const userTimezone = userData ? userData.timezone : 'UTC';
+
+        const pointsByDate = await getPointsByDate(userId, days, userTimezone);
+
+            const image = await buildImage("/immersionTime", { data: pointsByDate });
 
 
-       const userId = interaction.user.id; // Replace with the actual user ID
-       const days = 30; // Number of days to look back
-       const userData = await User.findOne({ userId: interaction.user.id });
-       const userTimezone = userData ? userData.timezone : 'UTC';
+            // Assuming `image` is your Uint8Array
+            const buffer = Buffer.from(image);
+            // Create an attachment from the buffer
+            const attachment = new AttachmentBuilder(buffer,
+                {
+                    name: 'image.png'
+                } );
 
-       const pointsByDate = await getPointsByDate(userId, days, userTimezone);
-
-        const image = await buildImage("/immersionTime", { data: pointsByDate });
-
-
-        // Assuming `image` is your Uint8Array
-        const buffer = Buffer.from(image);
-        // Create an attachment from the buffer
-        const attachment = new AttachmentBuilder(buffer,
-            {
-                name: 'image.png'
-            } );
-
-        const helpEmbed = new EmbedBuilder()
-            .setColor('#c3e0e8')  // Set a color for the embed
-            .setTitle('Hello world')  // Title of the embed with an emoji
-            .setDescription(':3:3:3:3:3:3:3:3:3​') //Zero width char here for spacing in embed
-            .setImage('attachment://image.png')
-            .setFooter({ text: 'For any additional assistance DM or @ flarenotfound on discord!' })  // Adding footer text
-        interaction.reply({embeds: [helpEmbed], files: [attachment]});
+            const helpEmbed = new EmbedBuilder()
+                .setColor('#c3e0e8')  // Set a color for the embed
+                .setTitle('Hello world')  // Title of the embed with an emoji
+                .setDescription(':3:3:3:3:3:3:3:3:3​') //Zero width char here for spacing in embed
+                .setImage('attachment://image.png')
+                .setFooter({ text: 'For any additional assistance DM or @ flarenotfound on discord!' })  // Adding footer text
+            interaction.editReply({embeds: [helpEmbed], files: [attachment]});
     },
 };
 

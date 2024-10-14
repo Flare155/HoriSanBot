@@ -1,3 +1,5 @@
+// fix with a map
+
 function footerCreator(interaction, points) {
     let footerText = 'Keep up the great immersion!';
     const iconURL = interaction.user.displayAvatarURL();

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Log = require("../../models/Log");
 
-export async function getPointsByDate(userId, days, timezone) {
+const getPointsByDate = async(userId, days, timezone)=> {
     const endDate = new Date(); // Current date in UTC
     const startDate = new Date();
     startDate.setUTCDate(endDate.getUTCDate() - days); // Calculate the start date in UTC
@@ -34,3 +34,5 @@ export async function getPointsByDate(userId, days, timezone) {
 
     return results; // This will return an array of objects with date and totalPoints
 }
+
+module.exports = { getPointsByDate };
