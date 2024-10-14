@@ -25,7 +25,7 @@ module.exports = {
 
        const pointsByDate = await getPointsByDate(userId, days, userTimezone);
 
-        const image = await buildImage("/immersionTime", { data: pointsByDate });
+        const image = await buildImage("immersionTime", { data: pointsByDate });
 
 
         // Assuming `image` is your Uint8Array
@@ -63,13 +63,10 @@ async function buildImage(route, data){
     height: 500
     })    
 
-
     await page.goto(`file:${path.join(__dirname, "..", "..", "utils", "hori-visuals", "prod", "index.html")}`);
 
     await page.evaluate((route, data) => {
-        window.history.pushState({}, '', route);
-        const popStateEvent = new PopStateEvent('popstate');
-        window.dispatchEvent(popStateEvent);
+        window.path = route;
         window.puppeteerData = data; 
     }, route, data);    
 
@@ -87,7 +84,3 @@ async function buildImage(route, data){
     await browser.close();
     return image;
 }
-
-buildImage("/immersionTime", { data: [] });
-
-

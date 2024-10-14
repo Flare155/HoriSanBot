@@ -4,3 +4,6 @@ node_modules
 logs.txt
 bulkRewrite.js
 depreciated
+commands/.DS_Store
+bun.lockb
+utils/hori-visuals/bun.lockb
