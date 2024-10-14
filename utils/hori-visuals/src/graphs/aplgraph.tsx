@@ -102,7 +102,7 @@ export const chartOptions = (data:DataPoint[]) => {
         labels: {
             
             style: {
-                fontSize: '15px',
+                fontSize: '13px',
                 colors: ['#fff'],
             },
             formatter: function(value) {
