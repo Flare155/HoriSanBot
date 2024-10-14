@@ -20,7 +20,7 @@ function App() {
   useEffect(() => {
     setTimeout(() => {
       setScreenComponent(componentMap[(window as any).path])
-    }, 5);
+    }, 100);
   }, []);
   
   return (

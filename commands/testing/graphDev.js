@@ -13,7 +13,7 @@ const User = require('../../models/User');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('graph_dev')
-        .setDescription('dev :3'),
+        .setDescription('Dev command to generate a graph'),
     async execute(interaction) {
        
 
@@ -38,8 +38,8 @@ module.exports = {
 
         const helpEmbed = new EmbedBuilder()
             .setColor('#c3e0e8')  // Set a color for the embed
-            .setTitle('Hello world')  // Title of the embed with an emoji
-            .setDescription(':3:3:3:3:3:3:3:3:3​') //Zero width char here for spacing in embed
+            .setTitle('Monthly Immersion Graph')  // Title of the embed with an emoji
+            // .setDescription('Monthly immersion graph') //Zero width char here for spacing in embed
             .setImage('attachment://image.png')
             .setFooter({ text: 'For any additional assistance DM or @ flarenotfound on discord!' })  // Adding footer text
         interaction.reply({embeds: [helpEmbed], files: [attachment]});
@@ -59,8 +59,8 @@ async function buildImage(route, data){
     });
     const page = await browser.newPage();
     page.setViewport({
-    width: 500,
-    height: 500
+    width: 800,
+    height: 300
     })    
 
     await page.goto(`file:${path.join(__dirname, "..", "..", "utils", "hori-visuals", "prod", "index.html")}`);
@@ -77,7 +77,7 @@ async function buildImage(route, data){
     path: "./image.png",
     clip: {
         width: 500,
-        height: 500,
+        height: 300,
         x : 0,
         y : 0
     }});    

@@ -38,7 +38,7 @@ export const chartOptions = (data:DataPoint[]) => {
     type: "gradient",
         gradient: {
             type: "diagonal2",
-            shade: 'dark',
+            shade: 'light',
             colorStops: [
                 {
                     offset: 0,
