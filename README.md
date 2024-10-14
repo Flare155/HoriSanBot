@@ -32,7 +32,7 @@ This project is currently private. Please do not use or distribute any part of H
 ## Examples
 
 *Graph generated with the bot (graphs currently under devlopment expected to be added to be added to global commands in the following days)*
-![Log Command Example](https://github.com/user-attachments/assets/31d0e8fb-3653-4271-8be1-47e6c9bc8fa8)
+![image](https://github.com/user-attachments/assets/167c96cd-2e80-46fe-85da-0eee4af59357)
 
 *The global leaderboard for monthly filterable by medium and time period*
 
