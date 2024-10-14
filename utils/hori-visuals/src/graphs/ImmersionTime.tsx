@@ -16,7 +16,7 @@ interface DataPoint {
 const ImmersionTime: React.FC = () => {
   // Replace this with your actual data source
   const data: DataPoint[] = [
-    { date: '-30', watchTime: null, listeningTime: null, readingTime: null }, // No logging
+    { date: '-30', watchTime: null, listeningTime: null, readingTime: 10 }, // No logging
     { date: '-29', watchTime: 80, listeningTime: 50, readingTime: 40 }, // All three activities (Total: 170)
     { date: '-28', watchTime: null, listeningTime: 70, readingTime: 50 }, // Listening & Reading (Total: 120)
     { date: '-27', watchTime: 60, listeningTime: null, readingTime: 70 }, // Watching & Reading (Total: 130)
