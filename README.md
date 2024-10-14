@@ -4,12 +4,12 @@ Welcome to **HorisanBot**, the ultimate tool designed to enhance your language l
 
 ## Key Features 🌟
 
-- **Activity Logging**: Effortlessly log your immersive activities—watching, reading, or listening—and earn points for every logged hour.
-- **Leaderboards**: See how you stack up against your friends with our competitive leaderboards. Aim for the top to become the immersion champion!
-- **Personal Profiles**: Get a comprehensive view of your immersion statistics and track your progress over time.
-- **Self Timeout**: Use the self-timeout feature to manage distractions and maintain focus during your language learning sessions.
-- **Undo/Redo/Delete**: Easily correct any mistakes in your activity logs with log editing functionality.
-- **Time Zone Management**: Set your time zone and your streak will reset at 4am just like anki, timestamps will display to your local time.
+- **Activity Logging** 📝: Effortlessly log your immersive activities—watching, reading, or listening—and earn points for every logged hour.
+- **Leaderboards** 🏆: See how you stack up against your friends with our competitive leaderboards. Aim for the top to become the immersion champion!
+- **Personal Profiles** 📊: Get a comprehensive view of your immersion statistics and track your progress over time.
+- **Self Timeout** ⏱️: Use the self-timeout feature to manage distractions and maintain focus during your language learning sessions.
+- **Undo/Redo/Delete** 🔙: Easily correct any mistakes in your activity logs with log editing functionality.
+- **Time Zone Management** 🌐: Set your time zone and your streak will reset at 4am just like Anki, timestamps will display to your local time.
 
 ## Getting Started 🚀
 
