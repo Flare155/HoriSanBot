@@ -11,7 +11,7 @@ const router = createBrowserRouter([
     element: <ImmersionTime/>,
   },
   {
-    path: "/charactersRead",
+    path: "/",
     element: <App/>,
   }
 ]);

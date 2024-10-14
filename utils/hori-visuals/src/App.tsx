@@ -8,7 +8,7 @@ function App() {
       backgroundColor: 'red',
     }} >
       {
-        (window as any).myJsonData.text
+        (window as any).myJsonData?.text ?? 'No data'
       
       }
     </div>
