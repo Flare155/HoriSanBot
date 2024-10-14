@@ -1,35 +1,49 @@
-# HorisanBot - Your Immersion Buddy 🌊
+# HorisanBot - Your Immersion Companion 🌊
 
-Welcome to **HorisanBot**, the ultimate bot to keep track of your immersion activities! Whether you're watching anime, reading manga, listening to podcasts, or diving into light novels, HorisanBot is here to make your language learning journey fun and rewarding.
+Welcome to **HorisanBot**, the ultimate tool designed to enhance your language learning through immersive activities. Whether you're watching anime, reading manga, listening to podcasts, or diving into novels, HorisanBot helps track your progress and makes your language journey both fun and rewarding.
 
-## What Does It Do? 🤔
+## Key Features 🌟
 
-HorisanBot helps you log your immersive activities and earn points for your dedication. Here's a quick look at what it can do:
-
-- **Log Immersion**: Track what you've watched, read, or listened to and earn points for every effort! 📈
-- **Leaderboards**: Compete with your friends to see who is leading the immersion game. Who's the real master? 🏆
-- **Profiles**: View your immersion stats in one place and witness your progress! 📊
-- **Self Timeout**: Feeling distracted? Use the self-timeout feature to take a break and stay on track! ⏱️
-- **Undo Logs**: Made a mistake? No problem! Undo your most recent log hassle-free. 🔄
-- **Delete Logs**: Want to delete a specific log in the past? use this simpe command. 🔄
-- **Help Command**: A help command that displays all the commands and thier uses! 🔄
-- **Timezones!**: All times in the bot are stored in UTC and localized to your time when displayed! 🔄
+- **Activity Logging** 📝: Effortlessly log your immersive activities—watching, reading, or listening—and earn points for every logged hour.
+- **Leaderboards** 🏆: See how you stack up against your friends with our competitive leaderboards. Aim for the top to become the immersion champion!
+- **Personal Profiles** 📊: Get a comprehensive view of your immersion statistics and track your progress over time.
+- **Self Timeout** ⏱️: Use the self-timeout feature to manage distractions and maintain focus during your language learning sessions.
+- **Undo/Redo/Delete** 🔙: Easily correct any mistakes in your activity logs with log editing functionality.
+- **Time Zone Management** 🌐: Set your time zone and your streak will reset at 4am just like Anki, timestamps will display to your local time.
 
 ## Getting Started 🚀
 
-1. **Invite HorisanBot** to your Discord server.
-2. Use `/log` to start tracking your activities. The more you log, the more points you earn!
-3. Keep an eye on your progress with `/profile` or see how you rank with `/leaderboard`.
+1. **Invite HorisanBot** to your Discord server. (Not public at the moment so reach out to me @flarenotfound on discord)
+2. Use the `/log` command to begin tracking your activities. The more you log, the more points you earn.
+3. Monitor your progress with the `/profile` command or check out the competition with `/leaderboard`.
 
-## Why Use HorisanBot? 🤓
+## Why HorisanBot? 🤓
 
-Learning languages should be fun and engaging! With HorisanBot, you can share your progress with friends and stay motivated through friendly competition. Watching your points stack up makes your hard work feel more rewarding. Plus, who doesn't love a bit of gamification?
+HorisanBot isn't just a tracking tool—it's your partner in the language learning journey. It motivates you by visualizing your progress, encourages competition through leaderboards, and integrates seamlessly into your daily routine. Stay motivated and see your efforts rewarded as you advance towards fluency.
 
 ## Contributing 🛠️
 
-Currently a solo project
+Want to contribute? HorisanBot is currently a mostly solo project, but I’m open to collaboration. Feel free to reach out if you're interested in developing features, fixing bugs, or providing suggestions.
 
 ## License 📜
 
-**This project is private. Please do not use or distribute without permission.**
+This project is currently private. Please do not use or distribute any part of HorisanBot without permission.
+
+## Examples
+
+*Graph generated with the bot (graphs currently under devlopment expected to be added to be added to global commands in the following days)*
+
+![image](https://github.com/user-attachments/assets/167c96cd-2e80-46fe-85da-0eee4af59357)
+
+*The global leaderboard for monthly filterable by medium and time period*
+
+![Profile View Example](https://github.com/user-attachments/assets/f77be04e-dd98-49e4-b4c7-09885cb90431)
+
+*What a log looks like currently (tie-ins with anilist and other media databases expected in the future)*
+
+![Leaderboard Example](https://github.com/user-attachments/assets/c372e3da-4d73-428a-831a-c0016ca4bba9)
+
+*Example of editing a log*
+
+![Settings Command Example](https://github.com/user-attachments/assets/8b9e4a09-9fec-4cde-8d02-5806c3a327b0)
 
