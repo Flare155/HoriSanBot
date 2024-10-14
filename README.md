@@ -31,18 +31,18 @@ This project is currently private. Please do not use or distribute any part of H
 
 ## Examples
 
+*Graph generated with the bot (graphs currently under devlopment expected to be added to be added to global commands in the following days)*
 ![Log Command Example](https://github.com/user-attachments/assets/31d0e8fb-3653-4271-8be1-47e6c9bc8fa8)
 
-*Logging an activity with HorisanBot*
+*The global leaderboard for monthly filterable by medium and time period*
 
 ![Profile View Example](https://github.com/user-attachments/assets/f77be04e-dd98-49e4-b4c7-09885cb90431)
 
-*Viewing user profile and stats*
+*What a log looks like currently (tie-ins with anilist and other media databases expected in the future)*
 
 ![Leaderboard Example](https://github.com/user-attachments/assets/c372e3da-4d73-428a-831a-c0016ca4bba9)
 
-*Checking out the leaderboard rankings*
+*Example of editing a log*
 
 ![Settings Command Example](https://github.com/user-attachments/assets/8b9e4a09-9fec-4cde-8d02-5806c3a327b0)
 
-*Configuring settings and preferences*
