@@ -31,16 +31,18 @@ This project is currently private. Please do not use or distribute any part of H
 
 ## Examples
 
-Here are some examples of HorisanBot in action, showcasing different commands and their outputs:
-
 ![Log Command Example](https://github.com/user-attachments/assets/31d0e8fb-3653-4271-8be1-47e6c9bc8fa8)
+
 *Logging an activity with HorisanBot*
 
 ![Profile View Example](https://github.com/user-attachments/assets/f77be04e-dd98-49e4-b4c7-09885cb90431)
+
 *Viewing user profile and stats*
 
 ![Leaderboard Example](https://github.com/user-attachments/assets/c372e3da-4d73-428a-831a-c0016ca4bba9)
+
 *Checking out the leaderboard rankings*
 
 ![Settings Command Example](https://github.com/user-attachments/assets/8b9e4a09-9fec-4cde-8d02-5806c3a327b0)
+
 *Configuring settings and preferences*
