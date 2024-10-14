@@ -4,3 +4,4 @@ node_modules
 logs.txt
 bulkRewrite.js
 depreciated
+package-lock.json
