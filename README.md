@@ -32,6 +32,7 @@ This project is currently private. Please do not use or distribute any part of H
 ## Examples
 
 *Graph generated with the bot (graphs currently under devlopment expected to be added to be added to global commands in the following days)*
+
 ![image](https://github.com/user-attachments/assets/167c96cd-2e80-46fe-85da-0eee4af59357)
 
 *The global leaderboard for monthly filterable by medium and time period*
