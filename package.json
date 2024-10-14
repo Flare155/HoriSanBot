@@ -14,7 +14,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "bun --watch index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "visuals": "cd utils/hori-visuals && npm run dev",
+    "build-visuals": "cd utils/hori-visuals && npm run build"
   },
   "author": "Flare",
   "license": "ISC",

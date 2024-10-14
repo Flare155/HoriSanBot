@@ -171,6 +171,7 @@ const ImmersionTime: React.FC = () => {
 
   return (
     <div className="bg-black w-[600px] h-[500px] p-4">
+
       <Chart
         options={chartOptions}
         series={series}
