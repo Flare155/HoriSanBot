@@ -15,16 +15,11 @@ module.exports = {
         .setName('graph_dev')
         .setDescription('Dev command to generate a graph'),
     async execute(interaction) {
-       
-
-
-       const userId = interaction.user.id; // Replace with the actual user ID
-       const days = 30; // Number of days to look back
-       const userData = await User.findOne({ userId: interaction.user.id });
-       const userTimezone = userData ? userData.timezone : 'UTC';
-
-       const pointsByDate = await getPointsByDate(userId, days, userTimezone);
-
+        const userId = interaction.user.id;
+        const days = 30;
+        const userData = await User.findOne({ userId: interaction.user.id });
+        const userTimezone = userData ? userData.timezone : 'UTC';
+        const pointsByDate = await getPointsByDate(userId, days, userTimezone);
         const image = await buildImage("immersionTime", { data: pointsByDate });
 
 
@@ -76,8 +71,8 @@ async function buildImage(route, data){
     type: "png",
     path: "./image.png",
     clip: {
-        width: 500,
-        height: 300,
+        width: 600,
+        height: 400,
         x : 0,
         y : 0
     }});    
