@@ -2,9 +2,15 @@ const path = require('node:path');
 const puppeteer = require("puppeteer");
 
 const buildImage = async (route, data) => {
+    // Fetch the WebSocket debugger URL from Chromium
+    const response = await fetch('http://localhost:9222/json/version');
+    const browserData = await response.json();
+    const wsEndpoint = browserData.webSocketDebuggerUrl;
+
+    // Connect to the running Chromium instance using the WebSocket URL
     const browser = await puppeteer.connect({
-        browserURL: 'http://localhost:9222' // Use the same port you specified above
-      });
+        browserWSEndpoint: wsEndpoint,
+    });
 
     const page = await browser.newPage();
     page.setViewport({
