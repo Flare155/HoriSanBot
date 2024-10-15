@@ -12,7 +12,7 @@ const buildImage = async (route, data) => {
         '--disable-site-isolation-trials',
         '--no-sandbox'
     ],
-    executablePath: process.platform == "linux" ? '/usr/bin/google-chrome' : null, // Use an environment variable instead of checking the OS
+    executablePath: process.platform == "linux" ? '/usr/bin/chromium' : null, // Use an environment variable instead of checking the OS
     });
     const page = await browser.newPage();
     page.setViewport({
