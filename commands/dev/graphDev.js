@@ -4,9 +4,8 @@ const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require('discor
 const puppeteer = require("puppeteer");
 const path = require('node:path');
 const fs = require('node:fs');  
-// // test
 const { Buffer } = require('buffer');
-const { getPointsByDate } = require('../../utils/db/dbPointsAggregate');
+const { getLogsByDate } = require('../../utils/db/dbLogsByDate');
 const User = require('../../models/User');
 
 
@@ -19,8 +18,8 @@ module.exports = {
         const days = 30;
         const userData = await User.findOne({ userId: interaction.user.id });
         const userTimezone = userData ? userData.timezone : 'UTC';
-        const pointsByDate = await getPointsByDate(userId, days, userTimezone);
-        const image = await buildImage("immersionTime", { data: pointsByDate });
+        const logsByDate = await getLogsByDate(userId, days, userTimezone);
+        const image = await buildImage("immersionTime", { data: logsByDate });
 
 
         // Assuming `image` is your Uint8Array

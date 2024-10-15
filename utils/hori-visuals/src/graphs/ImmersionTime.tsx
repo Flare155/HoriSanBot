@@ -7,71 +7,29 @@ import { ApexOptions } from 'apexcharts';
 // Define the structure of your data points
 interface DataPoint {
   date: string;
-  watchTime: number | null;
-  listeningTime: number | null;
-  readingTime: number | null;
+  watchTime: number;
+  listeningTime: number;
+  readingTime: number;
 }
 
 // Main component to render the bar chart
 const ImmersionTime: React.FC = () => {
   // Replace this with your actual data source
-  const data: DataPoint[] = [
-    { date: '-30', watchTime: null, listeningTime: null, readingTime: 10 }, // No logging
-    { date: '-29', watchTime: 80, listeningTime: 50, readingTime: 40 }, // All three activities (Total: 170)
-    { date: '-28', watchTime: null, listeningTime: 70, readingTime: 50 }, // Listening & Reading (Total: 120)
-    { date: '-27', watchTime: 60, listeningTime: null, readingTime: 70 }, // Watching & Reading (Total: 130)
-    { date: '-26', watchTime: null, listeningTime: null, readingTime: null }, // No logging
-    { date: '-25', watchTime: 100, listeningTime: 80, readingTime: 60 }, // All three activities (Total: 240)
-    { date: '-24', watchTime: null, listeningTime: 90, readingTime: 60 }, // Listening & Reading (Total: 150)
-    { date: '-23', watchTime: 75, listeningTime: null, readingTime: 50 }, // Watching & Reading (Total: 125)
-    { date: '-22', watchTime: 90, listeningTime: 70, readingTime: 60 }, // All three activities (Total: 220)
-    { date: '-21', watchTime: null, listeningTime: 100, readingTime: 10 }, // No logging
-    { date: '-20', watchTime: 70, listeningTime: 60, readingTime: 10 }, // Watching & Listening & Reading (Total: 140)
-    { date: '-19', watchTime: null, listeningTime: 120, readingTime: 80 }, // Listening & Reading (Total: 200)
-    { date: '-18', watchTime: 80, listeningTime: null, readingTime: 50 }, // Watching & Reading (Total: 130)
-    { date: '-17', watchTime: null, listeningTime: null, readingTime: null }, // Only Listening (Total: 80) *Adjust Needed*
-    { date: '-16', watchTime: 150, listeningTime: 100, readingTime: 80 }, // All three activities (Total: 330)
-    { date: '-15', watchTime: null, listeningTime: null, readingTime: null }, // No logging
-    { date: '-14', watchTime: 90, listeningTime: 60, readingTime: null }, // Watching & Listening (Total: 150)
-    { date: '-13', watchTime: null, listeningTime: 70, readingTime: 60 }, // Listening & Reading (Total: 130)
-    { date: '-12', watchTime: 100, listeningTime: null, readingTime: 60 }, // Watching & Reading (Total: 160)
-    { date: '-11', watchTime: null, listeningTime: 150, readingTime: 90 }, // Listening & Reading (Total: 240)
-    { date: '-10', watchTime: 120, listeningTime: 80, readingTime: 70 }, // All three activities (Total: 270)
-    { date: '-9', watchTime: null, listeningTime: null, readingTime: null }, // No logging
-    { date: '-8', watchTime: 60, listeningTime: 50, readingTime: null }, // Watching & Listening (Total: 110) *Adjust Needed*
-    { date: '-7', watchTime: null, listeningTime: 90, readingTime: 60 }, // Listening & Reading (Total: 150)
-    { date: '-6', watchTime: 80, listeningTime: null, readingTime: 50 }, // Watching & Reading (Total: 130)
-    { date: '-5', watchTime: null, listeningTime: 200, readingTime: 150 }, // Listening & Reading (Total: 350)
-    { date: '-4', watchTime: 110, listeningTime: 80, readingTime: null }, // Watching & Listening (Total: 190)
-    { date: '-3', watchTime: null, listeningTime: null, readingTime: 100 }, // Only Reading (Total: 100) *Adjust Needed*
-    { date: '-2', watchTime: 120, listeningTime: 100, readingTime: 80 }, // All three activities (Total: 300)
-    { date: '-1', watchTime: null, listeningTime: 180, readingTime: 150 }, // Listening & Reading (Total: 330)
-  ];
-  
-  
-  
+  const data: DataPoint[] = (window as any).puppeteerData.data;
 
-  // Sanitize data to replace 0 with null to prevent gaps in the stack
-  const sanitizedData: DataPoint[] = data.map((point) => ({
-    watchTime: point.watchTime === 0 ? null : point.watchTime,
-    listeningTime: point.listeningTime === 0 ? null : point.listeningTime,
-    readingTime: point.readingTime === 0 ? null : point.readingTime,
-    date: point.date,
-  }));
-
-  // Define the series for the bar chart
+  // Define the series for the bar chart without sanitization
   const series = [
     {
       name: 'Watchtime',
-      data: sanitizedData.map((point) => point.watchTime),
+      data: data.map((point) => point.watchTime),
     },
     {
       name: 'Listening',
-      data: sanitizedData.map((point) => point.listeningTime),
+      data: data.map((point) => point.listeningTime),
     },
     {
       name: 'Reading',
-      data: sanitizedData.map((point) => point.readingTime),
+      data: data.map((point) => point.readingTime),
     },
   ];
 
@@ -105,24 +63,27 @@ const ImmersionTime: React.FC = () => {
       show: false, // Remove borders between bars
     },
     grid: {
-        show: true,
-        borderColor: '#333', // Dark grid lines for visibility
-        strokeDashArray: 0,
-        position: 'back',
-        xaxis: {
-          lines: {
-            show: false, // Hide vertical grid lines
-          },
+      show: true,
+      borderColor: '#333', // Dark grid lines for visibility
+      strokeDashArray: 0,
+      position: 'back',
+      xaxis: {
+        lines: {
+          show: false, // Hide vertical grid lines
         },
-        yaxis: {
-          lines: {
-            show: true, // Show horizontal grid lines
-          },
+      },
+      yaxis: {
+        lines: {
+          show: true, // Show horizontal grid lines
         },
-    },      
+      },
+    },
     xaxis: {
-      categories: sanitizedData.map((point, index) => // This isnt working right but it looks ok
-        index % 5 === 0 ? point.date : ''
+      categories: data.map((point) =>
+        // Display the date label only every 5 days for readability
+        // Adjust as needed based on your data density
+        // Alternatively, display all labels by removing the condition
+        data.indexOf(point) % 5 === 0 ? point.date : ''
       ),
       labels: {
         rotate: 0,
@@ -141,7 +102,7 @@ const ImmersionTime: React.FC = () => {
     },
     yaxis: {
       title: {
-        text: 'Minutes',
+        text: 'Points',
         style: {
           fontSize: '15px',
         },
@@ -171,7 +132,6 @@ const ImmersionTime: React.FC = () => {
 
   return (
     <div className="bg-black w-[1200px] h-[1000px] p-4">
-
       <Chart
         options={chartOptions}
         series={series}

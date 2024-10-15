@@ -8,11 +8,25 @@ const { calculateStreak } = require('../../utils/streakCalculator'); // Import s
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('profile_dev')
-        .setDescription('Replies with your immersion info!'),
+        .setDescription('Replies with your immersion info!')
+        .addStringOption(option =>
+            option.setName('period')
+                .setDescription('Time period of the leaderboard')
+                .setRequired(true)
+                .addChoices(
+                    { name: 'All Time', value: 'All Time' },
+                    { name: 'Yearly', value: 'Yearly'},
+                    { name: 'Monthly', value: 'Monthly'},
+                    { name: 'Weekly', value: 'Weekly' },
+                    { name: 'Daily', value: 'Daily' },
+                    )),
     async execute(interaction) {
         const userId = interaction.user.id;
         const guildId = interaction.guild.id;
+        const timePeriod = interaction.options.getString('period');
         const exists = await User.exists({ userId: userId });
+        const userTimezone = userData ? userData.timezone : 'UTC';
+        const pointsByDate = await immersionByDate(userId, days, userTimezone);
 
         let logStats = [];
         let totalPoints = 0;
@@ -32,7 +46,7 @@ module.exports = {
         if (exists) {
             // Calculate the streak dynamically based on logs
             streak = await calculateStreak(userId, guildId);
-            
+
             // Update the user's streak in the database
             await User.updateOne({ userId }, { streak });
 

@@ -4,7 +4,7 @@ import './App.css'
 type ScreenComponent = React.FC<any>
 
 // Lazy load the components
-const ImmersionTimeGraph = lazy<ScreenComponent>(() => import('./graphs/ImmersionTime'));
+const ImmersionTimeGraph = lazy<ScreenComponent>(() => import('./graphs/immersionTime'));
 
     
 const componentMap: Record<string, React.LazyExoticComponent<ScreenComponent>|undefined> = {
