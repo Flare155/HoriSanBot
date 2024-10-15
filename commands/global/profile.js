@@ -159,7 +159,7 @@ module.exports = {
                     name: 'image.png'
                 } );
 
-            await interaction.editReply({ files: [attachment] });
+            await interaction.followUp({ files: [attachment] });
 
         } else {
             await interaction.editReply({ content: 'User not found 😞', ephemeral: true });
