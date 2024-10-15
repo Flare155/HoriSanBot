@@ -1,10 +1,7 @@
-
+# Use the Puppeteer base image (which already includes Chromium)
 FROM ghcr.io/puppeteer/puppeteer:22
 
 USER root
-
-# Install Chromium in the Docker container
-RUN apt-get update && apt-get install -y chromium-browser --no-install-recommends
 
 # Add user so we don't need --no-sandbox.
 RUN mkdir -p /home/pptruser/Downloads /app \
