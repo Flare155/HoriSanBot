@@ -31,7 +31,7 @@ module.exports = {
         const days = timePeriod;
         const userData = await User.findOne({ userId: interaction.user.id });
         const userTimezone = userData ? userData.timezone : 'UTC';
-        const logsByDate = await getLogsByDate(userId, days, userTimezone);
+        const logsByDate = await getLogsByDate(userId, days, userTimezone, guildId);
 
         let logStats = [];
         let totalPoints = 0;

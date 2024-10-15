@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Log = require("../../models/Log");
+const { testingServerId } = require('../../config.json');
 
 /**
  * Helper function to generate an array of dates between two dates.
@@ -10,7 +11,7 @@ const Log = require("../../models/Log");
  * @param {string} timezone - Timezone string, e.g., 'UTC', 'America/New_York'
  * @returns {string[]} Array of date strings
  */
-const generateDateRange = (start, end, timezone) => {
+const generateDateRange = (start, end, timezone, guidId) => {
     const dates = [];
     let current = new Date(start);
 
@@ -40,7 +41,7 @@ const generateDateRange = (start, end, timezone) => {
  * @param {string} timezone - Timezone string, e.g., 'UTC', 'America/New_York'
  * @returns {Promise<DataPoint[]>} Array of DataPoint objects
  */
-const getLogsByDate = async (userId, days, timezone) => {
+const getLogsByDate = async (userId, days, timezone, guildId) => {
     try {
         const endDate = new Date(); // Current date in UTC
         const startDate = new Date();
@@ -54,8 +55,17 @@ const getLogsByDate = async (userId, days, timezone) => {
             // Add more categories if needed
         };
 
+        // Seperate data from testing server data
+        let testGuildExcludeMatch;
+        if (guildId === testingServerId) {
+            testGuildExcludeMatch = { $match: { guildId: testingServerId} };
+        } else {
+            testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } };
+        }
+
         // Perform the aggregation
         const aggregationResults = await Log.aggregate([
+            testGuildExcludeMatch,
             {
                 $match: {
                     userId: userId, // Assuming userId is stored as a string
