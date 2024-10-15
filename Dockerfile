@@ -1,33 +1,19 @@
-# use the official node image
-# see all versions at https://hub.docker.com/r/oven/bun/tags
-FROM node AS base
 
-WORKDIR /usr/src/app
+FROM ghcr.io/puppeteer/puppeteer:22
 
-# We don't need the standalone Chromium
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+USER root
 
-# Install necessary dependencies for Puppeteer and Chromium
-RUN apt-get update \
-    && apt-get install -y gnupg wget ca-certificates --no-install-recommends \
-    && wget -qO - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable chromium-driver \
-    && google-chrome --version && chromedriver --version
+# Add user so we don't need --no-sandbox.
+RUN mkdir -p /home/pptruser/Downloads /app \
+    && chown -R pptruser:pptruser /home/pptruser \
+    && chown -R pptruser:pptruser /app
 
-# install dependencies into temp directory
-# this will cache them and speed up future builds
-FROM base AS install
-RUN mkdir -p /temp/dev
-COPY package.json package-lock.json /temp/dev/
-RUN cd /temp/dev && npm install --frozen-lockfile
+# Run everything after as non-privileged user.
+USER pptruser
 
-# copy node_modules from temp directory
-# then copy all (non-ignored) project files into the image
-FROM base AS prerelease
-ENV TZ='America/Montreal'
-COPY --from=install /temp/dev/node_modules node_modules
-COPY . .
+# Install Puppeteer under /node_modules so it's available system-wide
+COPY package.json /app/
+RUN cd /app/ && npm install
+COPY . /app/
 
-ENTRYPOINT ["node", "index.js"]
+ENTRYPOINT ["/usr/local/bin/node", "/app/index.js"]
