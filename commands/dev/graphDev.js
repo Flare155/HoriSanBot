@@ -23,6 +23,7 @@ module.exports = {
         const image = await buildImage("immersionTime", { data: logsByDate });
 
 
+        console.log(image);
         // Assuming `image` is your Uint8Array
         const buffer = Buffer.from(image);
         // Create an attachment from the buffer

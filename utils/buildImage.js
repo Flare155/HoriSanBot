@@ -2,18 +2,10 @@ const path = require('node:path');
 const puppeteer = require("puppeteer");
 
 const buildImage = async (route, data) => {
-    const browser = await puppeteer.launch({
-    headless: true,
-    defaultViewport: null,
-    devtools: true,
-    args: [
-        '--disable-web-security',
-        '--disable-features=IsolateOrigins',
-        '--disable-site-isolation-trials',
-        '--no-sandbox'
-    ],
-    executablePath: process.platform == "linux" ? '/usr/bin/chromium' : null, // Use an environment variable instead of checking the OS
-    });
+    const browser = await puppeteer.connect({
+        browserURL: 'http://localhost:9222' // Use the same port you specified above
+      });
+
     const page = await browser.newPage();
     page.setViewport({
     width: 1500,
@@ -31,14 +23,12 @@ const buildImage = async (route, data) => {
 
     const image = await page.screenshot({
     type: "png",
-    path: "./image.png",
     clip: {
         width: 1200,
         height: 800,
         x : 0,
         y : 0
     }});    
-    await browser.close();
     return image;
 }
 
