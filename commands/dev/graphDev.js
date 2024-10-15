@@ -7,6 +7,7 @@ const fs = require('node:fs');
 const { Buffer } = require('buffer');
 const { getLogsByDate } = require('../../utils/db/dbLogsByDate');
 const User = require('../../models/User');
+const { buildImage } = require('../../utils/buildImage');
 
 
 module.exports = {
@@ -41,40 +42,3 @@ module.exports = {
 };
 
 
-async function buildImage(route, data){
-    const browser = await puppeteer.launch({
-    headless: true,
-    devtools: true,
-    args: [
-        '--disable-web-security',
-        '--disable-features=IsolateOrigins',
-        '--disable-site-isolation-trials'
-    ]
-    });
-    const page = await browser.newPage();
-    page.setViewport({
-    width: 1500,
-    height: 1000
-    })    
-
-    await page.goto(`file:${path.join(__dirname, "..", "..", "utils", "hori-visuals", "prod", "index.html")}`);
-
-    await page.evaluate((route, data) => {
-        window.path = route;
-        window.puppeteerData = data; 
-    }, route, data);    
-
-    await page.waitForNetworkIdle();
-
-    const image = await page.screenshot({
-    type: "png",
-    path: "./image.png",
-    clip: {
-        width: 1200,
-        height: 800,
-        x : 0,
-        y : 0
-    }});    
-    await browser.close();
-    return image;
-}

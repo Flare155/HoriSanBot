@@ -1,18 +1,37 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 const User = require("../../models/User");
 const Log = require("../../models/Log");
 const { testingServerId } = require('../../config.json');
-const { calculateStreak } = require('../../utils/streakCalculator');
+const { calculateStreak } = require('../../utils/streakCalculator'); // Import streak utility
+const { getLogsByDate } = require('../../utils/db/dbLogsByDate');
+const { buildImage } = require('../../utils/buildImage');
+
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('profile')
-        .setDescription('Replies with your immersion info!'),
+        .setDescription('Replies with your immersion info!')
+        .addStringOption(option =>
+            option.setName('period')
+                .setDescription('Time period of the leaderboard')
+                .setRequired(true)
+                .addChoices(
+                    { name: 'All Time', value: '600' },
+                    { name: 'Yearly', value: '365'},
+                    { name: 'Monthly', value: '30'},
+                    { name: 'Weekly', value: '7' },
+                    )),
     async execute(interaction) {
+        await interaction.deferReply();
         const userId = interaction.user.id;
         const guildId = interaction.guild.id;
+        const timePeriod = interaction.options.getString('period');
         const exists = await User.exists({ userId: userId });
+        const days = timePeriod;
+        const userData = await User.findOne({ userId: interaction.user.id });
+        const userTimezone = userData ? userData.timezone : 'UTC';
+        const logsByDate = await getLogsByDate(userId, days, userTimezone);
 
         let logStats = [];
         let totalPoints = 0;
@@ -32,7 +51,7 @@ module.exports = {
         if (exists) {
             // Calculate the streak dynamically based on logs
             streak = await calculateStreak(userId, guildId);
-            
+
             // Update the user's streak in the database
             await User.updateOne({ userId }, { streak });
 
@@ -53,8 +72,7 @@ module.exports = {
                 { $group: { _id: { medium: "$medium", user: "$userId" }, total: { $sum: "$amount" }, units: { $push: "$unit" } } }
             ]);
         }
-        
-        // Audio
+
         const fieldOrder = {
             // Audio
             Listening: "Minutes",
@@ -89,6 +107,7 @@ module.exports = {
             }
         });
 
+
         // Reply
         if (exists) {
             // Embed response:
@@ -100,6 +119,7 @@ module.exports = {
                 .setTitle(`${interaction.user.displayName}'s Immersion Profile`)
                 .setThumbnail(userAvatarURL)
                 .setTimestamp()
+                .setImage('attachment://image.png')
                 .setFooter({ text: 'Keep up the great work!', iconURL: userAvatarURL });
 
             // Add total points field
@@ -127,9 +147,22 @@ module.exports = {
             }
             
             // Send embed
-            await interaction.reply({ embeds: [profileEmbed] });
+            await interaction.editReply({ embeds: [profileEmbed] });
+
+            // Create chart for profile
+            const image = await buildImage("immersionTime", { data: logsByDate });
+            // Assuming `image` is your Uint8Array
+            const buffer = Buffer.from(image);
+            // Create an attachment from the buffer
+            const attachment = new AttachmentBuilder(buffer,
+                {
+                    name: 'image.png'
+                } );
+
+            await interaction.editReply({ files: [attachment] });
+
         } else {
-            await interaction.reply({ content: 'User not found 😞', ephemeral: true });
+            await interaction.editReply({ content: 'User not found 😞', ephemeral: true });
         }
     },
 };
