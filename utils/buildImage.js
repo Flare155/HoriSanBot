@@ -4,12 +4,15 @@ const puppeteer = require("puppeteer");
 const buildImage = async (route, data) => {
     const browser = await puppeteer.launch({
     headless: true,
+    defaultViewport: null,
     devtools: true,
     args: [
         '--disable-web-security',
         '--disable-features=IsolateOrigins',
-        '--disable-site-isolation-trials'
-    ]
+        '--disable-site-isolation-trials',
+        '--no-sandbox'
+    ],
+    executablePath: process.platform == "linux" ? '/usr/bin/google-chrome' : null, // Use an environment variable instead of checking the OS
     });
     const page = await browser.newPage();
     page.setViewport({
