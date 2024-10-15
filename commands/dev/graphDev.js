@@ -54,8 +54,8 @@ async function buildImage(route, data){
     });
     const page = await browser.newPage();
     page.setViewport({
-    width: 800,
-    height: 300
+    width: 1500,
+    height: 1000
     })    
 
     await page.goto(`file:${path.join(__dirname, "..", "..", "utils", "hori-visuals", "prod", "index.html")}`);
@@ -71,8 +71,8 @@ async function buildImage(route, data){
     type: "png",
     path: "./image.png",
     clip: {
-        width: 600,
-        height: 400,
+        width: 1200,
+        height: 800,
         x : 0,
         y : 0
     }});    
