@@ -1,3 +1,5 @@
+// File for testing browser initialization
+
 const puppeteer = require("puppeteer");
 
 const a = async () => {
