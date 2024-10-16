@@ -14,7 +14,7 @@ module.exports = {
         .setDescription('Replies with your immersion info!')
         .addStringOption(option =>
             option.setName('period')
-                .setDescription('Time period of the leaderboard')
+                .setDescription('Time period of the data to display')
                 .setRequired(true)
                 .addChoices(
                     { name: 'All Time', value: '600' },
@@ -116,7 +116,7 @@ module.exports = {
             // Make embed for log message
             const profileEmbed = new EmbedBuilder()
                 .setColor('#c3e0e8')
-                .setTitle(`${interaction.user.displayName}'s Immersion Profile`)
+                .setTitle(`${interaction.user.displayName}'s ${timePeriod} Day Period Immersion Profile`)
                 .setThumbnail(userAvatarURL)
                 .setTimestamp()
                 .setImage('attachment://image.png')
