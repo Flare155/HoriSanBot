@@ -1,23 +1,25 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+// Define waitingEmbed to reduce time spent seeing "...Waiting for ホリさん"
+const waitingEmbed = new EmbedBuilder()
+.setColor(0x0099ff) // Orange color to indicate loading/waiting
+.setTitle('🏓 Pong!')
+.addFields(
+    { name: 'Total Latency', value: `||num||ms`, inline: true },
+    { name: 'API Latency', value: '||num||ms', inline: true },
+)
+.setTimestamp()
+.setFooter({text:"API Latency updates 1/min"});
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('ping_dev')
         .setDescription('Replies with Pong and detailed latency information.'),
-
     async execute(interaction) {
-        // Record the start time for processing delay calculation
+        // **1 Calculate the latency of the bot response**
         const startTime = Date.now();
-        await interaction.deferReply();
-
-		// **1. Create and Send the Initial "Waiting" Embed**
-		const waitingEmbed = new EmbedBuilder()
-		.setColor(0xffa500) // Orange color to indicate loading/waiting
-		.setTitle('⏳ Please wait...')
-		.setDescription('Fetching latency information...')
-		.setTimestamp();
-
-		// Calculate the processing delay
+        await interaction.reply({ embeds: [waitingEmbed]});
+        // Calculate the ping
 		const endTime = Date.now();
 		const processingDelay = endTime - startTime;
 
@@ -28,8 +30,6 @@ module.exports = {
         let elapsedTime = 0;
 		const clientUptime = interaction.client.uptime
 
-        // Send the initial "waiting" embed as a reply
-        await interaction.editReply({ embeds: [waitingEmbed], ephemeral: false });
 
         // **2. Poll for ws.ping Initialization**
         while (wsRTDelay === -1 && elapsedTime < maxWaitTime) {
@@ -47,15 +47,14 @@ module.exports = {
 
                 // Create an updated embed with status fields
                 const updatedWaitingEmbed = new EmbedBuilder()
-                    .setColor(0xffa500)
-                    .setTitle('⏳ Please wait...')
-                    .setDescription('Fetching latency information...')
+                    .setColor(0x0099ff) // Orange color to indicate loading/waiting
+                    .setTitle('🏓 Pong!')
                     .addFields(
-						{ name: 'Processing Delay', value: `${processingDelay} ms`, inline: false },
-                        { name: 'Status', value: 'Waiting for Discord API Latency...', inline: false },
-                        { name: 'Estimated Max Wait Time', value: `${estimatedWaitTime} seconds`, inline: false },
+                        { name: 'Total Latency', value: `\`${processingDelay} ms\``, inline: true },
+                        { name: 'Awaiting API Latency', value: `${estimatedWaitTime} seconds`, inline: true },
                     )
-					.setFooter({text: "This delay occurs only after a recent bot launch."});
+                    .setTimestamp()
+                    .setFooter({text:"API Latency updates ~1/min"});
 
                 // Edit the initial reply with the updated embed
                 await interaction.editReply({ embeds: [updatedWaitingEmbed] });
@@ -68,15 +67,10 @@ module.exports = {
                 .setTitle('🏓 Pong!')
                 .setTimestamp()
                 .addFields(
-                    { name: 'Processing Time', value: `${processingDelay} ms`, inline: true },
-                    { name: 'API Latency', value: wsRTDelay !== -1 ? `${wsRTDelay} ms` : 'N/A', inline: true },
+                    { name: 'Total Latency', value: `\`${processingDelay} ms\``, inline: true },
+                    { name: 'API Latency', value: wsRTDelay !== -1 ? `\`${wsRTDelay} ms\`` : 'N/A', inline: true },
                 )
-				.setFooter({text:"API Latency updates once a minute"});
-
-			// Add total latency to embed
-			finalEmbed.addFields(
-				{ name: 'Total Latency', value: `${processingDelay + wsRTDelay} ms`, inline: true }
-			);
+				.setFooter({text:"API Latency updates 1/min"});
 
             // Edit the initial reply with the final embed
             await interaction.editReply({ embeds: [finalEmbed] });
