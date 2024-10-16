@@ -89,7 +89,7 @@ const ImmersionTime: React.FC = () => {
         rotate: 0,
         rotateAlways: false,
         style: {
-          fontSize: '15px',
+          fontSize: '25px',
           colors: '#ffffff',
         },
       },
@@ -102,14 +102,15 @@ const ImmersionTime: React.FC = () => {
     },
     yaxis: {
       title: {
-        text: 'Points',
+        text: 'Minutes',
         style: {
-          fontSize: '15px',
+          fontSize: '30px',
         },
+        offsetX: -15,
       },
       labels: {
         style: {
-          fontSize: '18px',
+          fontSize: '30px',
           colors: ['#fff'],
         },
         formatter: (value: number) => `${value}`,
@@ -125,18 +126,19 @@ const ImmersionTime: React.FC = () => {
     },
     colors: ['#00E396', '#0090FF', '#FF4560'],
     legend: {
-      fontSize: '15px',
+      fontSize: '40px',
       fontWeight: 700, // Using numeric value for font weight
+      offsetY: -15,
     },
   };
 
   return (
-    <div className="bg-black w-[1200px] h-[1000px] p-4">
+    <div className="bg-black w-[1250px] h-[900px] p-4">
       <Chart
         options={chartOptions}
         series={series}
         type="bar"
-        height={750}
+        height={800}
       />
     </div>
   );

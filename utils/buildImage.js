@@ -30,8 +30,8 @@ const buildImage = async (route, data) => {
     const image = await page.screenshot({
     type: "png",
     clip: {
-        width: 1200,
-        height: 800,
+        width: 1250,
+        height: 820,
         x : 0,
         y : 0
     }});    
