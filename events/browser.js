@@ -17,7 +17,7 @@ module.exports = {
                 '--no-sandbox',
                 '--remote-debugging-port=9222'
             ],
-            executablePath: process.platform == "linux" ? '/snap/bin/google-chrome' : null, // Use an environment variable instead of checking the OS
+            executablePath: process.platform == "linux" ? '/usr/bin/google-chrome' : null, // Use an environment variable instead of checking the OS
             });
 
         console.log("✅ Browser initialised.");
