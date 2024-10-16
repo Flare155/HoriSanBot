@@ -18,7 +18,6 @@ module.exports = {
                     '--remote-debugging-port=9222',
                     '--window-position=-2400,-2400'
                 ],
-                executablePath: process.env.CHROME_EXECUTABLE_PATH || (process.platform === "linux" ? '/snap/bin/chromium' : null),
             });
 
             // Open and immediately close a dummy page to force initialization
