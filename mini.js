@@ -11,7 +11,6 @@ const a = async () => {
         '--no-sandbox',
         '--remote-debugging-port=9222'
     ],
-    executablePath: process.platform == "linux" ? '/usr/bin/google-chrome' : null, // Use an environment variable instead of checking the OS
     });
 
 console.log("✅ Browser initialised.");
