@@ -6,6 +6,7 @@ const { testingServerId } = require('../../config.json');
 const { calculateStreak } = require('../../utils/streakCalculator'); // Import streak utility
 const { getLogsByDate } = require('../../utils/db/dbLogsByDate');
 const { buildImage } = require('../../utils/buildImage');
+const { startDateCalculator } = require('../../utils/startDateCalculator'); // Import streak utility
 
 
 module.exports = {
@@ -17,21 +18,19 @@ module.exports = {
                 .setDescription('Time period of the data to display')
                 .setRequired(true)
                 .addChoices(
-                    { name: 'All Time', value: '600' },
-                    { name: 'Yearly', value: '365'},
-                    { name: 'Monthly', value: '30'},
-                    { name: 'Weekly', value: '7' },
+                    { name: 'All Time', value: 'All Time' },
+                    { name: 'Yearly', value: 'Yearly'},
+                    { name: 'Monthly', value: 'Monthly'},
+                    { name: 'Weekly', value: 'Weekly' },
                     )),
     async execute(interaction) {
         await interaction.deferReply();
         const userId = interaction.user.id;
         const guildId = interaction.guild.id;
-        const timePeriod = interaction.options.getString('period');
+        let timePeriod = interaction.options.getString('period');
         const exists = await User.exists({ userId: userId });
-        const days = timePeriod;
         const userData = await User.findOne({ userId: interaction.user.id });
         const userTimezone = userData ? userData.timezone : 'UTC';
-        const logsByDate = await getLogsByDate(userId, days, userTimezone, guildId);
 
         let logStats = [];
         let totalPoints = 0;
@@ -47,6 +46,31 @@ module.exports = {
             testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } };
         }
 
+        // TODO Rework getting the timestamp of the first log to be included in the query for all logs
+        // Add lowerTimeBoundMatch timestamp filter for all logs after the startDate
+        if (timePeriod === 'All Time') {
+            const firstLog = await Log.aggregate([
+                testGuildExcludeMatch,
+                { $match: { userId: interaction.user.id } },
+                { $sort: { timestamp: 1 } }, // Sort logs by timestamp, earliest first
+                { $limit: 1 } // Limit the result to the first log
+            ]);
+            startDate = firstLog.timestamp
+            console.log(firstLog);
+        } else {
+            startDate = startDateCalculator(timePeriod);
+        }
+        let lowerTimeBoundMatch = {
+            $match: { 
+                timestamp: { $gte: startDate },
+            }
+        };
+        let now = new Date();
+        let millisecondsPerDay = 86400000;
+        let days = Math.floor((now - startDate) / millisecondsPerDay);
+        console.log(days);
+
+
         // Find total points and calculate streak if user exists
         if (exists) {
             // Calculate the streak dynamically based on logs
@@ -58,6 +82,7 @@ module.exports = {
             // Query for total points
             const totalPointsResult = await Log.aggregate([
                 testGuildExcludeMatch,
+                
                 { $match: { userId: userId } },
                 { $group: { _id: null, total: { $sum: "$points" } } }
             ]);
@@ -68,6 +93,7 @@ module.exports = {
             // Query for genres and their amounts
             logStats = await Log.aggregate([
                 testGuildExcludeMatch,
+                lowerTimeBoundMatch,
                 { $match: { userId: userId } },
                 { $group: { _id: { medium: "$medium", user: "$userId" }, total: { $sum: "$amount" }, units: { $push: "$unit" } } }
             ]);
@@ -150,6 +176,7 @@ module.exports = {
             await interaction.editReply({ embeds: [profileEmbed] });
 
             // Create chart for profile
+            const logsByDate = await getLogsByDate(userId, days, userTimezone, guildId);
             const image = await buildImage("immersionTime", { data: logsByDate });
             // Assuming `image` is your Uint8Array
             const buffer = Buffer.from(image);
