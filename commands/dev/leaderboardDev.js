@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Log = require('../../models/Log');
 const { testingServerId } = require('../../config.json');
+const { startDateCalculator } = require('../../utils/startDateCalculator'); // Import streak utility
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -38,50 +39,20 @@ async execute(interaction) {
     await interaction.deferReply();
     const medium = interaction.options.getString('medium');
     const guildId = interaction.guild.id
-                    
-    // Get the data from the time period
     const timePeriod = interaction.options.getString('period');
-    let now = new Date();
-    let startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));        
+                    
 
-
-    switch(timePeriod) {
-        case 'All Time':
-            startDate = new Date(0); // Beginning of Unix time
-            break;
-        case 'Yearly':
-            // For 'Yearly', we want to start from the beginning of the current year.
-            // We set the month and date to their minimum values (0 for January and 1 for the first day).
-            startDate = new Date(Date.UTC(now.getUTCFullYear(), 0, 1)); // Start of this year
-            break;
-        case 'Monthly':
-            // For 'Monthly', we want to start from the beginning of the current month.
-            // We set the date to its minimum value (1 for the first day).
-            startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)); // Start of this month
-            break;
-        case 'Weekly':
-            // For 'Weekly', we want to start from the beginning of the current week.
-            // We're using the getUTCDay() function, which returns the day of the week (0 for Sunday, 1 for Monday, etc.).
-            // By subtracting this from the current date, we get the last Sunday.
-            startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - now.getUTCDay())); // Start of this week
-            break;
-        case 'Today':
-            // For 'Today', we just want to start from the beginning of the current day.
-            startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())); // Start of today
-            break;
-    };
-    
-    
-
-    // Define subcategories for Watchtime and Readtime
-    const watchtimeSubcategories = ['Watchtime', 'YouTube', 'Anime'];
-    const readtimeSubcategories = ['Readtime', 'Manga', 'Visual Novel'];
-
+    // Add to matchStage timestamp filter for all logs after the startDate
+    startDate = startDateCalculator(timePeriod);
     let matchStage = {
         $match: { 
             timestamp: { $gte: startDate },
         }
     };
+
+    // Define subcategories for Watchtime and Readtime
+    const watchtimeSubcategories = ['Watchtime', 'YouTube', 'Anime'];
+    const readtimeSubcategories = ['Readtime', 'Manga', 'Visual Novel'];
 
     // Adjust the match condition to include subcategories for Watchtime and Readtime
     if (medium === 'Watchtime') {
