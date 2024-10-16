@@ -2,11 +2,11 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 // Define waitingEmbed to reduce time spent seeing "...Waiting for ホリさん"
 const waitingEmbed = new EmbedBuilder()
-.setColor(0x0099ff) // Orange color to indicate loading/waiting
-.setTitle('🏓 Pong!')
+.setColor(0xFFA500)
+.setTitle('🏓 Ping!')
 .addFields(
-    { name: 'Total Latency', value: `||num||ms`, inline: true },
-    { name: 'API Latency', value: '||num||ms', inline: true },
+    { name: 'Total Latency', value: `||num|| ms`, inline: true },
+    { name: 'API Latency', value: '||num|| ms', inline: true },
 )
 .setTimestamp()
 .setFooter({text:"API Latency updates 1/min"});
@@ -22,16 +22,37 @@ module.exports = {
         // Calculate the ping
 		const endTime = Date.now();
 		const processingDelay = endTime - startTime;
-
-        // Initialize WebSocket ping and timing variables
         let wsRTDelay = interaction.client.ws.ping;
+
+        // Send embed with ping ASAP after calculation
+        const immediatePingEmbed = new EmbedBuilder()
+        .setColor(0x0099ff)
+        .setTitle('🏓 Pong!')
+        .addFields(
+            { name: 'Total Latency', value: `\`${processingDelay} ms\``, inline: true },
+        )
+        .setTimestamp()
+        .setFooter({text:"API Latency updates ~1/min"});
+        // Check if API latency is already present
+        if (wsRTDelay !== -1) {
+            immediatePingEmbed.addFields(
+                { name: 'API Latency', value: `\`${wsRTDelay} ms\``, inline: true }
+            );
+        } else { 
+            immediatePingEmbed.addFields(
+                { name: 'Awaiting API Latency', value: '.... seconds', inline: true },
+            );
+        }
+        await interaction.editReply({ embeds: [immediatePingEmbed] });
+
+
+        // Initialize timing variables
         const maxWaitTime = 60000; // Maximum wait time in milliseconds (60 seconds)
         const checkInterval = 1000; // Interval between checks in milliseconds (1 second)
         let elapsedTime = 0;
 		const clientUptime = interaction.client.uptime
 
-
-        // **2. Poll for ws.ping Initialization**
+        // **2 If Web Socket Heartbeak has not yet been sent out by discord, wait until it has and update reply**
         while (wsRTDelay === -1 && elapsedTime < maxWaitTime) {
             // Wait for the specified check interval
             await new Promise(resolve => setTimeout(resolve, checkInterval));
@@ -46,7 +67,7 @@ module.exports = {
                 const estimatedWaitTime = Math.ceil(((maxWaitTime - clientUptime) - elapsedTime) / 1000);
 
                 // Create an updated embed with status fields
-                const updatedWaitingEmbed = new EmbedBuilder()
+                const AwaitingAPIEmbed = new EmbedBuilder()
                     .setColor(0x0099ff) // Orange color to indicate loading/waiting
                     .setTitle('🏓 Pong!')
                     .addFields(
@@ -57,7 +78,7 @@ module.exports = {
                     .setFooter({text:"API Latency updates ~1/min"});
 
                 // Edit the initial reply with the updated embed
-                await interaction.editReply({ embeds: [updatedWaitingEmbed] });
+                await interaction.editReply({ embeds: [AwaitingAPIEmbed] });
             }
         }
         try {
@@ -70,7 +91,7 @@ module.exports = {
                     { name: 'Total Latency', value: `\`${processingDelay} ms\``, inline: true },
                     { name: 'API Latency', value: wsRTDelay !== -1 ? `\`${wsRTDelay} ms\`` : 'N/A', inline: true },
                 )
-				.setFooter({text:"API Latency updates 1/min"});
+				.setFooter({text:"API Latency updates ~1/min"});
 
             // Edit the initial reply with the final embed
             await interaction.editReply({ embeds: [finalEmbed] });
