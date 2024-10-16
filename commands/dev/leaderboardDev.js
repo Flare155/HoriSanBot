@@ -44,7 +44,7 @@ async execute(interaction) {
 
     // Add to matchStage timestamp filter for all logs after the startDate
     startDate = startDateCalculator(timePeriod);
-    let matchStage = {
+    let lowerTimeBoundMatch = {
         $match: { 
             timestamp: { $gte: startDate },
         }
@@ -54,16 +54,18 @@ async execute(interaction) {
     const watchtimeSubcategories = ['Watchtime', 'YouTube', 'Anime'];
     const readtimeSubcategories = ['Readtime', 'Manga', 'Visual Novel'];
 
-    // Adjust the match condition to include subcategories for Watchtime and Readtime
+    // A match stage that matches the medium but if the medium is watchtime or readtime groups those together appropriately
     if (medium === 'Watchtime') {
-        matchStage.$match.medium = { $in: watchtimeSubcategories };
+        mediumMatch = { $match: { medium: { $in: watchtimeSubcategories } } };
     } else if (medium === 'Readtime') {
-        matchStage.$match.medium = { $in: readtimeSubcategories };
+        mediumMatch = { $match: { medium: { $in: readtimeSubcategories } } };
     } else if (medium !== 'All') {
         // For any other specific medium, just match that one medium
-        matchStage.$match.medium = medium;
-}
-
+        mediumMatch = { $match: { medium } };
+    } else {
+        // If medium is 'All', no need for a specific match on medium
+        mediumMatch = { $match: {} }; // Empty match stage or just ignore it if it's not needed
+    }
 
     // Seperate leaderboards from testing server data
     let testGuildExcludeMatch;
@@ -75,7 +77,8 @@ async execute(interaction) {
 
     const topUsers = await Log.aggregate([
         testGuildExcludeMatch,
-        matchStage,
+        lowerTimeBoundMatch,
+        mediumMatch,
         { $group: { _id: "$userId", totalPoints: { $sum: "$points" } } },
         { $sort: { totalPoints: -1 } },
         { $limit: 10 }
@@ -84,7 +87,7 @@ async execute(interaction) {
     // Find all users logs and sort by points, save as currentUser
     const currentUser = await Log.aggregate([
         testGuildExcludeMatch,
-        matchStage,
+        lowerTimeBoundMatch,
         { $group: { _id: "$userId", totalPoints: { $sum: "$points" } } },
         { $sort: { totalPoints: -1 } }
     ]);

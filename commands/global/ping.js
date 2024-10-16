@@ -16,7 +16,7 @@ module.exports = {
         .setName('ping')
         .setDescription('Replies with Pong and detailed latency information.'),
     async execute(interaction) {
-        // **1 Calculate the latency of the bot response**
+        // Calculate the latency of the bot response
         const startTime = Date.now();
         await interaction.reply({ embeds: [waitingEmbed]});
         // Calculate the ping
