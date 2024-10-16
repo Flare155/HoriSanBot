@@ -2,4 +2,5 @@ services:
   hori-san:
     build: .
     platform: linux/amd64
+    restart: unless-stopped
   
