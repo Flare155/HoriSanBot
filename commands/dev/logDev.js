@@ -5,7 +5,7 @@ const { saveLog } = require('../../utils/saveLog.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('log')
+		.setName('log_dev')
 		.setDescription('Log your immersion!')
         .addStringOption(option =>
             option.setName('medium')

@@ -1,60 +1,132 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 const User = require("../../models/User");
 const Log = require("../../models/Log");
+const moment = require('moment-timezone');
 const { testingServerId } = require('../../config.json');
 const { calculateStreak } = require('../../utils/streakCalculator');
+const { buildImage } = require('../../utils/buildImage');
+const { startDateCalculator } = require('../../utils/startDateCalculator');
+const { localTimeConverter } = require('../../utils/localTimeConverter');
+const { immersionByTimePeriod } = require('../../utils/graph-data/immersionByTimePeriod');
+const { toPoints } = require('../../utils/formatting/toPoints'); // Import toPoints function
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('profile')
-        .setDescription('Replies with your immersion info!'),
+        .setDescription('Replies with your immersion info!')
+        .addStringOption(option =>
+            option.setName('period')
+                .setDescription('Time period of the data to display')
+                .setRequired(true)
+                .addChoices(
+                    { name: 'All Time', value: 'All Time' },
+                    { name: 'Yearly', value: 'Yearly' },
+                    { name: 'Monthly', value: 'Monthly' },
+                    { name: 'Weekly', value: 'Weekly' },
+                )),
     async execute(interaction) {
+        await interaction.deferReply();
         const userId = interaction.user.id;
         const guildId = interaction.guild.id;
+        const timePeriod = interaction.options.getString('period');
         const exists = await User.exists({ userId: userId });
+        const userData = await User.findOne({ userId: interaction.user.id });
+        const userTimezone = userData ? userData.timezone : 'UTC';
 
         let logStats = [];
         let totalPoints = 0;
         let streak = 0;
         let mangaPages = 0;
         let charactersRead = 0;
+        let startDateUTC, endDateUTC;
 
-        // Exclude testing server data
+        // Exclude testing server dasta
         let testGuildExcludeMatch;
         if (guildId === testingServerId) {
             testGuildExcludeMatch = { $match: { guildId: testingServerId } };
+            console.log("testing server");
         } else {
             testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } };
         }
+
+        // Calculate startDate based on timePeriod
+        if (timePeriod === 'All Time') {
+            // Get the timestamp of the first log
+            const firstLog = await Log.aggregate([
+                testGuildExcludeMatch,
+                { $match: { userId: interaction.user.id } },
+                { $sort: { timestamp: 1 } }, // Sort logs by timestamp, earliest first
+                { $limit: 1 } // Limit the result to the first log
+            ]);
+            if (firstLog.length > 0) {
+                startDate = firstLog[0].timestamp;
+                // Convert startDate to the user's timezone and get the start of that day
+                const startDateMoment = moment.tz(startDate).startOf('day');
+                // Convert startDate and endDate to UTC (format not timezone) for database querying
+                startDateUTC = startDateMoment.clone().utc().toDate();
+            } else {
+                // User has no alogs at all
+                await interaction.editReply({ content: 'You have no logs yet! Start logging your immersion with the `/backfill_dev` command.', ephemeral: true });
+                return;
+            }
+        } else {
+            startDateUTC = startDateCalculator(timePeriod);
+        }
+        // Similarly, get the current time in user's timezone and end of the day
+        const endDateMoment = moment.tz(new Date(), userTimezone).endOf('day');
+        endDateUTC = endDateMoment.clone().utc().toDate();
+        console.log(startDateUTC);
+        
+        
+        const lowerTimeBoundMatch = {
+            $match: {
+                timestamp: { $gte: startDateUTC },
+            }
+        };
 
         // Find total points and calculate streak if user exists
         if (exists) {
             // Calculate the streak dynamically based on logs
             streak = await calculateStreak(userId, guildId);
-            
+
             // Update the user's streak in the database
             await User.updateOne({ userId }, { streak });
 
             // Query for total points
             const totalPointsResult = await Log.aggregate([
                 testGuildExcludeMatch,
+                lowerTimeBoundMatch,
                 { $match: { userId: userId } },
-                { $group: { _id: null, total: { $sum: "$points" } } }
+                { $group: { _id: null, totalSeconds: { $sum: "$amount.totalSeconds" } } }
             ]);
 
-            // Assign total points, if no points assign zero
-            totalPoints = totalPointsResult.length > 0 ? totalPointsResult[0].total : 0;
+            // Assign total points (converted to points)
+            totalPoints = totalPointsResult.length > 0 ? toPoints(totalPointsResult[0].totalSeconds) : 0;
 
             // Query for genres and their amounts
             logStats = await Log.aggregate([
                 testGuildExcludeMatch,
+                lowerTimeBoundMatch,
                 { $match: { userId: userId } },
-                { $group: { _id: { medium: "$medium", user: "$userId" }, total: { $sum: "$amount" }, units: { $push: "$unit" } } }
+                {
+                    $group: {
+                        _id: { medium: "$medium" },
+                        totalSeconds: { $sum: "$amount.totalSeconds" },
+                        totalEpisodes: {
+                            $sum: {
+                                $cond: [
+                                    { $eq: ["$amount.unit", "Episodes"] },
+                                    "$amount.count",
+                                    0
+                                ]
+                            }
+                        }
+                    }
+                }
             ]);
         }
-        
-        // Audio
+
         const fieldOrder = {
             // Audio
             Listening: "Minutes",
@@ -70,51 +142,57 @@ module.exports = {
 
         // Sort logStats based on the defined fieldOrder
         logStats.sort((a, b) => {
-            // Get the index of each medium in the fieldOrder
             const indexA = Object.keys(fieldOrder).indexOf(a._id.medium);
             const indexB = Object.keys(fieldOrder).indexOf(b._id.medium);
-
-            // Sort by the index; if not found, it will be pushed to the end
             return indexA - indexB;
         });
 
         // Calculate estimates for manga pages and characters read
         logStats.forEach(stat => {
-            if (stat._id.medium === 'Manga') {
-                // Assume 5 pages per minute of Manga reading
-                mangaPages = stat.total * 5;
-            } else if (stat._id.medium === 'Readtime' || stat._id.medium === 'Visual Novel') {
-                // Assume 500 characters read per minute
-                charactersRead += stat.total * 500;
+            const medium = stat._id.medium;
+            if (medium === 'Manga') {
+                const minutes = Math.floor(stat.totalSeconds / 60);
+                mangaPages += minutes * 5; // Assume 5 pages per minute
+            } else if (medium === 'Readtime' || medium === 'Visual Novel') {
+                const minutes = Math.floor(stat.totalSeconds / 60);
+                charactersRead += minutes * 500; // Assume 500 characters per minute
             }
         });
+
+        // Build genresDescription
+        const genresDescription = logStats.map(stat => {
+            const medium = stat._id.medium;
+            let value = "";
+            if (medium === 'Anime') {
+                value = `${stat.totalEpisodes} Episodes`;
+            } else {
+                const minutes = Math.floor(stat.totalSeconds / 60);
+                value = `${minutes} Minutes`;
+            }
+            return `**${medium}**: ${value}`;
+        }).join('\n');
 
         // Reply
         if (exists) {
             // Embed response:
-            const userAvatarURL = interaction.user.displayAvatarURL();
-        
-            // Make embed for log message
+            const userAvatarURL = interaction.user.displayAvatarURL({ dynamic: true });
+
+            // Create embed for the profile
             const profileEmbed = new EmbedBuilder()
                 .setColor('#c3e0e8')
-                .setTitle(`${interaction.user.displayName}'s Immersion Profile`)
+                .setTitle(`${interaction.member.displayName}'s ${timePeriod} Immersion Profile`)
                 .setThumbnail(userAvatarURL)
-                .setTimestamp()
-                .setFooter({ text: 'Keep up the great work!', iconURL: userAvatarURL });
+                .setImage('attachment://image.png')
+                .setFooter({ text: `Keep up the great work!  •  Displayed in ${userTimezone} time`, iconURL: userAvatarURL });
 
             // Add total points field
             profileEmbed.addFields({ name: "🏆 Total Points", value: `${totalPoints}`, inline: true });
-            
+
             // Add streak field
             profileEmbed.addFields({ name: "🔥 Current Streak", value: `${streak} days`, inline: true });
 
-            // Add genre-specific fields in a more separate section
+            // Add genre-specific fields
             if (logStats.length > 0) {
-                const genresDescription = logStats.map(stat => {
-                    const unit = fieldOrder[stat._id.medium] || 'Units';
-                    return `**${stat._id.medium}**: ${stat.total} ${unit}`;
-                }).join('\n');
-                
                 profileEmbed.addFields({ name: "📚 Immersion Breakdown", value: genresDescription, inline: false });
             }
 
@@ -125,11 +203,22 @@ module.exports = {
             if (charactersRead > 0) {
                 profileEmbed.addFields({ name: "🔠 Estimated Characters Read", value: `${charactersRead} characters`, inline: false });
             }
-            
-            // Send embed
-            await interaction.reply({ embeds: [profileEmbed] });
+
+            // Send the embed
+            await interaction.editReply({ embeds: [profileEmbed] });
+
+            // Create chart for profile
+            const graphData = await immersionByTimePeriod(userId, startDateUTC, endDateUTC, userTimezone);
+            const image = await buildImage("immersionTime", { data: graphData });
+            // Assuming `image` is your Uint8Array
+            const buffer = Buffer.from(image);
+            // Create an attachment from the buffer
+            const attachment = new AttachmentBuilder(buffer, { name: 'image.png' });
+
+            // Edit the reply to include the image
+            await interaction.editReply({ files: [attachment] });
         } else {
-            await interaction.reply({ content: 'User not found 😞', ephemeral: true });
+            await interaction.editReply({ content: 'User not found 😞', ephemeral: true });
         }
     },
 };

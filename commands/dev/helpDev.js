@@ -4,7 +4,7 @@ const { testingServerId } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('help')
+        .setName('help_dev')
         .setDescription('Learn about the bot and overview of the commands!')
         .addStringOption(option =>
             option.setName('command')

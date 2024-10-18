@@ -4,7 +4,7 @@ const { formatTime } = require('../../utils/formatting/formatTime.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('delete_log')
+        .setName('delete_log_dev')
         .setDescription('Deletes a specific log by its ID.')
         .addStringOption(option =>
             option.setName('log_id')

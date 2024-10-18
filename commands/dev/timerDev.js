@@ -2,8 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('ping_dev')
-		.setDescription('Replies with Pong!'),
+		.setName('timer_dev')
+		.setDescription('Start or stop a timer for your immersion!'),
 	async execute(interaction) {
 		await interaction.deferReply();
 		await interaction.editReply('Pong!');

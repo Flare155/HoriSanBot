@@ -56,7 +56,7 @@ function constructInputString(amount) {
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('editlog')
+        .setName('edit_log_dev')
         .setDescription('Edits a specific log by its ID.')
         .addStringOption((option) =>
             option

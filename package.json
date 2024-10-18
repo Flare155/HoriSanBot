@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "better-sqlite3": "^8.4.0",
     "discord.js": "^14.16.1",
     "moment-timezone": "^0.5.46",
     "mongodb": "^5.6.0",
@@ -14,7 +13,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "bun --watch index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "visuals": "cd utils/hori-visuals && npm run dev",
+    "build-visuals": "cd utils/hori-visuals && npm run build"
   },
   "author": "Flare",
   "license": "ISC",

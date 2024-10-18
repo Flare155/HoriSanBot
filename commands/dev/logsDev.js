@@ -72,17 +72,18 @@ module.exports = {
       firstThreeLogs.forEach((log) => {
         // Format time using the user's timezone, without seconds
         const formattedDate = localTimeConverter(log.timestamp, userTimezone);
-        const formattedAmount = `${log.amount} ${log.unit}`;
+        const formattedAmount = `${log.amount.totalSeconds} Seconds`; // Needs updating
         const title = log.title || 'N/A';
         const notes = log.notes || 'N/A';
 
+        // If I put these tabbed in on mobile looks like crap
         embed.addFields({
           name: `\`${formattedDate}\``,
           value: `**Medium**: ${log.medium}
-          **Amount**: ${formattedAmount}
-          **Title**: ${title}
-          **Notes**: ${notes !== 'N/A' ? notes : 'No notes provided'}
-          **ID**: ${log._id}\n`
+**Amount**: ${formattedAmount}
+**Title**: ${title}
+**Notes**: ${notes !== 'N/A' ? notes : 'No notes provided'}
+**ID**: ${log._id}\n`
         });
       });
 
@@ -92,11 +93,11 @@ module.exports = {
       // Create and send the full log history as a text file
       const formattedLogs = logs.map((log) => {
         const formattedDate = localTimeConverter(log.timestamp, userTimezone);
-        let formattedAmount = `(${log.amount} ${log.unit})`;
+        let formattedAmount = `${log.amount.totalSeconds} Seconds`; // Needs updating
         let title = log.title || 'N/A';
         let notes = log.notes || 'N/A';
 
-        let logString = `⏤⏤⏤⏤⏤⏤\n${formattedDate}\nMedium: ${log.medium} ${formattedAmount}`;
+        let logString = `⏤⏤⏤⏤⏤⏤\n${formattedDate}\nMedium: ${log.medium} (${formattedAmount})`;
         if (title != 'N/A') {
           logString += `\nTitle: ${title}`;
         };
