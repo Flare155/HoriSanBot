@@ -9,7 +9,6 @@ const immersionByTimePeriod = async (userId, startDateUTC, endDateUTC, timezone)
   // Fetch logs from the database within the date range
   const logs = await Log.find({
     userId,
-    testGuildExcludeMatch,
     timestamp: {
       $gte: startDateUTC,
       $lte: endDateUTC,
