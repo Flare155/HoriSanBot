@@ -3,6 +3,7 @@
 function footerCreator(interaction, points) {
     let footerText = 'Keep up the great immersion!';
     const iconURL = interaction.user.displayAvatarURL();
+    points = points / 60;
 
     //special footers
     if (points == 1200) {
@@ -27,7 +28,6 @@ function footerCreator(interaction, points) {
     } else if (points > 40) {
         footerText = 'Great job! Keep pushing forward!';
     }
-
     return { text: footerText, iconURL: iconURL };
 };
 

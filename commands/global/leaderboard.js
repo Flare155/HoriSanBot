@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Log = require('../../models/Log');
 const { testingServerId } = require('../../config.json');
+const { startDateCalculator } = require('../../utils/startDateCalculator');
+const { toPoints } = require('../../utils/formatting/toPoints'); // Import the toPoints function
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -12,11 +14,11 @@ module.exports = {
                 .setRequired(true)
                 .addChoices(
                     { name: 'All Time', value: 'All Time' },
-                    { name: 'Yearly', value: 'Yearly'},
-                    { name: 'Monthly', value: 'Monthly'},
+                    { name: 'Yearly', value: 'Yearly' },
+                    { name: 'Monthly', value: 'Monthly' },
                     { name: 'Weekly', value: 'Weekly' },
                     { name: 'Daily', value: 'Daily' },
-                    ))
+                ))
         .addStringOption(option =>
             option.setName('medium')
                 .setDescription('The medium of the leaderboard')
@@ -33,135 +35,122 @@ module.exports = {
                     { name: 'Readtime', value: 'Readtime' },
                     { name: 'Visual Novel', value: 'Visual Novel' },
                     { name: 'Manga', value: 'Manga' },
-                    )),
-async execute(interaction) {
-    await interaction.deferReply();
-    const medium = interaction.options.getString('medium');
-    const guildId = interaction.guild.id
-                    
-    // Get the data from the time period
-    const timePeriod = interaction.options.getString('period');
-    let now = new Date();
-    let startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));        
+                )),
+    async execute(interaction) {
+        await interaction.deferReply();
+        const medium = interaction.options.getString('medium');
+        const guildId = interaction.guild.id;
+        const timePeriod = interaction.options.getString('period');
 
-
-    switch(timePeriod) {
-        case 'All Time':
-            startDate = new Date(0); // Beginning of Unix time
-            break;
-        case 'Yearly':
-            // For 'Yearly', we want to start from the beginning of the current year.
-            // We set the month and date to their minimum values (0 for January and 1 for the first day).
-            startDate = new Date(Date.UTC(now.getUTCFullYear(), 0, 1)); // Start of this year
-            break;
-        case 'Monthly':
-            // For 'Monthly', we want to start from the beginning of the current month.
-            // We set the date to its minimum value (1 for the first day).
-            startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)); // Start of this month
-            break;
-        case 'Weekly':
-            // For 'Weekly', we want to start from the beginning of the current week.
-            // We're using the getUTCDay() function, which returns the day of the week (0 for Sunday, 1 for Monday, etc.).
-            // By subtracting this from the current date, we get the last Sunday.
-            startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - now.getUTCDay())); // Start of this week
-            break;
-        case 'Today':
-            // For 'Today', we just want to start from the beginning of the current day.
-            startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())); // Start of today
-            break;
-    };
-    
-    
-
-    // Define subcategories for Watchtime and Readtime
-    const watchtimeSubcategories = ['Watchtime', 'YouTube', 'Anime'];
-    const readtimeSubcategories = ['Readtime', 'Manga', 'Visual Novel'];
-
-    let matchStage = {
-        $match: { 
-            timestamp: { $gte: startDate },
-        }
-    };
-
-    // Adjust the match condition to include subcategories for Watchtime and Readtime
-    if (medium === 'Watchtime') {
-        matchStage.$match.medium = { $in: watchtimeSubcategories };
-    } else if (medium === 'Readtime') {
-        matchStage.$match.medium = { $in: readtimeSubcategories };
-    } else if (medium !== 'All') {
-        // For any other specific medium, just match that one medium
-        matchStage.$match.medium = medium;
-}
-
-
-    // Seperate leaderboards from testing server data
-    let testGuildExcludeMatch;
-    if (guildId === testingServerId) {
-        testGuildExcludeMatch = { $match: { guildId: testingServerId} };
-    } else {
-        testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } };
-    }
-
-    const topUsers = await Log.aggregate([
-        testGuildExcludeMatch,
-        matchStage,
-        { $group: { _id: "$userId", totalPoints: { $sum: "$points" } } },
-        { $sort: { totalPoints: -1 } },
-        { $limit: 10 }
-    ]);
-    
-    // Find all users logs and sort by points, save as currentUser
-    const currentUser = await Log.aggregate([
-        testGuildExcludeMatch,
-        matchStage,
-        { $group: { _id: "$userId", totalPoints: { $sum: "$points" } } },
-        { $sort: { totalPoints: -1 } }
-    ]);
-
-    const topTenNamesAndPoints = await Promise.all(topUsers.map(async user => {
-        let discordUser = await interaction.client.users.fetch(user._id);
-        return {
-            displayName: discordUser.displayName,
-            totalPoints: user.totalPoints
+        const startDate = startDateCalculator(timePeriod);
+        console.log(startDate);
+        const lowerTimeBoundMatch = {
+            $match: {
+                timestamp: { $gte: startDate },
+            }
         };
-    }));
 
-    
-    
-    // Find position of current user, find their total points, get their displayName
-    const currentUserPosition = currentUser.findIndex(user => user._id === interaction.user.id) + 1;
-    const currentUserPoints = currentUser.find(user => user._id === interaction.user.id)?.totalPoints || 0;
-    const currentdisplayName = interaction.user.displayName;
+        // Define subcategories for Watchtime and Readtime
+        const watchtimeSubcategories = ['Watchtime', 'YouTube', 'Anime'];
+        const readtimeSubcategories = ['Readtime', 'Manga', 'Visual Novel'];
 
-    // if not in top 10, dont make a space to prevent useless space at bottom of leaderboard
-    let endspace = ""
-    if (currentUserPosition > 10) {
-        endspace = "\n‎"
-    }
+        // Match stage for the medium
+        let mediumMatch;
+        if (medium === 'Watchtime') {
+            mediumMatch = { $match: { medium: { $in: watchtimeSubcategories } } };
+        } else if (medium === 'Readtime') {
+            mediumMatch = { $match: { medium: { $in: readtimeSubcategories } } };
+        } else if (medium !== 'All') {
+            mediumMatch = { $match: { medium } };
+        } else {
+            mediumMatch = { $match: {} }; // No medium filter
+        }
 
-    // Make embed for log message
-    const leaderboardEmbed = new EmbedBuilder()
-    .setColor('#c3e0e8')
-    .setTitle(`${timePeriod} ${medium} Immersion Leaderboard`)
-    .setAuthor({ name: interaction.guild.name, iconURL: interaction.guild.iconURL() })
-    .setThumbnail('https://media.giphy.com/media/vNY0UZX11LcNW/giphy.gif')
-    .setTimestamp()
-    .addFields(
-        // Zero space unicode character after last name to add a space
-        topTenNamesAndPoints.map((user, index) => ({
-            name: `${index + 1}. ${user.displayName}`,
-            value: `\`${user.totalPoints} points\`${index==9 ? endspace : ""}`
-        }))
-    );
+        // Exclude or include testing server data
+        let testGuildExcludeMatch;
+        if (guildId === testingServerId) {
+            testGuildExcludeMatch = { $match: { guildId: testingServerId } };
+        } else {
+            testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } };
+        }
 
-    if (currentUserPosition > 10) {
-        leaderboardEmbed.addFields({ 
-            name: `${currentUserPosition}. ${currentdisplayName}`, 
-            value: `\`${currentUserPoints} points\``
-        });
-    };
-    
-    // Send embed
-    await interaction.editReply({ embeds: [leaderboardEmbed] });
-},
+        // Aggregation pipeline to get top users
+        const topUsers = await Log.aggregate([
+            testGuildExcludeMatch,
+            lowerTimeBoundMatch,
+            mediumMatch,
+            {
+                $group: {
+                    _id: "$userId",
+                    totalSeconds: { $sum: "$amount.totalSeconds" }
+                }
+            },
+            { $sort: { totalSeconds: -1 } },
+            { $limit: 10 }
+        ]);
+
+        // Aggregation to find all users and their positions
+        const allUsers = await Log.aggregate([
+            testGuildExcludeMatch,
+            lowerTimeBoundMatch,
+            mediumMatch,
+            {
+                $group: {
+                    _id: "$userId",
+                    totalSeconds: { $sum: "$amount.totalSeconds" }
+                }
+            },
+            { $sort: { totalSeconds: -1 } }
+        ]);
+
+        // Fetch display names for top users
+        const topTenNamesAndPoints = await Promise.all(topUsers.map(async (user) => {
+            let discordUser;
+            try {
+                discordUser = await interaction.client.users.fetch(user._id);
+            } catch {
+                discordUser = { username: "Unknown User" };
+            }
+            return {
+                displayName: discordUser.username,
+                totalPoints: toPoints(user.totalSeconds) // Convert totalSeconds to points
+            };
+        }));
+
+        // Find position and points of the current user
+        const currentUserPosition = allUsers.findIndex(user => user._id === interaction.user.id) + 1;
+        const currentUserData = allUsers.find(user => user._id === interaction.user.id);
+        const currentUserPoints = currentUserData ? toPoints(currentUserData.totalSeconds) : 0; // Convert to points
+        const currentDisplayName = interaction.user.username;
+
+        // If not in top 10, adjust spacing
+        let endspace = "";
+        if (currentUserPosition > 10) {
+            endspace = "\n‎";
+        }
+
+        // Create the leaderboard embed
+        const leaderboardEmbed = new EmbedBuilder()
+            .setColor('#c3e0e8')
+            .setTitle(`${timePeriod} ${medium} Immersion Leaderboard`)
+            .setAuthor({ name: interaction.guild.name, iconURL: interaction.guild.iconURL() })
+            .setThumbnail('https://media.giphy.com/media/vNY0UZX11LcNW/giphy.gif')
+            .setTimestamp()
+            .addFields(
+                topTenNamesAndPoints.map((user, index) => ({
+                    name: `${index + 1}. ${user.displayName}`,
+                    value: `\`${user.totalPoints} points\`${index === 9 ? endspace : ""}`
+                }))
+            );
+
+        if (currentUserPosition > 10) {
+            leaderboardEmbed.addFields({
+                name: `${currentUserPosition}. ${currentDisplayName}`,
+                value: `\`${currentUserPoints} points\``
+            });
+        }
+
+        // Send the embed
+        await interaction.editReply({ embeds: [leaderboardEmbed] });
+    },
 };

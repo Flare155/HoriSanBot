@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 const Log = require('../../models/Log');
+const { formatTime } = require('../../utils/formatting/formatTime.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -12,23 +13,21 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
         try {
-            // Step 1: Get the log ID from the user's input
             const logId = interaction.options.getString('log_id');
-            // Step 2: Find the log in the database without deleting it
             const log = await Log.findOne({ _id: logId, userId: interaction.user.id });
+            
             if (log) {
                 // Log was found, display details and ask for confirmation
                 const userAvatarURL = interaction.user.displayAvatarURL();
+                const amountDescription = log.amount.unit === 'Episodes' ? `${log.amount.count} Episodes` : formatTime(log.amount.totalSeconds);
+
                 const logEmbed = new EmbedBuilder()
                     .setColor(0xff0000)
-                    .setTitle(`Confirm Deletion of ${log.amount} ${log.unit} of ${log.medium}`)
+                    .setTitle(`Confirm Deletion of ${amountDescription} of ${log.medium}`)
                     .setDescription(`Are you sure you want to delete the following log? This action cannot be undone.`)
                     .setThumbnail(userAvatarURL)
                     .addFields({ name: 'Time Created', value: `<t:${Math.floor(new Date(log.timestamp).getTime() / 1000)}:F>`, inline: false })
-                    .addFields(
-                        { name: 'Amount', value: `${log.amount} ${log.unit}`, inline: true },
-                        // Add more fields as needed
-                    );
+                    .addFields({ name: 'Amount', value: amountDescription, inline: true });
 
                 if (log.title) {
                     logEmbed.addFields({ name: 'Title', value: log.title, inline: true });

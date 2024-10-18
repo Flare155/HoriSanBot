@@ -1,8 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const mongoose = require('mongoose');
-const User = require("../../models/User");
-const Log = require("../../models/Log");
-const { footerCreator } = require('../../utils/logFooterCreator.js');
+const { footerCreator } = require('../../utils/formatting/logFooterCreator.js');
+const { calculateEmbedColor } = require('../../utils/formatting/calculateEmbedColor.js');
+const { saveLog } = require('../../utils/saveLog.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -17,13 +16,13 @@ module.exports = {
                     { name: 'Watchtime', value: 'Watchtime' },     // Audio-Visual
                     { name: 'YouTube', value: 'YouTube' },
                     { name: 'Anime', value: 'Anime' },
-                    { name: 'Readtime', value: 'Readtime' },       // Reading
+                    { name: 'Readtime', value: 'Readtime' },       //    Reading
                     { name: 'Visual Novel', value: 'Visual Novel' },
                     { name: 'Manga', value: 'Manga' },
                 ))
-        .addNumberOption(option =>
+        .addStringOption(option =>
             option.setName('amount')
-                .setDescription('Minutes immersed or episodes watched (Episodes can be a decimal for non-standard length episodes)')
+                .setDescription('Enter a time (e.g., 45m 1h30m, 2m5s) or number of episodes (e.g., 10ep)')
                 .setRequired(true)
             )
         .addStringOption(option =>
@@ -35,149 +34,136 @@ module.exports = {
             option.setName('notes')
                 .setDescription('Optional notes')
                 .setRequired(false)
-            ),
-
+            )
+        .addStringOption(option =>
+            option.setName('episode_length')
+                .setDescription('The length of each episode (e.g., 45m 1h30m, 2m5s)')
+                .setRequired(false)
+        ),
     async execute(interaction) {
+        await interaction.deferReply();
         const medium = interaction.options.getString('medium');
-        const amount = interaction.options.getNumber('amount');
+        const input = interaction.options.getString('amount');
         const title = interaction.options.getString('title');
         const notes = interaction.options.getString('notes');
+        const customEpisodeLength = interaction.options.getString('episode_length');
+        let unit = "", unitLength = null;
+        let hours = 0, minutes = 0, totalSeconds = 0, episodes = 0;
+        // Regular expression to match time and episode formats
+        const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/; // Matches input in ( Num h, Num m, Num s) excludes ep
+        const episodePattern = /^(?!.*[hms])(\d+)ep$/; // Matches input in ( Num ep ) format, excludes hms
 
-        // Define units for each medium
-        const mediumUnits = {
-            Listening: "Minutes",
-            Watchtime: "Minutes",
-            YouTube: "Minutes",
-            Anime: "Episodes",
-            Readtime: "Minutes",
-            "Visual Novel": "Minutes",
-            Manga: "Minutes",
+
+        // Calculate log information based on input
+        if (!episodePattern.test(input) && !timePattern.test(input)) {
+            return sendErrorMessage(interaction, "Invalid input format. Examples: |2ep|, |1h3m|. See /help log for more info.");
+        }
+
+        // Handle episodes logic here
+        if (episodePattern.test(input)) {
+            // Ensure only Anime can be logged as Episodes
+            if (medium !== "Anime") {
+                return sendErrorMessage(interaction, "You can only log Anime as Episodes, do /help log for more info.");
+            };
+            // If the user enters a custom episode length
+            if (customEpisodeLength) {
+                if (timePattern.test(customEpisodeLength)) {
+                    // Parse episodes and totalSeconds for custom length animse log, then save data
+                    count = parseEpisodes(input, episodePattern);
+                    unitLength = parseTime(customEpisodeLength, timePattern);
+                    console.log(unitLength);
+                    totalSeconds = unitLength * count;
+                    unit = "Episodes"
+                } else {
+                    // Invalid Input Catch
+                    return sendErrorMessage(interaction, "Invalid input format. Examples: |2ep|, |1h3m|. See /help log for more info.");
+                }
+            } else {
+                // Set log data for non custom anime log
+                unitLength = 1260;
+                count = parseEpisodes(input, episodePattern);
+                unit = "Episodes"
+                totalSeconds = count * 21 * 60;
+            };
+        } else if (timePattern.test(input)) {
+            // Handle time
+            if (medium === "Anime") {
+                return sendErrorMessage(interaction, "For custom anime episode lengths, use episodeLength. See /help log for more info.");
+            };
+            count = parseTime(input, timePattern)
+            console.log(count);
+            unit = "Seconds";
+            totalSeconds = count;
+        } else {
+            // Invalid Input Catch
+            return sendErrorMessage(interaction, "Invalid input format. Examples: |2ep|, |1h3m|. See /help log for more info.");
+        }
+
+        // Error handling for invalid log amounts
+        if (totalSeconds <= 60) return interaction.editReply(`Error: The minimum log size is 1 minute, you entered ${totalSeconds} seconds`);
+        if (totalSeconds > 72000) return interaction.editReply(`Error: The maximum log size is 1200 minutes (20 hours), you entered ${Math.round((totalSeconds * 10) / 60) / 10} Minutes.`);
+
+        // Calculate title and description for embed
+        const description = unit === "Episodes" ? `${unitLength} points/episode → +${totalSeconds} points` : `1 point/sec → +${totalSeconds} points`;
+        if (unit !== "Episodes") {
+            embedTitle = `🎉 ${interaction.user.displayName} Logged ${Math.round((totalSeconds * 10) / 60) / 10} Minutes of ${medium}!`;
+        } else {
+            embedTitle = `🎉 ${interaction.user.displayName} Logged ${input} ${unit} of ${medium}!`;
         };
 
-        const mediumUnit = mediumUnits[medium];
-        if (!mediumUnit) return interaction.reply("Error: Unable to find the medium for the log.");
-
-        // Calculate points and description for the embed
-        const points = mediumUnit === "Episodes" ? amount * 20 : amount;
-        const description = mediumUnit === "Episodes" ? `20 points/episode → +${points} points` : `1 point/minute → +${points} points`;
-
-        // Error handling for invalid amounts
-        if (points <= 0) return interaction.reply("Error: The amount is too low to log.");
-        if (points > 1200) return interaction.reply("Error: The maximum log size is 1200 minutes (20 hours).");
-
         // Save the log data to the database
-        await saveLog(interaction, medium, mediumUnit, amount, points, title, notes);
-
-        // Generate and send an embed message with the log details
-        await sendLogEmbed(interaction, medium, mediumUnit, amount, description, title, notes, points);
+        customDate = null;
+        isBackLog = false;
+        await saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
+        // Send an embed message with the log details
+        await sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes);
     },
 };
 
-// Function to save the log to the database
-async function saveLog(interaction, medium, mediumUnit, amount, points, title, notes) {
-    try {
-        // Check if the user exists and create a user entry if not
-        const userExists = await User.exists({ userId: interaction.user.id });
-        if (!userExists) {
-            const newUser = new User({
-                userId: interaction.user.id,
-                guildId: interaction.guild.id,
-                timestamp: Date.now(),  // Use Date.now() for better timestamp handling
-            });
-            await newUser.save();
-        }
 
-        // Save the log entry
-        const newLog = new Log({
-            userId: interaction.user.id,
-            guildId: interaction.guild.id,
-            timestamp: Date.now(),
-            medium,
-            unit: mediumUnit,
-            amount,
-            points,
-            title,
-            notes,
-        });
-        await newLog.save();
-    } catch (error) {
-        console.error("Error saving log:", error);
-        await interaction.reply("An error occurred while saving your log.");
-    }
-}
-
-// Function to calculate the embed color based on points
-function calculateEmbedColor(points) {
-    // Cap points at 1200
-    const cappedPoints = Math.min(points, 1200);
-
-    let r, g, b;
-
-    if (cappedPoints <= 60) {
-        // Points 0 to 60: White to Cyan
-        const ratio = cappedPoints / 60;
-        r = Math.round(255 - (255 * ratio));
-        g = 255;
-        b = 255;
-    } else if (cappedPoints <= 150) {
-        // Points 60 to 150: Cyan to Bright Green
-        const ratio = (cappedPoints - 60) / (150 - 60);
-        r = 0;
-        g = Math.round(255 - (55 * ratio)); // Green: 255 to 200
-        b = Math.round(255 - (155 * ratio)); // Blue: 255 to 100
-    } else if (cappedPoints <= 250) {
-        // Points 150 to 250: Bright Green to Red
-        const ratio = (cappedPoints - 150) / (250 - 150);
-        r = Math.round(255 * ratio);
-        g = Math.round(200 - (200 * ratio)); // Green: 200 to 0
-        b = Math.round(100 - (100 * ratio)); // Blue: 100 to 0
-    } else if (cappedPoints <= 400) {
-        // Points 250 to 400: Red to Black
-        const ratio = (cappedPoints - 250) / (400 - 250);
-        r = Math.round(255 - (255 * ratio));
-        g = 0;
-        b = 0;
-    } else {
-        // Points above 400: Gold color
-        r = 255;
-        g = 215;
-        b = 0;
-    }
-
-    // Convert RGB to hex
-    const rgbToHex = (r, g, b) => {
-        return '#' + [r, g, b].map(x => {
-            const hex = x.toString(16).padStart(2, '0');
-            return hex;
-        }).join('');
-    }
-
-    return rgbToHex(r, g, b);
-}
-
-
-// Function to create and send the embed message
-async function sendLogEmbed(interaction, medium, mediumUnit, amount, description, title, notes, points) {
-    
+// Utility function to create and send the embed message
+async function sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes) {
     // Calculate the embed color based on the points
-    const embedColor = calculateEmbedColor(points);
-
+    const embedColor = calculateEmbedColor(totalSeconds);
     // Create footer message
-    const footer = footerCreator(interaction, points);
+    const footer = footerCreator(interaction, totalSeconds);
 
     const logEmbed = new EmbedBuilder()
         .setColor(embedColor)
-        .setTitle(`🎉 ${interaction.user.displayName} Logged ${amount} ${mediumUnit} of ${medium}!`)
+        .setTitle(embedTitle)
         .setDescription(description)
         .setThumbnail(interaction.user.displayAvatarURL())
-        .addFields({ name: '📖 Title', value: title, inline: true });
-
+        .addFields({ name: '📖 Title', value: title, inline: true })
+        .setTimestamp();
     if (notes) {
         logEmbed.addFields({ name: '📝 Notes', value: notes, inline: true });
     }
-
     logEmbed.setFooter(footer);
 
     // Send the embed
-    await interaction.reply({ embeds: [logEmbed] });
+    await interaction.editReply({ embeds: [logEmbed] });
 }
+
+
+// Utility function to send error messages
+function sendErrorMessage(interaction, message) {
+    interaction.editReply(`\`${message}\``);
+    return;
+}
+
+// Utility function to parse time strings
+const parseTime = (input, timePattern) => {
+    const match = input.match(timePattern);
+    if (!match) return null;
+    const hours = parseInt(match[1] || 0, 10);
+    const minutes = parseInt(match[2] || 0, 10);
+    const totalSeconds = parseInt(match[3] || 0, 10);
+    return (hours * 3600) + (minutes * 60) + totalSeconds;
+};
+
+// Utility function to parse episode input
+const parseEpisodes = (input, episodePattern) => {
+    const match = input.match(episodePattern);
+    if (!match) return null;
+    return parseInt(match[1], 10);
+};
