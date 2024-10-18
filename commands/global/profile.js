@@ -182,9 +182,8 @@ module.exports = {
                 .setColor('#c3e0e8')
                 .setTitle(`${interaction.member.displayName}'s ${timePeriod} Immersion Profile`)
                 .setThumbnail(userAvatarURL)
-                .setTimestamp()
                 .setImage('attachment://image.png')
-                .setFooter({ text: 'Keep up the great work!', iconURL: userAvatarURL });
+                .setFooter({ text: `Keep up the great work!  •  Displayed in ${userTimezone} time`, iconURL: userAvatarURL });
 
             // Add total points field
             profileEmbed.addFields({ name: "🏆 Total Points", value: `${totalPoints}`, inline: true });
