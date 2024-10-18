@@ -3,11 +3,9 @@ const mongoose = require('mongoose');
 const User = require("../../models/User");
 const Log = require("../../models/Log");
 const moment = require('moment-timezone');
-const { testingServerId } = require('../../config.json');
 const { calculateStreak } = require('../../utils/streakCalculator');
 const { buildImage } = require('../../utils/buildImage');
 const { startDateCalculator } = require('../../utils/startDateCalculator');
-const { localTimeConverter } = require('../../utils/localTimeConverter');
 const { immersionByTimePeriod } = require('../../utils/graph-data/immersionByTimePeriod');
 const { toPoints } = require('../../utils/formatting/toPoints'); // Import toPoints function
 
@@ -41,20 +39,11 @@ module.exports = {
         let charactersRead = 0;
         let startDateUTC, endDateUTC;
 
-        // Exclude testing server dasta
-        let testGuildExcludeMatch;
-        if (guildId === testingServerId) {
-            testGuildExcludeMatch = { $match: { guildId: testingServerId } };
-            console.log("testing server");
-        } else {
-            testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } };
-        }
 
         // Calculate startDate based on timePeriod
         if (timePeriod === 'All Time') {
             // Get the timestamp of the first log
             const firstLog = await Log.aggregate([
-                testGuildExcludeMatch,
                 { $match: { userId: interaction.user.id } },
                 { $sort: { timestamp: 1 } }, // Sort logs by timestamp, earliest first
                 { $limit: 1 } // Limit the result to the first log
@@ -62,7 +51,7 @@ module.exports = {
             if (firstLog.length > 0) {
                 startDate = firstLog[0].timestamp;
                 // Convert startDate to the user's timezone and get the start of that day
-                const startDateMoment = moment.tz(startDate).startOf('day');
+                const startDateMoment = moment(startDate).startOf('day');
                 // Convert startDate and endDate to UTC (format not timezone) for database querying
                 startDateUTC = startDateMoment.clone().utc().toDate();
             } else {
@@ -76,7 +65,6 @@ module.exports = {
         // Similarly, get the current time in user's timezone and end of the day
         const endDateMoment = moment.tz(new Date(), userTimezone).endOf('day');
         endDateUTC = endDateMoment.clone().utc().toDate();
-        console.log(startDateUTC);
         
         
         const lowerTimeBoundMatch = {
@@ -95,7 +83,6 @@ module.exports = {
 
             // Query for total points
             const totalPointsResult = await Log.aggregate([
-                testGuildExcludeMatch,
                 lowerTimeBoundMatch,
                 { $match: { userId: userId } },
                 { $group: { _id: null, totalSeconds: { $sum: "$amount.totalSeconds" } } }
@@ -106,7 +93,6 @@ module.exports = {
 
             // Query for genres and their amounts
             logStats = await Log.aggregate([
-                testGuildExcludeMatch,
                 lowerTimeBoundMatch,
                 { $match: { userId: userId } },
                 {

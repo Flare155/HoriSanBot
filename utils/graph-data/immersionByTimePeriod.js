@@ -33,6 +33,7 @@ const immersionByTimePeriod = async (userId, startDateUTC, endDateUTC, timezone)
   logs.forEach((log) => {
     // Adjust the timestamp to the user's timezone
     const logDate = moment(log.timestamp).tz(timezone).format('YYYY-MM-DD');
+    // Interaction.followUp(logDate);
 
     // Initialize dataByDate[logDate] if not present
     if (!dataByDate[logDate]) {
