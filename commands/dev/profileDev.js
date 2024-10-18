@@ -1,5 +1,4 @@
     const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require('discord.js');
-    const mongoose = require('mongoose');
     const User = require("../../models/User");
     const Log = require("../../models/Log");
     const moment = require('moment-timezone');

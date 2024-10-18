@@ -9,15 +9,9 @@ module.exports = {
         .setDescription('Removes your most recent log (cannot be undone)'),
     async execute(interaction) {
         // Determine which guildId to search for
-        let guildIdCondition;
-        if (interaction.guild.id === testingServerId) {
-            guildIdCondition = testingServerId;
-        } else {
-            guildIdCondition = { $ne: testingServerId };
-        }
 
         // Fetch the most recent log by the user with the determined guildId
-        const log = await Log.findOne({ userId: interaction.user.id, guildId: guildIdCondition }).sort({ timestamp: -1 });
+        const log = await Log.findOne({ userId: interaction.user.id }).sort({ timestamp: -1 });
 
         // If there is a log, delete it
         if(log) {
