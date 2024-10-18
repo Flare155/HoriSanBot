@@ -3,8 +3,8 @@ const Log = require("../../models/Log");
 
 const immersionByTimePeriod = async (userId, startDateUTC, endDateUTC, timezone) => {
   // Convert startDateUTC and endDateUTC to moment objects in the user's timezone
-  const startDateMoment = moment.tz(startDateUTC, timezone);
-  const endDateMoment = moment.tz(endDateUTC, timezone);
+  const startDateMoment = moment(startDateUTC);
+  const endDateMoment = moment(endDateUTC);
 
   // Fetch logs from the database within the date range
   const logs = await Log.find({
