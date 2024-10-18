@@ -23,7 +23,6 @@ module.exports = {
         ),
     async execute(interaction) {
         const command = interaction.options.getString('command');
-
         const helpMessages = {
             help: {
                 title: '💡 Help Command',
@@ -34,8 +33,22 @@ module.exports = {
             log: {
                 title: '📝 Log Command',
                 description: 'Log your immersion with a medium, title, amount, and notes.',
-                usage: '/log [medium] [title] [amount] [notes]',
-                details: 'Use this command to keep track of your immersion details such as books, movies, or other media.'
+                usage: '/log [medium] [title] [amount] [notes] [episode length=21]',
+                details: `Use this command to keep track of your immersion details such as books, movies, or other media.
+Use this command to keep track of your immersion details such as books, movies, or other media.
+* The [amount] field can be in episodes or in raw minutes.
+Examples: `5ep`(21*5=105) `1h15m` (75) `5m30s` (5.5) 
+* Suggested title format: 
+YouTube: `ChannelName Title`
+Anime:    `SeriesName Season`
+Podcast: `Creator PodcastName`
+etc.
+* Suggested note format:
+YouTube: `[link]`
+Anime:     `eps[start]-[end]`
+Podcast: `Episode [number] | [link]`
+-# For any additional assistance DM or @ flarenotfound on discord!
+                    `
             },
             logs: {
                 title: '📜 Logs Command',
