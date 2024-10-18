@@ -18,7 +18,17 @@ module.exports = {
             option.setName('amount')
                 .setDescription('The amount of time you want to be timed out for')
                 .setRequired(true)
-            ),
+            )
+		.addNumberOption(option =>
+			option.setName('time_of_day')
+				.setDescription('The amount of times to repeat the timeout')
+				.setRequired(true)
+			)
+		.addNumberOption(option =>
+			option.setName('repeat')
+				.setDescription('The amount of times to repeat the timeout')
+				.setRequired(true)
+			),	
 	async execute(interaction) {
 		const timeUnits = {
 			86400000: 'day',

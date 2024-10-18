@@ -41,82 +41,87 @@ module.exports = {
                 .setRequired(false)
         ),
     async execute(interaction) {
-        await interaction.deferReply();
-        const medium = interaction.options.getString('medium');
-        const input = interaction.options.getString('amount');
-        const title = interaction.options.getString('title');
-        const notes = interaction.options.getString('notes');
-        const customEpisodeLength = interaction.options.getString('episode_length');
-        let unit = "", unitLength = null;
-        let hours = 0, minutes = 0, totalSeconds = 0, episodes = 0;
-        // Regular expression to match time and episode formats
-        const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/; // Matches input in ( Num h, Num m, Num s) excludes ep
-        const episodePattern = /^(?!.*[hms])(\d+)ep$/; // Matches input in ( Num ep ) format, excludes hms
+        try {
+            await interaction.deferReply();
+            const medium = interaction.options.getString('medium');
+            const input = interaction.options.getString('amount');
+            const title = interaction.options.getString('title');
+            const notes = interaction.options.getString('notes');
+            const customEpisodeLength = interaction.options.getString('episode_length');
+            let unit = "", unitLength = null;
+            let hours = 0, minutes = 0, totalSeconds = 0, episodes = 0;
+            // Regular expression to match time and episode formats
+            const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/; // Matches input in ( Num h, Num m, Num s) excludes ep
+            const episodePattern = /^(?!.*[hms])(\d+)ep$/; // Matches input in ( Num ep ) format, excludes hms
 
 
-        // Calculate log information based on input
-        if (!episodePattern.test(input) && !timePattern.test(input)) {
-            return sendErrorMessage(interaction, "Invalid input format. Examples: |2ep|, |1h3m|. See /help log for more info.");
-        }
+            // Calculate log information based on input
+            if (!episodePattern.test(input) && !timePattern.test(input)) {
+                return sendErrorMessage(interaction, "Invalid input format. Examples: |2ep|, |1h3m|. See /help log for more info.");
+            }
 
-        // Handle episodes logic here
-        if (episodePattern.test(input)) {
-            // Ensure only Anime can be logged as Episodes
-            if (medium !== "Anime") {
-                return sendErrorMessage(interaction, "You can only log Anime as Episodes, do /help log for more info.");
-            };
-            // If the user enters a custom episode length
-            if (customEpisodeLength) {
-                if (timePattern.test(customEpisodeLength)) {
-                    // Parse episodes and totalSeconds for custom length animse log, then save data
-                    count = parseEpisodes(input, episodePattern);
-                    unitLength = parseTime(customEpisodeLength, timePattern);
-                    console.log(unitLength);
-                    totalSeconds = unitLength * count;
-                    unit = "Episodes"
+            // Handle episodes logic here
+            if (episodePattern.test(input)) {
+                // Ensure only Anime can be logged as Episodes
+                if (medium !== "Anime") {
+                    return sendErrorMessage(interaction, "You can only log Anime as Episodes, do /help log for more info.");
+                };
+                // If the user enters a custom episode length
+                if (customEpisodeLength) {
+                    if (timePattern.test(customEpisodeLength)) {
+                        // Parse episodes and totalSeconds for custom length animse log, then save data
+                        count = parseEpisodes(input, episodePattern);
+                        unitLength = parseTime(customEpisodeLength, timePattern);
+                        console.log(unitLength);
+                        totalSeconds = unitLength * count;
+                        unit = "Episodes"
+                    } else {
+                        // Invalid Input Catch
+                        return sendErrorMessage(interaction, "Invalid input format. Examples: |2ep|, |1h3m|. See /help log for more info.");
+                    }
                 } else {
-                    // Invalid Input Catch
-                    return sendErrorMessage(interaction, "Invalid input format. Examples: |2ep|, |1h3m|. See /help log for more info.");
-                }
+                    // Set log data for non custom anime log
+                    unitLength = 1260;
+                    count = parseEpisodes(input, episodePattern);
+                    unit = "Episodes"
+                    totalSeconds = count * 21 * 60;
+                };
+            } else if (timePattern.test(input)) {
+                // Handle time
+                if (medium === "Anime") {
+                    return sendErrorMessage(interaction, "For custom anime episode lengths, use episodeLength. See /help log for more info.");
+                };
+                count = parseTime(input, timePattern)
+                console.log(count);
+                unit = "Seconds";
+                totalSeconds = count;
             } else {
-                // Set log data for non custom anime log
-                unitLength = 1260;
-                count = parseEpisodes(input, episodePattern);
-                unit = "Episodes"
-                totalSeconds = count * 21 * 60;
+                // Invalid Input Catch
+                return sendErrorMessage(interaction, "Invalid input format. Examples: |2ep|, |1h3m|. See /help log for more info.");
+            }
+
+            // Error handling for invalid log amounts
+            if (totalSeconds <= 60) return interaction.editReply(`Error: The minimum log size is 1 minute, you entered ${totalSeconds} seconds`);
+            if (totalSeconds > 72000) return interaction.editReply(`Error: The maximum log size is 1200 minutes (20 hours), you entered ${Math.round((totalSeconds * 10) / 60) / 10} Minutes.`);
+
+            // Calculate title and description for embed
+            const description = unit === "Episodes" ? `${Math.round((unitLength * 10) / 60) / 10} minutes/episode → +${Math.round((totalSeconds * 10) / 60) / 10} points` : `1 point/min → +${Math.round((totalSeconds * 10) / 60) / 10} points`;
+            if (unit !== "Episodes") {
+                embedTitle = `🎉 ${interaction.user.displayName} Logged ${Math.round((totalSeconds * 10) / 60) / 10} Minutes of ${medium}!`;
+            } else {
+                embedTitle = `🎉 ${interaction.user.displayName} Logged ${count} ${unit} of ${medium}!`;
             };
-        } else if (timePattern.test(input)) {
-            // Handle time
-            if (medium === "Anime") {
-                return sendErrorMessage(interaction, "For custom anime episode lengths, use episodeLength. See /help log for more info.");
-            };
-            count = parseTime(input, timePattern)
-            console.log(count);
-            unit = "Seconds";
-            totalSeconds = count;
-        } else {
-            // Invalid Input Catch
-            return sendErrorMessage(interaction, "Invalid input format. Examples: |2ep|, |1h3m|. See /help log for more info.");
-        }
 
-        // Error handling for invalid log amounts
-        if (totalSeconds <= 60) return interaction.editReply(`Error: The minimum log size is 1 minute, you entered ${totalSeconds} seconds`);
-        if (totalSeconds > 72000) return interaction.editReply(`Error: The maximum log size is 1200 minutes (20 hours), you entered ${Math.round((totalSeconds * 10) / 60) / 10} Minutes.`);
-
-        // Calculate title and description for embed
-        const description = unit === "Episodes" ? `${unitLength} points/episode → +${totalSeconds} points` : `1 point/sec → +${totalSeconds} points`;
-        if (unit !== "Episodes") {
-            embedTitle = `🎉 ${interaction.user.displayName} Logged ${Math.round((totalSeconds * 10) / 60) / 10} Minutes of ${medium}!`;
-        } else {
-            embedTitle = `🎉 ${interaction.user.displayName} Logged ${input} ${unit} of ${medium}!`;
-        };
-
-        // Save the log data to the database
-        customDate = null;
-        isBackLog = false;
-        await saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
-        // Send an embed message with the log details
-        await sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes);
+            // Save the log data to the database
+            customDate = null;
+            isBackLog = false;
+            await saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
+            // Send an embed message with the log details
+            await sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes);
+        } catch (error) {
+            console.log(error);
+            return sendErrorMessage(interaction, "An unexpected error occurred executing log command. Please try again later.")
+        }    
     },
 };
 
@@ -146,9 +151,14 @@ async function sendLogEmbed(interaction, embedTitle, description, medium, unit, 
 
 
 // Utility function to send error messages
-function sendErrorMessage(interaction, message) {
-    interaction.editReply(`\`${message}\``);
-    return;
+async function sendErrorMessage(interaction, message) {
+    try {
+        // Attempt to edit the reply with an error message
+        await interaction.editReply({ content: `\`${message}\`` });
+        console.error(`Succesfully sent error message: ${message}`);
+    } catch (error) {   
+        console.error('Failed to send error message for log command');
+    }
 }
 
 // Utility function to parse time strings
