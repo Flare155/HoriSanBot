@@ -45,6 +45,7 @@ module.exports = {
         let testGuildExcludeMatch;
         if (guildId === testingServerId) {
             testGuildExcludeMatch = { $match: { guildId: testingServerId } };
+            console.log("testing server");
         } else {
             testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } };
         }
@@ -61,7 +62,7 @@ module.exports = {
             if (firstLog.length > 0) {
                 startDate = firstLog[0].timestamp;
                 // Convert startDate to the user's timezone and get the start of that day
-                const startDateMoment = moment.tz(startDate, userTimezone).startOf('day');
+                const startDateMoment = moment.tz(startDate).startOf('day');
                 // Convert startDate and endDate to UTC (format not timezone) for database querying
                 startDateUTC = startDateMoment.clone().utc().toDate();
             } else {
@@ -70,11 +71,7 @@ module.exports = {
                 return;
             }
         } else {
-            const startDate = startDateCalculator(timePeriod);
-            // Convert startDate to the user's timezone and get the start of that day
-            const startDateMoment = moment.tz(startDate, userTimezone).startOf('day');
-            // Convert startDate and endDate to UTC (format not timezone) for database querying
-            startDateUTC = startDateMoment.clone().utc().toDate();
+            startDateUTC = startDateCalculator(timePeriod);
         }
         // Similarly, get the current time in user's timezone and end of the day
         const endDateMoment = moment.tz(new Date(), userTimezone).endOf('day');
