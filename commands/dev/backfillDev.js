@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { footerCreator } = require('../../utils/formatting/logFooterCreator.js');
 const { calculateEmbedColor } = require('../../utils/formatting/calculateEmbedColor.js');
+const { sendErrorMessage} = require('../../utils/formatting/errorMessageFormatter.js');
 const { saveLog } = require('../../utils/saveLog.js');
 
 module.exports = {
@@ -183,12 +184,6 @@ async function sendLogEmbed(interaction, embedTitle, description, medium, unit, 
 
     // Send the embed
     await interaction.editReply({ embeds: [logEmbed] });
-}
-
-// Utility function to send error messages
-function sendErrorMessage(interaction, message) {
-    interaction.editReply(`❌ \`${message}\``);
-    return;
 }
 
 // Utility function to parse time strings
