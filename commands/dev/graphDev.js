@@ -24,9 +24,17 @@ module.exports = {
         const timePeriod = interaction.options.getString('period');
         const userData = await User.findOne({ userId: interaction.user.id });
         const userTimezone = userData ? userData.timezone : 'UTC';
-        const graphData = await immersionByTimePeriod(userId, timePeriod, userTimezone);
-        const image = await buildImage("immersionTime", { data: graphData });
+        console.log(`timezone is ${userTimezone}`);
+        console.log(`user data is ${toString(userData)}`);
+        
+        
+        
+        
 
+        
+        const graphData = await immersionByTimePeriod(userId, timePeriod, userTimezone);
+        interaction.followUp(graphData);
+        const image = await buildImage("immersionTime", { data: graphData });
 
         // Assuming `image` is your Uint8Array
         const buffer = Buffer.from(image);

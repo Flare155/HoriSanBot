@@ -43,7 +43,6 @@ module.exports = {
         const timePeriod = interaction.options.getString('period');
 
         const startDate = startDateCalculator(timePeriod);
-        console.log(startDate);
         const lowerTimeBoundMatch = {
             $match: {
                 timestamp: { $gte: startDate },

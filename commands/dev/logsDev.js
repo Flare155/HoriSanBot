@@ -34,8 +34,6 @@ module.exports = {
       // Fetch the user's timezone from the database
       const userData = await User.findOne({ userId: interaction.user.id });
       const userId = userData.userId;
-      console.log(userId);
-      console.log(typeof userId);
       const userTimezone = userData ? userData.timezone : 'UTC';
 
       // Fetch logs based on the medium filter

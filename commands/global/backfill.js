@@ -1,7 +1,10 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { footerCreator } = require('../../utils/formatting/logFooterCreator.js');
 const { calculateEmbedColor } = require('../../utils/formatting/calculateEmbedColor.js');
+const { sendErrorMessage} = require('../../utils/formatting/errorMessageFormatter.js');
 const { saveLog } = require('../../utils/saveLog.js');
+const { DateTime } = require('luxon');
+const User = require('../../models/User');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -55,6 +58,8 @@ module.exports = {
         const notes = interaction.options.getString('notes');
         const customEpisodeLength = interaction.options.getString('episode_length');
         const dateInput = interaction.options.getString('date'); // Retrieve date input
+        const userData = await User.findOne({ userId: interaction.user.id });
+        const userTimezone = userData ? userData.timezone : 'UTC';
 
         let unit = "";
         let episodes = 0;
@@ -68,7 +73,7 @@ module.exports = {
         const episodePattern = /^(?!.*[hms])(\d+)ep$/; // Matches inputs like 10ep
 
         // Parse and validate the date input
-        const parsedDate = parseDate(dateInput);
+        const parsedDate = parseDate(dateInput, userTimezone);
         if (!parsedDate) {
             return sendErrorMessage(interaction, 'Invalid date format. Please use YYYY-MM-DD.');
         }
@@ -185,12 +190,6 @@ async function sendLogEmbed(interaction, embedTitle, description, medium, unit, 
     await interaction.editReply({ embeds: [logEmbed] });
 }
 
-// Utility function to send error messages
-function sendErrorMessage(interaction, message) {
-    interaction.editReply(`❌ \`${message}\``);
-    return;
-}
-
 // Utility function to parse time strings
 const parseTime = (input) => {
     const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/;
@@ -211,22 +210,30 @@ const parseEpisodes = (input) => {
 };
 
 // Utility function to parse date strings in YYYY-MM-DD format
-const parseDate = (input) => {
+const parseDate = (input, userTimezone) => {
     // Regular expression to match YYYY-MM-DD
     const datePattern = /^(\d{4})-(\d{2})-(\d{2})$/;
     const match = input.match(datePattern);
     if (!match) return null;
     const year = parseInt(match[1], 10);
-    const month = parseInt(match[2], 10) - 1; // Months are 0-indexed in JS
+    const month = parseInt(match[2], 10)
     const day = parseInt(match[3], 10);
-    const date = new Date(year, month, day);
-    // Validate the date components
+
+    // Create DateTime in user's timezone at local midnight
+    const dt = DateTime.fromObject(
+        { year, month, day, hour: 12, minute: 0, second: 0, millisecond: 0 },
+        { zone: userTimezone }
+    );
+
+    // Validate the date components using Luxon
     if (
-        date.getFullYear() !== year ||
-        date.getMonth() !== month ||
-        date.getDate() !== day
+        dt.year !== year ||
+        dt.month !== month ||
+        dt.day !== day
     ) {
         return null;
     }
-    return date;
+    // Convert to UTC for storage
+    const utcDt = dt.toUTC();
+    return utcDt.toJSDate(); // Store this Date object in UTC
 };

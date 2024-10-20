@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require('discord.js');
 const User = require("../../models/User");
 const Log = require("../../models/Log");
-const moment = require('moment-timezone');
+const { DateTime } = require('luxon'); // Replacing Moment with Luxon
 const { calculateStreak } = require('../../utils/streakCalculator');
 const { buildImage } = require('../../utils/buildImage');
 const { startDateCalculator } = require('../../utils/startDateCalculator');
@@ -39,7 +39,7 @@ module.exports = {
         let startDateUTC, endDateUTC;
 
 
-        // Calculate startDate based on timePeriod
+        // Calculate startDate based on timePeriod using Luxon
         if (timePeriod === 'All Time') {
             // Get the timestamp of the first log
             const firstLog = await Log.aggregate([
@@ -48,29 +48,28 @@ module.exports = {
                 { $limit: 1 } // Limit the result to the first log
             ]);
             if (firstLog.length > 0) {
-                startDate = firstLog[0].timestamp;
-                // Convert startDate to the user's timezone and get the start of that day
-                const startDateMoment = moment(startDate).startOf('day');
-                // Convert startDate and endDate to UTC (format not timezone) for database querying
-                startDateUTC = startDateMoment.clone().utc().toDate();
+                const startDate = DateTime.fromJSDate(firstLog[0].timestamp).setZone(userTimezone).startOf('day');
+                startDateUTC = startDate.toUTC().toJSDate(); // Convert to UTC and then to native JS Date
             } else {
-                // User has no alogs at all
+                // User has no logs at all
                 await interaction.editReply({ content: 'You have no logs yet! Start logging your immersion with the `/backfill_dev` command.', ephemeral: true });
                 return;
             }
         } else {
-            startDateUTC = startDateCalculator(timePeriod);
+            startDateUTC = startDateCalculator(timePeriod, userTimezone);
         }
-        // Similarly, get the current time in user's timezone and end of the day
-        const endDateMoment = moment.tz(new Date(), userTimezone).endOf('day');
-        endDateUTC = endDateMoment.clone().utc().toDate();
-        
-        
+
+        // Get the current time in the user's timezone for endDate
+        const endDate = DateTime.now().setZone(userTimezone).endOf('day');
+        endDateUTC = endDate.toUTC().toJSDate(); // Convert to UTC
+
         const lowerTimeBoundMatch = {
             $match: {
                 timestamp: { $gte: startDateUTC },
             }
         };
+        console.log(endDateUTC);
+        console.log(startDateUTC);
 
         // Find total points and calculate streak if user exists
         if (exists) {

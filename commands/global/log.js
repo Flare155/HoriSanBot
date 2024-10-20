@@ -72,7 +72,6 @@ module.exports = {
                         // Parse episodes and totalSeconds for custom length animse log, then save data
                         count = parseEpisodes(input, episodePattern);
                         unitLength = parseTime(customEpisodeLength, timePattern);
-                        console.log(unitLength);
                         totalSeconds = unitLength * count;
                         unit = "Episodes"
                     } else {
@@ -92,7 +91,6 @@ module.exports = {
                     return sendErrorMessage(interaction, "For custom anime episode lengths, use episodeLength. See /help log for more info.");
                 };
                 count = parseTime(input, timePattern)
-                console.log(count);
                 unit = "Seconds";
                 totalSeconds = count;
             } else {

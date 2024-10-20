@@ -2,7 +2,6 @@ const fs = require('fs');
 const { AttachmentBuilder, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Log = require('../../models/Log');
 const User = require('../../models/User');  // Import the User model
-const { testingServerId } = require('../../config.json');
 const { localTimeConverter } = require('../../utils/localTimeConverter'); // Import streak utility
 
 module.exports = {
@@ -34,6 +33,7 @@ module.exports = {
 
       // Fetch the user's timezone from the database
       const userData = await User.findOne({ userId: interaction.user.id });
+      const userId = userData.userId;
       const userTimezone = userData ? userData.timezone : 'UTC';
 
       // Fetch logs based on the medium filter
@@ -41,12 +41,10 @@ module.exports = {
       if (medium == "All") {
         logs = await Log.find({
           userId: interaction.user.id,
-          guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId },
         });
       } else {
         logs = await Log.find({
           userId: interaction.user.id,
-          guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId },
           medium: medium
         });
       }

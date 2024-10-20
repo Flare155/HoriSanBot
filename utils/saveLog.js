@@ -8,7 +8,6 @@ async function saveLog(interaction, customDate, medium, title, notes, isBackLog,
         if (!interaction || !interaction.user || !interaction.guild) {
             throw new Error("Invalid interaction object.");
         }
-        console.log(medium, title, unit);
         if (!medium || !title || !unit) {
             throw new Error("Missing required parameters.");
         }
@@ -23,7 +22,6 @@ async function saveLog(interaction, customDate, medium, title, notes, isBackLog,
             totalSeconds,
         };
 
-        console.log(amount);
         // Add unitLength if provided
         if (unitLength) {
             amount.unitLength = unitLength;
@@ -50,7 +48,7 @@ async function saveLog(interaction, customDate, medium, title, notes, isBackLog,
             const newUser = new User({
                 userId: interaction.user.id,
                 guildId: interaction.guild.id,
-                timestamp: Date.now(),
+                timestamp: Date().toISOString(),
             });
             await newUser.save();
         }
