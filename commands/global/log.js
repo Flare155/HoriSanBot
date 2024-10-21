@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { footerCreator } = require('../../utils/formatting/logFooterCreator.js');
 const { calculateEmbedColor } = require('../../utils/formatting/calculateEmbedColor.js');
+const { sendErrorMessage} = require('../../utils/formatting/errorMessageFormatter.js');
 const { saveLog } = require('../../utils/saveLog.js');
 
 module.exports = {
@@ -145,18 +146,6 @@ async function sendLogEmbed(interaction, embedTitle, description, medium, unit, 
 
     // Send the embed
     await interaction.editReply({ embeds: [logEmbed] });
-}
-
-
-// Utility function to send error messages
-async function sendErrorMessage(interaction, message) {
-    try {
-        // Attempt to edit the reply with an error message
-        await interaction.editReply({ content: `\`${message}\`` });
-        console.error(`Succesfully sent error message: ${message}`);
-    } catch (error) {   
-        console.error('Failed to send error message for log command');
-    }
 }
 
 // Utility function to parse time strings
