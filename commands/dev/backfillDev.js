@@ -78,6 +78,14 @@ module.exports = {
                 return sendErrorMessage(interaction, 'Invalid date format. Please use YYYY-MM-DD.');
             }
 
+            // Add backlog restriction here
+            const maxBacklogYears = 40; // Maximum time in past allowed to backlog (40 years)
+            const currentDate = DateTime.now().setZone(userTimezone);
+            const yearsDifference = currentDate.diff(DateTime.fromJSDate(parsedDate), 'years').years;
+            if (yearsDifference > maxBacklogYears) {
+                return sendErrorMessage(interaction, `You can only backlog up to ${maxBacklogYears} years in the past.`);
+            }
+
             // Calculate log information based on input
             if (!episodePattern.test(input) && !timePattern.test(input)) {
                 return sendErrorMessage(interaction, "Invalid input format. Examples: 2ep, 1h30m, 45m. See /help log for more info.");
