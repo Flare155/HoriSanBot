@@ -8,7 +8,7 @@ const User = require('../../models/User');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('backfill_dev')
+        .setName('backlog_dev')
         .setDescription('Log your immersion in the past!')
         .addStringOption(option =>
             option.setName('medium')
