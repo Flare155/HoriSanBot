@@ -31,7 +31,7 @@ This project is currently private. Please do not use or distribute any part of H
 
 ## Examples
 
-*Graph generated with the bot (graphs currently under devlopment expected to be added to be added to global commands in the following days)*
+*Graph generated with the bot *(Graphs are still under development and will look better in the near future)*
 
 ![One week graph example](https://github.com/user-attachments/assets/8208d175-d1b3-4774-afca-f8bcebe9fb7d)
 
