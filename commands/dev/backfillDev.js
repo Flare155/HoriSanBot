@@ -187,7 +187,7 @@ async function sendLogEmbed(interaction, embedTitle, description, medium, unit, 
     logEmbed.setFooter(footer);
 
     // Send the embed
-    await interaction.editReply({ embeds: [logEmbed] });
+    await interaction.reply({ embeds: [logEmbed] });
 }
 
 // Utility function to parse time strings

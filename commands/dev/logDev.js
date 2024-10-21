@@ -43,14 +43,12 @@ module.exports = {
         ),
     async execute(interaction) {
         try {
-            await interaction.deferReply();
             const medium = interaction.options.getString('medium');
             const input = interaction.options.getString('amount');
             const title = interaction.options.getString('title');
             const notes = interaction.options.getString('notes');
             const customEpisodeLength = interaction.options.getString('episode_length');
-            let unit = "", unitLength = null;
-            let hours = 0, minutes = 0, totalSeconds = 0, episodes = 0;
+            let unit = "", unitLength = null, totalSeconds = 0;
             // Regular expression to match time and episode formats
             const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/; // Matches input in ( Num h, Num m, Num s) excludes ep
             const episodePattern = /^(?!.*[hms])(\d+)ep$/; // Matches input in ( Num ep ) format, excludes hms
@@ -102,8 +100,8 @@ module.exports = {
             }
 
             // Error handling for invalid log amounts
-            if (totalSeconds <= 60) return interaction.editReply(`Error: The minimum log size is 1 minute, you entered ${totalSeconds} seconds`);
-            if (totalSeconds > 72000) return interaction.editReply(`Error: The maximum log size is 1200 minutes (20 hours), you entered ${Math.round((totalSeconds * 10) / 60) / 10} Minutes.`);
+            if (totalSeconds <= 60) return interaction.reply(`Error: The minimum log size is 1 minute, you entered ${totalSeconds} seconds`);
+            if (totalSeconds > 72000) return interaction.reply(`Error: The maximum log size is 1200 minutes (20 hours), you entered ${Math.round((totalSeconds * 10) / 60) / 10} Minutes.`);
 
             // Calculate title and description for embed
             const description = unit === "Episodes" ? `${Math.round((unitLength * 10) / 60) / 10} minutes/episode → +${Math.round((totalSeconds * 10) / 60) / 10} points` : `1 point/min → +${Math.round((totalSeconds * 10) / 60) / 10} points`;
@@ -147,7 +145,7 @@ async function sendLogEmbed(interaction, embedTitle, description, medium, unit, 
     logEmbed.setFooter(footer);
 
     // Send the embed
-    await interaction.editReply({ embeds: [logEmbed] });
+    await interaction.reply({ embeds: [logEmbed] });
 }
 
 // Utility function to parse time strings
