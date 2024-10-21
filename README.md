@@ -33,7 +33,7 @@ This project is currently private. Please do not use or distribute any part of H
 
 *Graph generated with the bot (graphs currently under devlopment expected to be added to be added to global commands in the following days)*
 
-![image](https://github.com/user-attachments/assets/167c96cd-2e80-46fe-85da-0eee4af59357)
+![One week graph example](https://github.com/user-attachments/assets/8208d175-d1b3-4774-afca-f8bcebe9fb7d)
 
 *The global leaderboard for monthly filterable by medium and time period*
 
