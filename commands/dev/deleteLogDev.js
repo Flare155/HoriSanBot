@@ -36,21 +36,8 @@ module.exports = {
                     logEmbed.addFields({ name: 'Notes', value: log.notes, inline: true });
                 }
 
-                // Create buttons for confirmation
-                const row = new ActionRowBuilder()
-                    .addComponents(
-                        new ButtonBuilder()
-                            .setCustomId('confirm_delete')
-                            .setLabel('Confirm')
-                            .setStyle(ButtonStyle.Danger),
-                        new ButtonBuilder()
-                            .setCustomId('cancel_delete')
-                            .setLabel('Cancel')
-                            .setStyle(ButtonStyle.Secondary)
-                    );
-
                 // Send the embed with buttons
-                await interaction.editReply({ embeds: [logEmbed], components: [row] });
+                await interaction.editReply({ embeds: [logEmbed], components: [buttons] });
 
                 // Create a collector to handle button interactions
                 const filter = i => i.user.id === interaction.user.id;
@@ -60,7 +47,7 @@ module.exports = {
                     if (i.customId === 'confirm_delete') {
                         // User confirmed the deletion
                         await Log.findByIdAndDelete(logId);
-                        await i.update({ content: `Log with ID ${logId} has been deleted.`, embeds: [], components: [] });
+                        await i.update({ content: `Log with ID ${logId} has been deleted.`, components: [] });
                     } else if (i.customId === 'cancel_delete') {
                         // User canceled the deletion
                         await i.update({ content: 'Deletion canceled.', embeds: [], components: [] });
@@ -83,3 +70,17 @@ module.exports = {
         }
     },
 };
+
+
+// Create the buttons for confirmation on the embed
+const buttons = new ActionRowBuilder()
+    .addComponents(
+        new ButtonBuilder()
+            .setCustomId('confirm_delete')
+            .setLabel('Confirm')
+            .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+            .setCustomId('cancel_delete')
+            .setLabel('Cancel')
+            .setStyle(ButtonStyle.Secondary)
+    );

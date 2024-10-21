@@ -108,7 +108,7 @@ module.exports = {
             if (unit !== "Episodes") {
                 embedTitle = `🎉 ${interaction.user.displayName} Logged ${Math.round((totalSeconds * 10) / 60) / 10} Minutes of ${medium}!`;
             } else {
-                embedTitle = `🎉 ${interaction.user.displayName} Logged ${count} ${unit} of ${medium}!`;
+                embedTitle = count <= 1 ? `🎉 ${interaction.user.displayName} Logged ${count} Episode of ${medium}!` : `${interaction.user.displayName} Logged ${count} ${unit} of ${medium}!`;
             };
 
             // Save the log data to the database
@@ -126,7 +126,7 @@ module.exports = {
 
 
 // Utility function to create and send the embed message
-async function sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes) {
+async function sendLogEmbed(interaction, embedTitle, description, totalSeconds, title, notes) {
     // Calculate the embed color based on the points
     const embedColor = calculateEmbedColor(totalSeconds);
     // Create footer message

@@ -49,116 +49,120 @@ module.exports = {
                 .setRequired(false)
             ),
     async execute(interaction) {
-        await interaction.deferReply();
+        try { 
 
-        // Retrieve user inputs
-        const medium = interaction.options.getString('medium');
-        const input = interaction.options.getString('amount');
-        const title = interaction.options.getString('title');
-        const notes = interaction.options.getString('notes');
-        const customEpisodeLength = interaction.options.getString('episode_length');
-        const dateInput = interaction.options.getString('date'); // Retrieve date input
-        const userData = await User.findOne({ userId: interaction.user.id });
-        const userTimezone = userData ? userData.timezone : 'UTC';
+            // Retrieve user inputs
+            const medium = interaction.options.getString('medium');
+            const input = interaction.options.getString('amount');
+            const title = interaction.options.getString('title');
+            const notes = interaction.options.getString('notes');
+            const customEpisodeLength = interaction.options.getString('episode_length');
+            const dateInput = interaction.options.getString('date'); // Retrieve date input
+            const userData = await User.findOne({ userId: interaction.user.id });
+            const userTimezone = userData ? userData.timezone : 'UTC';
 
-        let unit = "";
-        let episodes = 0;
-        let seconds = 0;
-        let count = 0;
-        let unitLength = undefined;
-        let totalSeconds = 0;
+            let unit = "";
+            let episodes = 0;
+            let seconds = 0;
+            let count = 0;
+            let unitLength = undefined;
+            let totalSeconds = 0;
 
-        // Regular expressions to match time and episode formats
-        const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/; // Matches inputs like 1h30m
-        const episodePattern = /^(?!.*[hms])(\d+)ep$/; // Matches inputs like 10ep
+            // Regular expressions to match time and episode formats
+            const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/; // Matches inputs like 1h30m
+            const episodePattern = /^(?!.*[hms])(\d+)ep$/; // Matches inputs like 10ep
 
-        // Parse and validate the date input
-        const parsedDate = parseDate(dateInput, userTimezone);
-        if (!parsedDate) {
-            return sendErrorMessage(interaction, 'Invalid date format. Please use YYYY-MM-DD.');
-        }
-
-        // Calculate log information based on input
-        if (!episodePattern.test(input) && !timePattern.test(input)) {
-            return sendErrorMessage(interaction, "Invalid input format. Examples: 2ep, 1h30m, 45m. See /help log for more info.");
-        }
-
-        // Handle episodes logic
-        if (episodePattern.test(input)) {
-            // Ensure only Anime can be logged as Episodes
-            if (medium !== "Anime") {
-                return sendErrorMessage(interaction, "You can only log Anime as Episodes. See /help log for more info.");
+            // Parse and validate the date input
+            const parsedDate = parseDate(dateInput, userTimezone);
+            if (!parsedDate) {
+                return sendErrorMessage(interaction, 'Invalid date format. Please use YYYY-MM-DD.');
             }
 
-            // Parse episodes
-            episodes = parseEpisodes(input);
-            if (episodes === null) {
-                return sendErrorMessage(interaction, "Invalid episodes format. Example: 10ep.");
+            // Calculate log information based on input
+            if (!episodePattern.test(input) && !timePattern.test(input)) {
+                return sendErrorMessage(interaction, "Invalid input format. Examples: 2ep, 1h30m, 45m. See /help log for more info.");
             }
 
-            // If the user enters a custom episode length
-            if (customEpisodeLength) {
-                if (timePattern.test(customEpisodeLength)) {
-                    // Parse episode length
-                    unitLength = parseTime(customEpisodeLength);
-                    if (unitLength === null) {
+            // Handle episodes logic
+            if (episodePattern.test(input)) {
+                // Ensure only Anime can be logged as Episodes
+                if (medium !== "Anime") {
+                    return sendErrorMessage(interaction, "You can only log Anime as Episodes. See /help log for more info.");
+                }
+
+                // Parse episodes
+                episodes = parseEpisodes(input);
+                if (episodes === null) {
+                    return sendErrorMessage(interaction, "Invalid episodes format. Example: 10ep.");
+                }
+
+                // If the user enters a custom episode length
+                if (customEpisodeLength) {
+                    if (timePattern.test(customEpisodeLength)) {
+                        // Parse episode length
+                        unitLength = parseTime(customEpisodeLength);
+                        if (unitLength === null) {
+                            return sendErrorMessage(interaction, "Invalid episode length format. Examples: 45m, 1h30m.");
+                        }
+                    } else {
                         return sendErrorMessage(interaction, "Invalid episode length format. Examples: 45m, 1h30m.");
                     }
                 } else {
-                    return sendErrorMessage(interaction, "Invalid episode length format. Examples: 45m, 1h30m.");
+                    // Default episode length is 21 minutes (1260 seconds)
+                    unitLength = 1260;
                 }
+
+                unit = "Episodes";
+                count = episodes;
+                totalSeconds = unitLength * episodes;
+
+            } else if (timePattern.test(input)) {
+                // Handle time-based logs
+                if (medium === "Anime") {
+                    return sendErrorMessage(interaction, "For custom anime episode lengths, use episode_length along with episodes. See /help log for more info.");
+                }
+
+                // Parse time input
+                seconds = parseTime(input);
+                if (seconds === null) {
+                    return sendErrorMessage(interaction, "Invalid time format. Examples: 1h30m, 2m5s.");
+                }
+
+                unit = "Seconds";
+                count = seconds;
+                totalSeconds = seconds;
+
             } else {
-                // Default episode length is 21 minutes (1260 seconds)
-                unitLength = 1260;
+                // This else block is redundant due to earlier validation but kept for safety
+                return sendErrorMessage(interaction, "Invalid input format. Examples: 2ep, 1h30m, 45m. See /help log for more info.");
             }
 
-            unit = "Episodes";
-            count = episodes;
-            totalSeconds = unitLength * episodes;
-
-        } else if (timePattern.test(input)) {
-            // Handle time-based logs
-            if (medium === "Anime") {
-                return sendErrorMessage(interaction, "For custom anime episode lengths, use episode_length along with episodes. See /help log for more info.");
+            // Error handling for invalid log amounts
+            if (totalSeconds < 60) {
+                return sendErrorMessage(interaction, `The minimum log size is 1 minute (60 seconds). You entered ${totalSeconds} seconds.`);
+            }
+            if (totalSeconds > 72000) { // 1200 minutes = 72000 seconds
+                return sendErrorMessage(interaction, `The maximum log size is 1200 minutes (20 hours). You entered ${Math.round((totalSeconds / 60) * 10) / 10} minutes.`);
             }
 
-            // Parse time input
-            seconds = parseTime(input);
-            if (seconds === null) {
-                return sendErrorMessage(interaction, "Invalid time format. Examples: 1h30m, 2m5s.");
+            // Calculate title and description for embed
+            const description = unit === "Episodes" ? `${unitLength} seconds/episode → +${totalSeconds} seconds` : `1 point/sec → +${totalSeconds} points`;
+            let embedTitle;
+            if (unit !== "Episodes") {
+                embedTitle = `🎉 ${interaction.user.username} Logged ${Math.round((totalSeconds / 60) * 10) / 10} Minutes of ${medium}!`;
+            } else {
+                embedTitle = `🎉 ${interaction.user.username} Logged ${input} of ${medium}!`;
             }
 
-            unit = "Seconds";
-            count = seconds;
-            totalSeconds = seconds;
-
-        } else {
-            // This else block is redundant due to earlier validation but kept for safety
-            return sendErrorMessage(interaction, "Invalid input format. Examples: 2ep, 1h30m, 45m. See /help log for more info.");
+            const isBackLog = true;
+            // Save the log data to the database, including the parsed date
+            await saveLog(interaction, parsedDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
+            // Send an embed message with the log details
+            await sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes, parsedDate);
+        } catch (error) {
+            console.log(error);
+            return sendErrorMessage(interaction, "An unexpected error occurred executing log command. Please try again later.")
         }
-
-        // Error handling for invalid log amounts
-        if (totalSeconds < 60) {
-            return sendErrorMessage(interaction, `The minimum log size is 1 minute (60 seconds). You entered ${totalSeconds} seconds.`);
-        }
-        if (totalSeconds > 72000) { // 1200 minutes = 72000 seconds
-            return sendErrorMessage(interaction, `The maximum log size is 1200 minutes (20 hours). You entered ${Math.round((totalSeconds / 60) * 10) / 10} minutes.`);
-        }
-
-        // Calculate title and description for embed
-        const description = unit === "Episodes" ? `${unitLength} seconds/episode → +${totalSeconds} seconds` : `1 point/sec → +${totalSeconds} points`;
-        let embedTitle;
-        if (unit !== "Episodes") {
-            embedTitle = `🎉 ${interaction.user.username} Logged ${Math.round((totalSeconds / 60) * 10) / 10} Minutes of ${medium}!`;
-        } else {
-            embedTitle = `🎉 ${interaction.user.username} Logged ${input} of ${medium}!`;
-        }
-
-        const isBackLog = true;
-        // Save the log data to the database, including the parsed date
-        await saveLog(interaction, parsedDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
-        // Send an embed message with the log details
-        await sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes, parsedDate);
     },
 };
 
