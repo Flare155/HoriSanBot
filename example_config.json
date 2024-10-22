@@ -1,0 +1,6 @@
+{
+    "defaultEnv": "development or production (for files .env.prod and .end.dev)",
+    "clientIdTest": "id of the testing client",
+    "clientIdMain": "id of the main client",
+    "testingServerId": "id of the testing server" 
+}
