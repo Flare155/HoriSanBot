@@ -8,4 +8,5 @@ package-lock.json
 commands/.DS_Store
 bun.lockb
 utils/hori-visuals/bun.lockb
-.env
+.env.dev
+.env.prod

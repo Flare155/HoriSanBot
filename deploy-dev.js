@@ -1,7 +1,12 @@
 const { REST, Routes } = require('discord.js');
-const { clientIdTest, testingServerId, devToken } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
+require('dotenv').config();  // Load environment variables
+
+// Use environment variables from .env file
+const clientIdTest = process.env.CLIENT_ID_TEST;
+const testingServerId = process.env.TESTING_SERVER_ID;
+const devToken = process.env.DEV_TOKEN;
 
 const commands = [];
 const foldersPath = path.join(__dirname, 'commands');

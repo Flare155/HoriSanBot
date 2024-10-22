@@ -1,8 +1,8 @@
 {
   "dependencies": {
     "discord.js": "^14.16.1",
+    "dotenv": "^16.4.5",
     "luxon": "^3.5.0",
-    "moment-timezone": "^0.5.46",
     "mongodb": "^5.6.0",
     "mongoose": "^7.3.1",
     "puppeteer": "^23.5.3",
@@ -13,7 +13,7 @@
   "description": "immersion tracking bot",
   "main": "index.js",
   "scripts": {
-    "dev": "bun --watch index.js",
+    "bun": "bun --watch index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "visuals": "cd utils/hori-visuals && npm run dev",
     "build-visuals": "cd utils/hori-visuals && npm run build"
@@ -22,4 +22,3 @@
   "license": "ISC",
   "keywords": []
 }
-

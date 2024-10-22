@@ -1,6 +1,6 @@
+const { DateTime } = require('luxon');
 const Log = require("../models/Log");
 const User = require("../models/User");
-const moment = require('moment-timezone');
 const { testingServerId } = require('../config.json');
 
 const calculateStreak = async (userId, guildId) => {
@@ -12,7 +12,6 @@ const calculateStreak = async (userId, guildId) => {
         } else {
             testGuildExcludeMatch = { guildId: { $ne: testingServerId } };
         }
-
 
         // Find the user to get their timezone
         const user = await User.findOne({ userId: userId });
@@ -30,14 +29,14 @@ const calculateStreak = async (userId, guildId) => {
         }
 
         let currentStreak = 0;
-        const today = moment.tz(userTimezone).startOf('day').add(4, 'hours'); // "Start of today" is 4 AM in user's timezone
-        const yesterday = today.clone().subtract(1, 'day'); // "Start of yesterday" is also based on 4 AM
+        const today = DateTime.now().setZone(userTimezone).startOf('day').plus({ hours: 4 }); // "Start of today" is 4 AM in user's timezone
+        const yesterday = today.minus({ days: 1 }); // "Start of yesterday" is also based on 4 AM
 
         // Convert the first log's timestamp to the adjusted "day" (4 AM start)
-        let mostRecentLogTime = moment.tz(logs[0].timestamp, userTimezone).startOf('day').add(4, 'hours');
+        let mostRecentLogTime = DateTime.fromJSDate(logs[0].timestamp).setZone(userTimezone).startOf('day').plus({ hours: 4 });
 
         // Check if the most recent log is from today or yesterday (with the 4 AM reset)
-        if (mostRecentLogTime.isSameOrAfter(yesterday)) {
+        if (mostRecentLogTime >= yesterday) {
             currentStreak = 1; // Start streak if most recent log is within today or yesterday's window
         } else {
             return 0; // If the most recent log is older than yesterday, reset streak to 0
@@ -45,9 +44,9 @@ const calculateStreak = async (userId, guildId) => {
 
         // Loop through the remaining logs to check for consecutive "days"
         for (let i = 1; i < logs.length; i++) {
-            let currentLogTime = moment.tz(logs[i].timestamp, userTimezone).startOf('day').add(4, 'hours');
+            let currentLogTime = DateTime.fromJSDate(logs[i].timestamp).setZone(userTimezone).startOf('day').plus({ hours: 4 });
 
-            const daysDifference = mostRecentLogTime.diff(currentLogTime, 'days');
+            const daysDifference = mostRecentLogTime.diff(currentLogTime, 'days').days;
 
             if (daysDifference === 1) {
                 // Logs are on consecutive days (adjusted for 4 AM window), increment streak

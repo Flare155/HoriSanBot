@@ -1,14 +1,9 @@
 const Log = require("../../models/Log");
 const { DateTime } = require('luxon');
 
-const immersionByTimePeriod = async (userId, startDate, endDate, timezone) => {
-  // Log raw startDate and endDate inputs
-  console.log("Raw startDate:", startDate);
-  console.log("Raw endDate:", endDate);
-  console.log("Type of startDate:", typeof startDate);
-  console.log("Type of endDate:", typeof endDate);
+const immersionByTimePeriod = async (userId, startDate, endDate, timezone) => { 
 
-  
+  console.log(timezone);
   let startDateLuxon, endDateLuxon;
 
   try {
