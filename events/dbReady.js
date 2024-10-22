@@ -1,16 +1,13 @@
 const { Events } = require('discord.js');
 const { mongoose } = require('mongoose');
-const { localDbUrl } = require('../config.json');
-const { AtlasDbUrl } = require('../config.json');
-const User = require("../models/User");
-const Log = require("../models/Log");
+const DatabaseURL = process.env.MONGO_DB_URL;
 
 module.exports = {
     name: Events.ClientReady,
     once: true,
     execute(client) {
     mongoose
-        .connect(AtlasDbUrl)
+        .connect(DatabaseURL)
         .then(() => {
             console.log(`✅ Database is online.`);
         })

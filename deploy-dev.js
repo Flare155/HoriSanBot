@@ -1,12 +1,20 @@
 const { REST, Routes } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
+const { clientIdTest, testingServerId } = require('./config.json');
+const dotenv = require('dotenv');
 require('dotenv').config();  // Load environment variables
+const envFile = '.env.dev';
 
-// Use environment variables from .env file
-const clientIdTest = process.env.CLIENT_ID_TEST;
-const testingServerId = process.env.TESTING_SERVER_ID;
-const devToken = process.env.DEV_TOKEN;
+// Load environment variables from the selected .env file
+const result = dotenv.config({ path: envFile });
+if (result.error) {
+  console.error(`Failed to load ${envFile}:`, result.error);
+  process.exit(1);  // Exit the application if env file loading fails
+}
+
+
+const devToken = process.env.TOKEN;
 
 const commands = [];
 const foldersPath = path.join(__dirname, 'commands');

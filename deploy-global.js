@@ -1,18 +1,28 @@
 const { REST, Routes } = require('discord.js');
-const { clientIdMain, globalToken } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
+const { clientIdMain } = require('./config.json');
+const dotenv = require('dotenv');
+require('dotenv').config();  // Load environment variables
+const envFile = '.env.prod';
+
+// Load environment variables from the selected .env file
+const result = dotenv.config({ path: envFile });
+if (result.error) {
+  console.error(`Failed to load ${envFile}:`, result.error);
+  process.exit(1);  // Exit the application if env file loading fails
+}
+
+const globalToken = process.env.TOKEN;
 
 const commands = [];
 const foldersPath = path.join(__dirname, 'commands');
 const globalFoldersPath = path.join(foldersPath, 'global');
 
-// Construct and prepare an instance of the REST module
 const rest = new REST().setToken(globalToken);
 
-// Deploy GLOBAL commands
+// Format data to be deployed
 const globalCommandFiles = fs.readdirSync(globalFoldersPath).filter(file => file.endsWith('.js'));
-
 for (const file of globalCommandFiles) {
   const filePath = path.join(globalFoldersPath, file);
   const command = require(filePath);
@@ -25,14 +35,14 @@ for (const file of globalCommandFiles) {
 
 // Deploy the commands globally
 (async () => {
-	try {
-		console.log(`Started refreshing ${commands.length} global application (/) commands.`);
-		const data = await rest.put(
-			Routes.applicationCommands(clientIdMain),
-			{ body: commands },
-		);
-		console.log(`Successfully reloaded ${data.length} global application (/) commands.`);
-	} catch (error) {
-		console.error(error);
-	}
+  try {
+    console.log(`Started refreshing ${commands.length} global application (/) commands.`);
+    const data = await rest.put(
+      Routes.applicationCommands(clientIdMain),
+      { body: commands },
+    );
+    console.log(`Successfully reloaded ${data.length} global application (/) commands.`);
+  } catch (error) {
+    console.error(error);
+  }
 })();

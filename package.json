@@ -20,5 +20,8 @@
   },
   "author": "Flare",
   "license": "ISC",
-  "keywords": []
+  "keywords": [],
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  }
 }
