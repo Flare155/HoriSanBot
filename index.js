@@ -8,7 +8,7 @@ const dotenv = require('dotenv');
 const envFile = defaultEnv === 'development' ? '.env.dev' : '.env.prod';
 
 // Load environment variables from the selected .env file
-const result = dotenv.config({ path: envFile });
+const result = dotenv.config({ path: path.join(__dirname, envFile)});
 if (result.error) {
   console.error(`Failed to load ${envFile}:`, result.error);
   process.exit(1);  // Exit the application if env file loading fails
