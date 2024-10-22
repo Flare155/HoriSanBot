@@ -1,17 +1,9 @@
 const { DateTime } = require('luxon');
 const Log = require("../models/Log");
 const User = require("../models/User");
-const { testingServerId } = require('../config.json');
 
 const calculateStreak = async (userId, guildId) => {
     try {
-        // Exclude testing server data or main server data based on the guildId
-        let testGuildExcludeMatch;
-        if (guildId === testingServerId) {
-            testGuildExcludeMatch = { guildId: testingServerId };
-        } else {
-            testGuildExcludeMatch = { guildId: { $ne: testingServerId } };
-        }
 
         // Find the user to get their timezone
         const user = await User.findOne({ userId: userId });
@@ -22,7 +14,7 @@ const calculateStreak = async (userId, guildId) => {
         const userTimezone = user.timezone || 'UTC'; // Default to UTC if timezone is not set
 
         // Find all logs for the user, sorted by timestamp descending
-        const logs = await Log.find({ userId: userId, ...testGuildExcludeMatch }).sort({ timestamp: -1 });
+        const logs = await Log.find({ userId: userId }).sort({ timestamp: -1 });
 
         if (logs.length === 0) {
             return 0; // No logs mean no streak

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { DateTime, IANAZone } = require('luxon');
+const { IANAZone } = require('luxon');
 const User = require("../../models/User");
 
 module.exports = {

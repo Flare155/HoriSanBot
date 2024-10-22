@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Log = require("../../models/Log");
-const { testingServerId } = require('../../config.json');
 
 
 const getLogsByDate = async (userId, days, timezone, guildId) => {
@@ -18,17 +17,8 @@ const getLogsByDate = async (userId, days, timezone, guildId) => {
             // Add more categories if needed
         };
 
-        // Exclude testing server data
-        let testGuildExcludeMatch;
-        if (guildId === testingServerId) {
-            testGuildExcludeMatch = { $match: { guildId: testingServerId } };
-        } else {
-            testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } };
-        }
-
         // Perform the aggregation
         const aggregationResults = await Log.aggregate([
-            testGuildExcludeMatch,
             {
                 $match: {
                     userId: userId, // Assuming userId is stored as a string

@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Log = require('../../models/Log');
-const { testingServerId } = require('../../config.json');
 const { startDateCalculator } = require('../../utils/startDateCalculator');
 const { toPoints } = require('../../utils/formatting/toPoints'); // Import the toPoints function
 
@@ -65,17 +64,8 @@ module.exports = {
             mediumMatch = { $match: {} }; // No medium filter
         }
 
-        // Exclude or include testing server data
-        let testGuildExcludeMatch;
-        if (guildId === testingServerId) {
-            testGuildExcludeMatch = { $match: { guildId: testingServerId } };
-        } else {
-            testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } };
-        }
-
         // Aggregation pipeline to get top users
         const topUsers = await Log.aggregate([
-            testGuildExcludeMatch,
             lowerTimeBoundMatch,
             mediumMatch,
             {
@@ -90,7 +80,6 @@ module.exports = {
 
         // Aggregation to find all users and their positions
         const allUsers = await Log.aggregate([
-            testGuildExcludeMatch,
             lowerTimeBoundMatch,
             mediumMatch,
             {
