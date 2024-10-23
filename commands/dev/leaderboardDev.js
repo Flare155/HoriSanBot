@@ -100,7 +100,7 @@ module.exports = {
                 discordUser = { username: "Unknown User" };
             }
             return {
-                displayName: discordUser.username,
+                displayName: discordUser.displayName,
                 totalPoints: toPoints(user.totalSeconds) // Convert totalSeconds to points
             };
         }));
@@ -109,7 +109,7 @@ module.exports = {
         const currentUserPosition = allUsers.findIndex(user => user._id === interaction.user.id) + 1;
         const currentUserData = allUsers.find(user => user._id === interaction.user.id);
         const currentUserPoints = currentUserData ? toPoints(currentUserData.totalSeconds) : 0; // Convert to points
-        const currentDisplayName = interaction.user.username;
+        const currentDisplayName = interaction.user.displayName;
 
         // If not in top 10, adjust spacing
         let endspace = "";
