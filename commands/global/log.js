@@ -43,12 +43,14 @@ module.exports = {
         ),
     async execute(interaction) {
         try {
+            // Retrieve the inputs and set variables
             const medium = interaction.options.getString('medium');
             const input = interaction.options.getString('amount');
             const title = interaction.options.getString('title');
             const notes = interaction.options.getString('notes');
             const customEpisodeLength = interaction.options.getString('episode_length');
             let unit = "", unitLength = null, totalSeconds = 0;
+
             // Regular expression to match time and episode formats
             const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/; // Matches input in ( Num h, Num m, Num s) excludes ep
             const episodePattern = /^(?!.*[hms])(\d+)ep$/; // Matches input in ( Num ep ) format, excludes hms

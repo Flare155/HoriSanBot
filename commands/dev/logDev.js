@@ -43,12 +43,14 @@ module.exports = {
         ),
     async execute(interaction) {
         try {
+            // Retrieve the inputs and set variables
             const medium = interaction.options.getString('medium');
             const input = interaction.options.getString('amount');
             const title = interaction.options.getString('title');
             const notes = interaction.options.getString('notes');
             const customEpisodeLength = interaction.options.getString('episode_length');
             let unit = "", unitLength = null, totalSeconds = 0;
+
             // Regular expression to match time and episode formats
             const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/; // Matches input in ( Num h, Num m, Num s) excludes ep
             const episodePattern = /^(?!.*[hms])(\d+)ep$/; // Matches input in ( Num ep ) format, excludes hms
@@ -108,7 +110,7 @@ module.exports = {
             if (unit !== "Episodes") {
                 embedTitle = `🎉 ${interaction.user.displayName} Logged ${Math.round((totalSeconds * 10) / 60) / 10} Minutes of ${medium}!`;
             } else {
-                embedTitle = count <= 1 ? `🎉 ${interaction.user.displayName} Logged ${count} Episode of ${medium}!` : `${interaction.user.displayName} Logged ${count} ${unit} of ${medium}!`;
+                embedTitle = `🎉 ${interaction.user.displayName} Logged ${count} ${unit} of ${medium}!`;
             };
 
             // Save the log data to the database
@@ -126,7 +128,7 @@ module.exports = {
 
 
 // Utility function to create and send the embed message
-async function sendLogEmbed(interaction, embedTitle, description, totalSeconds, title, notes) {
+async function sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes) {
     // Calculate the embed color based on the points
     const embedColor = calculateEmbedColor(totalSeconds);
     // Create footer message
