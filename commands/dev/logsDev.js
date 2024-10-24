@@ -37,7 +37,7 @@ module.exports = {
       const medium = interaction.options.getString('medium');
       const user = interaction.options.getUser('user') || interaction.user;
       const userId = user.id;
-      console.log(userId);
+      
       // Fetch the user's timezone from the database
       const userData = await User.findOne({ userId: userId});
       const userTimezone = userData ? userData.timezone : 'UTC';
