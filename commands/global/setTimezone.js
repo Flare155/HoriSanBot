@@ -35,7 +35,8 @@ module.exports = {
                     guildId: guildId,
                     timestamp: new Date().toISOString(),
                     streak: 0,
-                    timezone: timezoneInput
+                    timezone: timezoneInput,
+                    displayName: interaction.user.displayName,
                 });
             } else {
                 console.log("Updating Timezone");
