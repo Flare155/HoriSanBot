@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     timestamp: {type: Date, required: true },
     streak: {type: Number, required: true, default: 0, min: 0 },
     timezone: { type: String, required: true, default: 'UTC' },
+    displayName: {type: String, required: true }
 });
 
 userSchema.index({ userId: 1 });

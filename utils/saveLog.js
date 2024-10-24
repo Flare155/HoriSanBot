@@ -27,7 +27,6 @@ async function saveLog(interaction, customDate, medium, title, notes, isBackLog,
             amount.unitLength = unitLength;
         }
 
-
         // Save the log entry
         const newLog = new Log({
             userId: interaction.user.id,
@@ -41,21 +40,28 @@ async function saveLog(interaction, customDate, medium, title, notes, isBackLog,
         });
         await newLog.save();
 
-
-        // Check if the user exists and create a user entry if not
-        const userExists = await User.exists({ userId: interaction.user.id });
-        if (!userExists) {
+        // Check if the user exists
+        const existingUser = await User.findOne({ userId: interaction.user.id });
+        if (!existingUser) {
+            // Create a new user if they don't exist
             const newUser = new User({
                 userId: interaction.user.id,
                 guildId: interaction.guild.id,
-                timestamp: Date().toISOString(),
+                timestamp: new Date().toISOString(),
+                displayName: interaction.user.displayName,
             });
             await newUser.save();
+        } else {
+            // Check if the display name has changed
+            if (existingUser.displayName !== interaction.user.displayName) {
+                existingUser.displayName = interaction.user.displayName;
+                await existingUser.save();
+            }
         }
     } catch (error) {
         console.error("Error saving log:", error);
         await interaction.editReply("An error occurred while saving your log.");
     }
-};
+}
 
 module.exports = { saveLog };

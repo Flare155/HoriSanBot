@@ -93,7 +93,6 @@ module.exports = {
                     return sendErrorMessage(interaction, "For custom anime episode lengths, use episodeLength. See /help log for more info.");
                 };
                 count = parseTime(input, timePattern)
-                console.log(count);
                 unit = "Seconds";
                 totalSeconds = count;
             } else {
