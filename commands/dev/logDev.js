@@ -113,12 +113,13 @@ module.exports = {
                 embedTitle = `🎉 ${interaction.user.displayName} Logged ${count} ${unit} of ${medium}!`;
             };
 
-            // Save the log data to the database
+            // customDate and isBackLog are used in backlog command
             customDate = null;
             isBackLog = false;
+            // Save the log to the database
             await saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
             // Send an embed message with the log details
-            await sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes);
+            await sendLogEmbed(interaction, embedTitle, description, totalSeconds, title, notes);
         } catch (error) {
             console.log(error);
             return sendErrorMessage(interaction, "An unexpected error occurred executing log command. Please try again later.")
@@ -128,7 +129,7 @@ module.exports = {
 
 
 // Utility function to create and send the embed message
-async function sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes) {
+async function sendLogEmbed(interaction, embedTitle, description, totalSeconds, title, notes) {
     // Calculate the embed color based on the points
     const embedColor = calculateEmbedColor(totalSeconds);
     // Create footer message

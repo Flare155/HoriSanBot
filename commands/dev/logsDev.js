@@ -24,27 +24,39 @@ module.exports = {
           { name: 'Readtime', value: 'Readtime' },
           { name: 'Visual Novel', value: 'Visual Novel' },
           { name: 'Manga', value: 'Manga' },
-        )),
+        ))
+    .addUserOption(option =>
+      option.setName('user')
+        .setDescription('Optionally input a user to see other peoples logs')
+        .setRequired(false)
+    ),
+
   async execute(interaction) {
     await interaction.deferReply();
-
     try {
       const medium = interaction.options.getString('medium');
-
+      let user = interaction.options.getUser('user');
+      // Set the userId based on whether a custom user was provided or not
+      if (!user) {
+        userId = interaction.user.id;
+        user = interaction.user
+      } else {
+        userId = user.id;
+      }
+      console.log(userId);
       // Fetch the user's timezone from the database
-      const userData = await User.findOne({ userId: interaction.user.id });
-      const userId = userData.userId;
+      const userData = await User.findOne({ userId: userId});
       const userTimezone = userData ? userData.timezone : 'UTC';
 
       // Fetch logs based on the medium filter
       let logs;
       if (medium == "All") {
         logs = await Log.find({
-          userId: interaction.user.id,
+          userId: userId,
         });
       } else {
         logs = await Log.find({
-          userId: interaction.user.id,
+          userId: userId,
           medium: medium
         });
       }
@@ -62,8 +74,8 @@ module.exports = {
       // Display the first 3 logs in a detailed embed
       const embed = new EmbedBuilder()
         .setColor('#c3e0e8')
-        .setTitle(`${interaction.user.displayName}'s Recent Logs (${medium})`)
-        .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
+        .setTitle(`${user.displayName}'s Recent Logs (${medium})`)
+        .setThumbnail(user.displayAvatarURL({ dynamic: true }))
         .setFooter({ text: 'Use /undo or /deletelog to remove a log' });
 
       // Iterate over the first three logs
