@@ -21,14 +21,20 @@ module.exports = {
                     { name: 'Yearly', value: 'Yearly' },
                     { name: 'Monthly', value: 'Monthly' },
                     { name: 'Weekly', value: 'Weekly' },
-                )),
+                ))
+        .addUserOption(option =>
+            option.setName('user')
+                .setDescription('Optionally input a user to see other peoples information')
+                .setRequired(false)
+            ),
     async execute(interaction) {
         await interaction.deferReply();
-        const userId = interaction.user.id;
+        const user = interaction.options.getUser('user') || interaction.user;
+        const userId = user.id;
         const guildId = interaction.guild.id;
         const timePeriod = interaction.options.getString('period');
         const exists = await User.exists({ userId: userId });
-        const userData = await User.findOne({ userId: interaction.user.id });
+        const userData = await User.findOne({ userId: userId});
         const userTimezone = userData ? userData.timezone : 'UTC';
 
         let logStats = [];
@@ -43,7 +49,7 @@ module.exports = {
         if (timePeriod === 'All Time') {
             // Get the timestamp of the first log
             const firstLog = await Log.aggregate([
-                { $match: { userId: interaction.user.id } },
+                { $match: { userId: userId } },
                 { $sort: { timestamp: 1 } }, // Sort logs by timestamp, earliest first
                 { $limit: 1 } // Limit the result to the first log
             ]);
@@ -52,7 +58,7 @@ module.exports = {
                 startDateUTC = startDate.toUTC().toJSDate(); // Convert to UTC and then to native JS Date
             } else {
                 // User has no logs at all
-                await interaction.editReply({ content: 'You have no logs yet! Start logging your immersion with the `/backfill_dev` command.', ephemeral: true });
+                await interaction.editReply({ content: 'User has no logs yet! Start logging your immersion with the `/log` command.', ephemeral: true });
                 return;
             }
         } else {
@@ -159,12 +165,12 @@ module.exports = {
         // Reply
         if (exists) {
             // Embed response:
-            const userAvatarURL = interaction.user.displayAvatarURL({ dynamic: true });
+            const userAvatarURL = user.displayAvatarURL({ dynamic: true });
 
             // Create embed for the profile
             const profileEmbed = new EmbedBuilder()
                 .setColor('#c3e0e8')
-                .setTitle(`${interaction.member.displayName}'s ${timePeriod} Immersion Profile`)
+                .setTitle(`${user.displayName}'s ${timePeriod} Immersion Profile`)
                 .setThumbnail(userAvatarURL)
                 .setImage('attachment://image.png')
                 .setFooter({ text: `Keep up the great work!  •  Displayed in ${userTimezone} time`, iconURL: userAvatarURL });

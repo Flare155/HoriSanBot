@@ -6,7 +6,7 @@ const { localTimeConverter } = require('../../utils/localTimeConverter'); // Imp
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('logs')
+    .setName('logs_dev')
     .setDescription('Sends your log history!')
     .addStringOption(option =>
       option.setName('medium')
@@ -35,15 +35,9 @@ module.exports = {
     await interaction.deferReply();
     try {
       const medium = interaction.options.getString('medium');
-      let user = interaction.options.getUser('user');
-      // Set the userId based on whether a custom user was provided or not
-      if (!user) {
-        userId = interaction.user.id;
-        user = interaction.user
-      } else {
-        userId = user.id;
-      }
-      console.log(userId);
+      const user = interaction.options.getUser('user') || interaction.user;
+      const userId = user.id;
+      
       // Fetch the user's timezone from the database
       const userData = await User.findOne({ userId: userId});
       const userTimezone = userData ? userData.timezone : 'UTC';

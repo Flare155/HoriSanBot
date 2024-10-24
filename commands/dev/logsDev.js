@@ -35,14 +35,8 @@ module.exports = {
     await interaction.deferReply();
     try {
       const medium = interaction.options.getString('medium');
-      let user = interaction.options.getUser('user');
-      // Set the userId based on whether a custom user was provided or not
-      if (!user) {
-        userId = interaction.user.id;
-        user = interaction.user
-      } else {
-        userId = user.id;
-      }
+      const user = interaction.options.getUser('user') || interaction.user;
+      const userId = user.id;
       console.log(userId);
       // Fetch the user's timezone from the database
       const userData = await User.findOne({ userId: userId});
