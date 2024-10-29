@@ -38,7 +38,7 @@ module.exports = {
             )
         .addStringOption(option =>
             option.setName('episode_length')
-                .setDescription('The length of each episode (e.g., 45m 1h30m, 2m5s)')
+                .setDescription('The length of each episode (e.g., 45m 1h30m, 2m5s), (default is 21m)')
                 .setRequired(false)
         ),
     async execute(interaction) {
@@ -73,7 +73,6 @@ module.exports = {
                         // Parse episodes and totalSeconds for custom length animse log, then save data
                         count = parseEpisodes(input, episodePattern);
                         unitLength = parseTime(customEpisodeLength, timePattern);
-                        console.log(unitLength);
                         totalSeconds = unitLength * count;
                         unit = "Episodes"
                     } else {

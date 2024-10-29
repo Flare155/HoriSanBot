@@ -18,6 +18,7 @@ module.exports = {
         const userId = interaction.user.id;
         const guildId = interaction.guild.id;
         const timezoneInput = interaction.options.getString('timezone');
+        console.log(interaction.user.displayName);
 
         // Validate the timezone using Luxon
         if (!IANAZone.isValidZone(timezoneInput)) {
@@ -42,6 +43,7 @@ module.exports = {
                 console.log("Updating Timezone");
                 // Update existing user's timezone
                 user.timezone = timezoneInput;
+                user.displayName = interaction.user.displayName;
             }
 
             // Save the user object
