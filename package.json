@@ -14,7 +14,7 @@
   "main": "index.js",
   "scripts": {
     "bun": "bun --watch index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest",
     "visuals": "cd utils/hori-visuals && npm run dev",
     "build-visuals": "cd utils/hori-visuals && npm run build"
   },
@@ -22,6 +22,7 @@
   "license": "ISC",
   "keywords": [],
   "devDependencies": {
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "vitest": "^2.1.4"
   }
 }
