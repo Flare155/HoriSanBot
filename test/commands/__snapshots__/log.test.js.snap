@@ -1,0 +1,20 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`should fail on invalid time pattern 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      {
+        "content": "\`❌ Invalid input format. Examples: |2ep|, |1h3m|. See /help log for more info.\`",
+        "ephemeral": true,
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
