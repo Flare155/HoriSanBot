@@ -25,6 +25,38 @@ HorisanBot isn't just a tracking tool—it's your partner in the language learni
 
 Want to contribute? HorisanBot is currently a mostly solo project, but I’m open to collaboration. Feel free to reach out if you're interested in developing features, fixing bugs, or providing suggestions.
 
+## Installation
+
+### Prerequisites
+
+- [mongodb](https://www.mongodb.com/)
+- [nodejs](https://nodejs.org/)
+
+### Installation
+
+After cloning the repository, run `npm i` to install all dependencies in the root of this project.
+
+**Ubuntu**:  
+This project uses [Puppeteer](https://pptr.dev/) with the Chromium browser to render graphs, so you might need to install these additional dependencies:
+```sh
+sudo apt-get install libx11-xcb1 libxcomposite1 libasound2 libatk1.0-0 libatk-bridge2.0-0 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6
+```
+
+### Configuration
+Copy `.env.example` and rename it to `.env.dev`. In this file, configure the MongoDB credentials and add your Discord bot token.
+
+#### Discord bot token
+To set up your new Discord bot application, follow these steps:
+
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications) and create a new application.
+2. Select your new app and navigate to **Bot** under **Settings**.
+3. Click **Reset Token** to generate a new bot token, then copy it.
+4. Open your `.env.dev` file and replace `discord bot token` with your bot token.
+
+### Run
+Execute the following command in the root of this project:
+```node index.js```
+
 ## License 📜
 
 This project is currently private. Please do not use or distribute any part of HorisanBot without permission.
