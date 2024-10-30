@@ -11,5 +11,5 @@ const timeoutSchema = new mongoose.Schema({
 
 timeoutSchema.index({ activationTime: 1 });  // To efficiently find timeouts ready to activate
 
-const Timeout = mongoose.model('Timeout', timeoutSchema);
+const Timeout = mongoose.models.Timeout || mongoose.model('Timeout', timeoutSchema);
 module.exports = Timeout;
