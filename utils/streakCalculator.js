@@ -11,8 +11,11 @@ const calculateStreak = async (userId) => {
 
         const userTimezone = user.timezone || 'UTC'; // Default to UTC if timezone is not set
 
-        // Find all logs for the user, sorted by timestamp descending
-        const logs = await Log.find({ userId: userId }).sort({ timestamp: -1 });
+        // Exclude logs where isBackLog is true
+        const logs = await Log.find({
+            userId: userId,
+            isBackLog: { $ne: true } // This ensures that isBackLog is not true
+        }).sort({ timestamp: -1 });
 
         if (logs.length === 0) {
             return 0; // No logs mean no streak
