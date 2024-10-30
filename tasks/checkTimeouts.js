@@ -3,15 +3,12 @@ const Timeout = require('../models/Timeout'); // Adjust the path as necessary
 
 async function checkTimeouts(client) {
     const now = DateTime.utc();
-    console.log(`Checking timeouts at ${now.toISO()}`);
-
+    
     // Find timeouts that are due and have repeats remaining
     const dueTimeouts = await Timeout.find({
         activationTime: { $lte: now.toJSDate() },
         repeatCount: { $gte: 0 },
     });
-
-    console.log(`Found ${dueTimeouts.length} timeouts due`);
 
     for (const timeout of dueTimeouts) {
         try {

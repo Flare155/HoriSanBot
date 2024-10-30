@@ -34,6 +34,11 @@ module.exports = {
         const userTimezone = userData ? userData.timezone : 'UTC';
         const formattedCurrentTime = DateTime.now().setZone(userTimezone).toFormat('h:mm a');
 
+        // Validate inputs
+        if (repeatCount > 21) {
+            return sendErrorMessage(interaction, "The maximum amount of repeats is 21 (3 weeks)")
+        };
+
         // Parse duration
         const parsedDuration = parseDuration(duration);
         if (!parsedDuration) {
