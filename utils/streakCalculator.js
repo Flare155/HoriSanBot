@@ -48,17 +48,15 @@ const calculateStreak = async (userId) => {
         // Loop through the remaining logs to check for consecutive "days"
         for (let i = 1; i < logs.length; i++) {
             let currentLogTime = getAdjustedDay(logs[i].timestamp);
-
             const daysDifference = mostRecentLogTime.diff(currentLogTime, 'days').days;
-
-            if (daysDifference === 1) {
-                // Logs are on consecutive days (adjusted for 4 AM window), increment streak
+        
+            // Adjusted comparison to account for floating-point precision
+            if (Math.round(daysDifference) === 1) {
                 currentStreak++;
-            } else if (daysDifference > 1) {
-                // Non-consecutive day found, break the streak
+            } else if (Math.round(daysDifference) > 1) {
                 break;
             }
-
+        
             mostRecentLogTime = currentLogTime;
         }
 
