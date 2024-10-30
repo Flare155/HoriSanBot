@@ -2,6 +2,8 @@
 
 Welcome to **HorisanBot**, the ultimate tool designed to enhance your language learning through immersive activities. Whether you're watching anime, reading manga, listening to podcasts, or diving into novels, HorisanBot helps track your progress and makes your language journey both fun and rewarding.
 
+![tests result](https://github.com/Flare155/HoriSanBot/actions/workflows/tests.js.yml/badge.svg)
+
 ## Key Features 🌟
 
 - **Activity Logging** 📝: Effortlessly log your immersive activities—watching, reading, or listening—and earn points for every logged hour.
