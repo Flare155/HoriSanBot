@@ -16,6 +16,22 @@ exports[`should not delete when no logs 1`] = `
 }
 `;
 
+exports[`should not undo log from other user 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      "You have no logs to remove.",
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
 exports[`should undo log 1`] = `
 [MockFunction spy] {
   "calls": [

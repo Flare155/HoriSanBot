@@ -1,15 +1,15 @@
 import { expect } from 'vitest';
 import { execute } from '../../commands/global/editLog';
 import Log from '../../models/Log';
-import {myTest, createMockInteraction} from '../fixtures';
+import {myTest} from '../fixtures';
 
 myTest('should return error when log not found by id', async ({ interaction }) => {
     await execute(interaction);
     expect(interaction.editReply).toMatchSnapshot();
 });
 
-myTest('should edit log', async ({ log, interaction }) => {
-    let editInteraction = createMockInteraction({
+myTest('should edit log', async ({ log, interaction, createInteraction }) => {
+    let editInteraction = createInteraction({
         log_id: log.id,
         title: 'new title'
     });
@@ -22,8 +22,8 @@ myTest('should edit log', async ({ log, interaction }) => {
     expect(editedLog.title).toBe('new title');
 });
 
-myTest('should cancel edit log', async ({log, interaction}) => {
-    let editInteraction = createMockInteraction({
+myTest('should cancel edit log', async ({log, interaction, createInteraction}) => {
+    let editInteraction = createInteraction({
         log_id: log.id,
         title: 'new title'
     });

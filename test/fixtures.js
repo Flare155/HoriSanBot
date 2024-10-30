@@ -2,26 +2,33 @@ import Log from '../models/Log';
 import { test } from 'vitest';
 
 export const myTest = test.extend({
-    interaction: async({}, use) => {
+    interaction: async ({ }, use) => {
         await use(createMockInteraction());
     },
-    log: async ({ interaction }, use) => {
-        const newLog = new Log({
-            userId: interaction.user.id,
-            guildId: interaction.guild.id,
-            timestamp: new Date(),
-            medium: interaction.options.getString('medium'),
-            title: interaction.options.getString('title'),
-            notes: interaction.options.getString('notes'),
-            isBackLog: false,
-            amount: {
-                totalSeconds: 10,
-                count: 1,
-                unit: 'Seconds'
-            },
+    createInteraction: async ({}, use) => await use(createMockInteraction),
+    createLog: async ({}, use) => {
+        return use(async (interaction) => {
+            const newLog = new Log({
+                userId: interaction.user.id,
+                guildId: interaction.guild.id,
+                timestamp: new Date(),
+                medium: interaction.options.getString('medium'),
+                title: interaction.options.getString('title'),
+                notes: interaction.options.getString('notes'),
+                isBackLog: false,
+                amount: {
+                    totalSeconds: 10,
+                    count: 1,
+                    unit: 'Seconds'
+                },
+            });
+            await newLog.save();
+            return newLog;
         });
-        await newLog.save();
-        await use(newLog);
+    },
+    log: async ({ createLog, interaction }, use) => {
+        const log = await createLog(interaction);
+        await use(log);
     },
 });
 
