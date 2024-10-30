@@ -101,7 +101,7 @@ module.exports = {
             }
 
             // Error handling for invalid log amounts
-            if (totalSeconds <= 60) {
+            if (totalSeconds < 60) {
                 return interaction.reply(`Error: The minimum log size is 1 minute, you entered ${totalSeconds} seconds.`);
             }
             if (totalSeconds > 72000) {
