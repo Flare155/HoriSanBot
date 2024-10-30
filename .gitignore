@@ -9,4 +9,3 @@ bun.lockb
 utils/hori-visuals/bun.lockb
 .env.dev
 .env.prod
-config.json
