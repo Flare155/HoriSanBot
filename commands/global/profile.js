@@ -82,7 +82,7 @@ module.exports = {
         // Find total points and calculate streak if user exists
         if (exists) {
             // Calculate the streak dynamically based on logs
-            streak = await calculateStreak(userId, guildId);
+            streak = await calculateStreak(userId);
 
             // Calculate the longest streak by checking if currect streak is bigger then the curret longest streak
             longestStreak = await calculateLongestStreak(userId, streak);

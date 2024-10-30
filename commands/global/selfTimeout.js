@@ -31,14 +31,21 @@ module.exports = {
         const userId = interaction.user.id;
         const member = await interaction.guild.members.fetch(userId);
         const userData = await User.findOne({ userId: userId });
-        const userTimezone = userData ? userData.timezone : 'UTC';
+        const userTimezone = userData ? userData.timezone : null;
         const formattedCurrentTime = DateTime.now().setZone(userTimezone).toFormat('h:mm a');
+
+        // Validate inputs
+        if (repeatCount > 21) {
+            return sendErrorMessage(interaction, "The maximum amount of repeats is 21 (3 weeks)")
+        } else if (userTimezone == null) {
+            return sendErrorMessage(interaction, "Set a timezone first with /settimezone!");
+        };
 
         // Parse duration
         const parsedDuration = parseDuration(duration);
         if (!parsedDuration) {
             return sendErrorMessage(interaction, "Invalid duration format. Examples: 1h30m, 45m, 2m5s. See /help for more info.");
-        }
+        };
 
         try {
             let parsedActivationTime;
