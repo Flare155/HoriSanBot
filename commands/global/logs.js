@@ -85,7 +85,7 @@ module.exports = {
           name: `\`${formattedDate}\``,
           value: `**Medium**: ${log.medium}
 **Amount**: ${formattedAmount}
-**Title**: ${title}z
+**Title**: ${title}
 **Notes**: ${notes !== 'N/A' ? notes : 'No notes provided'}
 **ID**: ${log._id}\n`
         });
