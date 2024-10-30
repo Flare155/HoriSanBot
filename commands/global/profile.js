@@ -80,7 +80,7 @@ module.exports = {
         // Find total points and calculate streak if user exists
         if (exists) {
             // Calculate the streak dynamically based on logs
-            streak = await calculateStreak(userId, guildId);
+            streak = await calculateStreak(userId);
 
             // Update the user's streak in the database
             await User.updateOne({ userId }, { streak });
