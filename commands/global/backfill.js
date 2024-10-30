@@ -162,6 +162,11 @@ module.exports = {
                 embedTitle = `🎉 ${interaction.user.username} Logged ${input} of ${medium}!`;
             }
 
+            // Check if the log is in the future
+            if (DateTime.fromJSDate(parsedDate).toMillis() > currentDate.toMillis()) {
+                return sendErrorMessage(interaction, "You can't log activities for future dates.");
+            }
+
             const isBackLog = true;
             // Save the log data to the database, including the parsed date
             await saveLog(interaction, parsedDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
