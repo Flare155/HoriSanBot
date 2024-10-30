@@ -85,7 +85,7 @@ module.exports = {
           name: `\`${formattedDate}\``,
           value: `**Medium**: ${log.medium}
 **Amount**: ${formattedAmount}
-**Title**: ${title}
+**Title**: ${title}z
 **Notes**: ${notes !== 'N/A' ? notes : 'No notes provided'}
 **ID**: ${log._id}\n`
         });
@@ -101,12 +101,18 @@ module.exports = {
         let title = log.title || 'N/A';
         let notes = log.notes || 'N/A';
 
+        // Remove unicode range u1F000-1FFFF (emoji)
+        // Remove animated <a:name:id> / regular emojis <name:id>
+        // Remove discord emojis :name:
+        var notes_no_emojis = notes.replace(/[\u{1F000}-\u{1FFFF}]|<a?:\w+:\d+>|:.+?:/gmu, ""); 
+        var title_no_emojis = title.replace(/[\u{1F000}-\u{1FFFF}]|<a?:\w+:\d+>|:.+?:/gmu, ""); 
+
         let logString = `⏤⏤⏤⏤⏤⏤\n${formattedDate}\nMedium: ${log.medium} (${formattedAmount})`;
         if (title != 'N/A') {
-          logString += `\nTitle: ${title}`;
+          logString += `\nTitle: ${title_no_emojis}`;
         };
         if (notes != 'N/A') {
-          logString += `\nNotes: ${notes}`;
+          logString += `\nNotes: ${notes_no_emojis}`;
         };
         logString += `\nID: ${log._id}`;
         return logString;
