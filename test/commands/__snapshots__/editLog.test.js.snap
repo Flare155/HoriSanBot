@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`should return error when log not found by id 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      "❌ \`Invalid log ID provided.\`",
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;

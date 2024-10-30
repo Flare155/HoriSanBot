@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`should not delete when no logs 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      "You have no logs to remove.",
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`should undo log 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      "Your most recent log has been removed.",
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
