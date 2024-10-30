@@ -2,7 +2,6 @@ const { DateTime } = require('luxon');
 
 function startDateCalculator(timePeriod, userTimezone = 'UTC') {
   const now = DateTime.now().setZone(userTimezone); // Get the current time in the user's timezone
-  console.log("ran");
   let startDate;
 
   switch (timePeriod) {
@@ -19,7 +18,7 @@ function startDateCalculator(timePeriod, userTimezone = 'UTC') {
       monday = now.startOf('week'); // Start of the current day
       startDate = monday.minus({days: 1})
       break;
-    case 'Today':
+    case 'Daily':
       startDate = now.startOf('day'); // Start of the current day
       break;
     default:
