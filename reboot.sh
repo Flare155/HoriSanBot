@@ -1,4 +1,5 @@
 # Run this command with ./reboot in order to update and reboot the bot!
+# if it says no perms use <chmod +x reboot.sh>
 
 git pull # Pulls the new changes
 docker-compose down --rmi all # Closes and deletes the old container
