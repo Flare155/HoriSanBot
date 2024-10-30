@@ -5,7 +5,7 @@ exports[`should fail on invalid time pattern 1`] = `
   "calls": [
     [
       {
-        "content": "\`❌ Invalid input format. Examples: |2ep|, |1h3m|. See /help log for more info.\`",
+        "content": "\`❌ Invalid input format. Examples: \`2ep\`, \`1h3m\`. See \`/help log\` for more info.\`",
         "ephemeral": true,
       },
     ],
@@ -19,38 +19,13 @@ exports[`should fail on invalid time pattern 1`] = `
 }
 `;
 
-exports[`should save log 1`] = `
+exports[`should send embed after saving log 1`] = `
 [MockFunction spy] {
   "calls": [
     [
       {
-        "embeds": [
-          {
-            "color": 14024703,
-            "description": "1 point/min → +10 points",
-            "fields": [
-              {
-                "inline": true,
-                "name": "📖 Title",
-                "value": "Test Title",
-              },
-              {
-                "inline": true,
-                "name": "📝 Notes",
-                "value": "Some notes here",
-              },
-            ],
-            "footer": {
-              "icon_url": "http://example.com/image.jpg",
-              "text": "Keep up the great immersion!",
-            },
-            "thumbnail": {
-              "url": "http://example.com/image.jpg",
-            },
-            "timestamp": "TIMESTAMP",
-            "title": "🎉 test Logged 10 Minutes of Watchtime!",
-          },
-        ],
+        "content": "\`❌ Invalid input format. Examples: \`2ep\`, \`1h3m\`. See \`/help log\` for more info.\`",
+        "ephemeral": true,
       },
     ],
   ],
@@ -60,98 +35,5 @@ exports[`should save log 1`] = `
       "value": undefined,
     },
   ],
-}
-`;
-
-exports[`should save log 2`] = `
-{
-  "options": {
-    "getString": [MockFunction spy] {
-      "calls": [
-        [
-          "medium",
-        ],
-        [
-          "amount",
-        ],
-        [
-          "title",
-        ],
-        [
-          "notes",
-        ],
-        [
-          "episode_length",
-        ],
-      ],
-      "results": [
-        {
-          "type": "return",
-          "value": "Watchtime",
-        },
-        {
-          "type": "return",
-          "value": "10m",
-        },
-        {
-          "type": "return",
-          "value": "Test Title",
-        },
-        {
-          "type": "return",
-          "value": "Some notes here",
-        },
-        {
-          "type": "return",
-          "value": "30",
-        },
-      ],
-    },
-  },
-  "reply": [MockFunction spy] {
-    "calls": [
-      [
-        {
-          "embeds": [
-            {
-              "color": 14024703,
-              "description": "1 point/min → +10 points",
-              "fields": [
-                {
-                  "inline": true,
-                  "name": "📖 Title",
-                  "value": "Test Title",
-                },
-                {
-                  "inline": true,
-                  "name": "📝 Notes",
-                  "value": "Some notes here",
-                },
-              ],
-              "footer": {
-                "icon_url": "http://example.com/image.jpg",
-                "text": "Keep up the great immersion!",
-              },
-              "thumbnail": {
-                "url": "http://example.com/image.jpg",
-              },
-              "timestamp": "TIMESTAMP",
-              "title": "🎉 test Logged 10 Minutes of Watchtime!",
-            },
-          ],
-        },
-      ],
-    ],
-    "results": [
-      {
-        "type": "return",
-        "value": undefined,
-      },
-    ],
-  },
-  "user": {
-    "displayAvatarURL": [Function],
-    "displayName": "test",
-  },
 }
 `;

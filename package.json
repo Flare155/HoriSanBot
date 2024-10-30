@@ -23,6 +23,7 @@
   "keywords": [],
   "devDependencies": {
     "cross-env": "^7.0.3",
+    "mongodb-memory-server": "^10.1.2",
     "vitest": "^2.1.4"
   }
 }

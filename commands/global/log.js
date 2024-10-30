@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { footerCreator } = require('../../utils/formatting/logFooterCreator.js');
 const { calculateEmbedColor } = require('../../utils/formatting/calculateEmbedColor.js');
 const { sendErrorMessage } = require('../../utils/formatting/errorMessageFormatter.js');
-const { saveLog: saveLogInMongo } = require('../../utils/saveLog.js');
+const { saveLog } = require('../../utils/saveLog.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -41,8 +41,7 @@ module.exports = {
                 .setDescription('The length of each episode (e.g., 45m, 1h30m, 2m5s), (default is 21m)')
                 .setRequired(false)
         ),
-    async execute(interaction, saveLog = null) {
-        saveLog = saveLog ?? saveLogInMongo;
+    async execute(interaction) {
         try {
             // Retrieve the inputs and set variables
             const medium = interaction.options.getString('medium');
