@@ -157,9 +157,9 @@ module.exports = {
             const description = unit === "Episodes" ? `${unitLength} seconds/episode → +${totalSeconds} seconds` : `1 point/sec → +${totalSeconds} points`;
             let embedTitle;
             if (unit !== "Episodes") {
-                embedTitle = `🎉 ${interaction.user.username} Logged ${Math.round((totalSeconds / 60) * 10) / 10} Minutes of ${medium}!`;
+                embedTitle = `🎉 ${interaction.user.displayName} Logged ${Math.round((totalSeconds / 60) * 10) / 10} Minutes of ${medium}!`;
             } else {
-                embedTitle = `🎉 ${interaction.user.username} Logged ${input} of ${medium}!`;
+                embedTitle = `🎉 ${interaction.user.displayName} Logged ${input} of ${medium}!`;
             }
 
             // Check if the log is in the future
@@ -171,7 +171,7 @@ module.exports = {
             // Save the log data to the database, including the parsed date
             await saveLog(interaction, parsedDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
             // Send an embed message with the log details
-            await sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes, parsedDate);
+            await sendLogEmbed(interaction, embedTitle, description, medium, input, totalSeconds, title, notes, parsedDate);
         } catch (error) {
             console.log(error);
             return sendErrorMessage(interaction, "An unexpected error occurred executing log command. Please try again later.")
@@ -180,7 +180,7 @@ module.exports = {
 };
 
 // Utility function to create and send the embed message
-async function sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes, date) {
+async function sendLogEmbed(interaction, embedTitle, description, medium, input, totalSeconds, title, notes, date) {
     // Calculate the embed color based on the points
     const embedColor = calculateEmbedColor(totalSeconds);
     // Create footer message
