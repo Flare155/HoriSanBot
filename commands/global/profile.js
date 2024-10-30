@@ -87,8 +87,6 @@ module.exports = {
             // Calculate the longest streak by checking if currect streak is bigger then the curret longest streak
             longestStreak = await calculateLongestStreak(userId, streak);
 
-            console.log(streak);
-
             // Update the user's streak in the database
             await User.updateOne({ userId }, { streak });
 
