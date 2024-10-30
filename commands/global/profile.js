@@ -3,7 +3,6 @@ const User = require("../../models/User");
 const Log = require("../../models/Log");
 const { DateTime } = require('luxon'); // Replacing Moment with Luxon
 const { calculateStreak } = require('../../utils/streakCalculator');
-const { calculateLongestStreak } = require('../../utils/longestStreakCalculator');
 const { buildImage } = require('../../utils/buildImage');
 const { startDateCalculator } = require('../../utils/startDateCalculator');
 const { immersionByTimePeriod } = require('../../utils/graph-data/immersionByTimePeriod');
@@ -82,10 +81,10 @@ module.exports = {
         // Find total points and calculate streak if user exists
         if (exists) {
             // Calculate the streak dynamically based on logs
-            streak = await calculateStreak(userId);
+            streak = await calculateStreak(userId, true);
 
             // Calculate the longest streak by checking if currect streak is bigger then the curret longest streak
-            longestStreak = await calculateLongestStreak(userId, streak);
+            longestStreak = await calculateStreak(userId, false);
 
             // Update the user's streak in the database
             await User.updateOne({ userId }, { streak });
