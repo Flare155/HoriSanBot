@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { footerCreator } = require('../../utils/formatting/logFooterCreator.js');
 const { calculateEmbedColor } = require('../../utils/formatting/calculateEmbedColor.js');
 const { sendErrorMessage} = require('../../utils/formatting/errorMessageFormatter.js');
-const { saveLog } = require('../../utils/saveLog.js');
+const { saveLog: saveLogInMongo } = require('../../utils/saveLog.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -41,7 +41,8 @@ module.exports = {
                 .setDescription('The length of each episode (e.g., 45m 1h30m, 2m5s), (default is 21m)')
                 .setRequired(false)
         ),
-    async execute(interaction) {
+    async execute(interaction, saveLog = null) {
+        saveLog = saveLog ?? saveLogInMongo;
         try {
             // Retrieve the inputs and set variables
             const medium = interaction.options.getString('medium');
@@ -49,6 +50,7 @@ module.exports = {
             const title = interaction.options.getString('title');
             const notes = interaction.options.getString('notes');
             const customEpisodeLength = interaction.options.getString('episode_length');
+            let count = null;
             let unit = "", unitLength = null, totalSeconds = 0;
 
             // Regular expression to match time and episode formats
@@ -91,7 +93,7 @@ module.exports = {
                 if (medium === "Anime") {
                     return sendErrorMessage(interaction, "For custom anime episode lengths, use episodeLength. See /help log for more info.");
                 };
-                count = parseTime(input, timePattern)
+                count = parseTime(input, timePattern);
                 unit = "Seconds";
                 totalSeconds = count;
             } else {
@@ -105,15 +107,14 @@ module.exports = {
 
             // Calculate title and description for embed
             const description = unit === "Episodes" ? `${Math.round((unitLength * 10) / 60) / 10} minutes/episode → +${Math.round((totalSeconds * 10) / 60) / 10} points` : `1 point/min → +${Math.round((totalSeconds * 10) / 60) / 10} points`;
+            let embedTitle = `🎉 ${interaction.user.displayName} Logged ${count} ${unit} of ${medium}!`;
             if (unit !== "Episodes") {
                 embedTitle = `🎉 ${interaction.user.displayName} Logged ${Math.round((totalSeconds * 10) / 60) / 10} Minutes of ${medium}!`;
-            } else {
-                embedTitle = `🎉 ${interaction.user.displayName} Logged ${count} ${unit} of ${medium}!`;
-            };
+            }
 
             // customDate and isBackLog are used in backlog command
-            customDate = null;
-            isBackLog = false;
+            let customDate = null;
+            let isBackLog = false;
             // Save the log to the database
             await saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
             // Send an embed message with the log details
