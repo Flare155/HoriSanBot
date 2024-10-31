@@ -4,7 +4,7 @@ const { calculateEmbedColor } = require('../../utils/formatting/calculateEmbedCo
 const { sendErrorMessage} = require('../../utils/formatting/errorMessageFormatter.js');
 const { saveLog } = require('../../utils/saveLog.js');
 const { DateTime } = require('luxon');
-const User = require('../../models/User');
+const User = require('../../models/User.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -154,7 +154,9 @@ module.exports = {
             }
 
             // Calculate title and description for embed
-            const description = unit === "Episodes" ? `${unitLength} seconds/episode → +${totalSeconds} seconds` : `1 point/sec → +${totalSeconds} points`;
+            const description = unit === "Episodes"
+                ? `${Math.round((unitLength * 10) / 60) / 10} minutes/episode → +${Math.round((totalSeconds * 10) / 60) / 10} points`
+                : `1 point/min → +${Math.round((totalSeconds * 10) / 60) / 10} points`;
             let embedTitle;
             if (unit !== "Episodes") {
                 embedTitle = `🎉 ${interaction.user.displayName} Logged ${Math.round((totalSeconds / 60) * 10) / 10} Minutes of ${medium}!`;
