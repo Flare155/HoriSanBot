@@ -21,9 +21,6 @@ const calculateStreak = async (userId, isCurrentStreak) => {
             return 0; // No logs mean no streak
         }
 
-        let currentStreak = 0;
-        let currectLongestStreak = 0;
-
         const getAdjustedDay = (timestamp) => {
             const dt = DateTime.fromJSDate(timestamp).setZone(userTimezone);
             if (dt.hour < 4) {
@@ -35,45 +32,61 @@ const calculateStreak = async (userId, isCurrentStreak) => {
             }
         };
 
+        // Build an array of adjusted unique days when the user logged
+        const adjustedDays = logs.map(log => getAdjustedDay(log.timestamp));
+        const uniqueDays = [];
+
+        for (let i = 0; i < adjustedDays.length; i++) {
+            if (i === 0 || !adjustedDays[i].hasSame(adjustedDays[i - 1], 'day')) {
+                uniqueDays.push(adjustedDays[i]);
+            }
+        }
+
+        // Initialize variables for longest streak calculation
+        let longestStreak = 1;
+        let tempStreak = 1;
+
+        for (let i = 1; i < uniqueDays.length; i++) {
+            const daysDifference = uniqueDays[i - 1].diff(uniqueDays[i], 'days').days;
+
+            if (Math.round(daysDifference) === 1) {
+                tempStreak++;
+            } else {
+                tempStreak = 1;
+            }
+
+            if (tempStreak > longestStreak) {
+                longestStreak = tempStreak;
+            }
+        }
+
+        // Calculate current streak
         const now = DateTime.now().setZone(userTimezone);
         const today = getAdjustedDay(now.toJSDate());
         const yesterday = today.minus({ days: 1 });
 
-        // Adjust the first log's timestamp to the adjusted "day" (4 AM start)
-        let mostRecentLogTime = getAdjustedDay(logs[0].timestamp);
+        let currentStreak = 0;
 
-        // Check if the most recent log is from today or yesterday
-        if (mostRecentLogTime >= yesterday) {
+        if (uniqueDays[0] >= yesterday) {
             currentStreak = 1;
-        } else {
-            return 0; // If the most recent log is older than yesterday, reset streak to 0
-        }
+            for (let i = 1; i < uniqueDays.length; i++) {
+                const daysDifference = uniqueDays[i - 1].diff(uniqueDays[i], 'days').days;
 
-        // Loop through the remaining logs to check for consecutive "days"
-        for (let i = 1; i < logs.length; i++) {
-            let currentLogTime = getAdjustedDay(logs[i].timestamp);
-            const daysDifference = mostRecentLogTime.diff(currentLogTime, 'days').days;
-        
-            // Adjusted comparison to account for floating-point precision
-            if (Math.round(daysDifference) === 1) {
-                currentStreak++;
-            } else if (Math.round(daysDifference) > 1) {
-                break;
+                if (Math.round(daysDifference) === 1) {
+                    currentStreak++;
+                } else {
+                    break;
+                }
             }
-        
-            mostRecentLogTime = currentLogTime;
+        } else {
+            currentStreak = 0;
         }
 
-        // Checks if the longest streak is smaller then the currect streak
-        if(currectLongestStreak < currentStreak) {
-            currectLongestStreak = currentStreak;
-        }
-
-        // isCurretStreak is a boolean variable that decideds which value to return
-        if(isCurrentStreak){
+        // Decide which value to return based on isCurrentStreak
+        if (isCurrentStreak) {
             return currentStreak;
-        } else if(!isCurrentStreak) {
-            return currectLongestStreak;
+        } else {
+            return longestStreak;
         }
     } catch (error) {
         console.error("Error calculating streak:", error);
