@@ -40,6 +40,7 @@ module.exports = {
         let logStats = [];
         let totalPoints = 0;
         let streak = 0;
+        let longestStreak = 0;
         let mangaPages = 0;
         let charactersRead = 0;
         let startDateUTC, endDateUTC;
@@ -80,10 +81,16 @@ module.exports = {
         // Find total points and calculate streak if user exists
         if (exists) {
             // Calculate the streak dynamically based on logs
-            streak = await calculateStreak(userId);
+            streak = await calculateStreak(userId, true);
+
+            // Calculate the longest streak by checking if currect streak is bigger then the curret longest streak
+            longestStreak = await calculateStreak(userId, false);
 
             // Update the user's streak in the database
             await User.updateOne({ userId }, { streak });
+
+            // Update the user's longest streak in the database
+            await User.updateOne({ userId }, { longestStreak }); 
 
             // Query for total points
             const totalPointsResult = await Log.aggregate([
@@ -180,6 +187,9 @@ module.exports = {
 
             // Add streak field
             profileEmbed.addFields({ name: "🔥 Current Streak", value: `${streak} days`, inline: true });
+
+            // Add longest streak field
+            profileEmbed.addFields({ name: "❗ Longest Streak", value: `${longestStreak} days`, inline: true });
 
             // Add genre-specific fields
             if (logStats.length > 0) {

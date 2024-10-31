@@ -2,7 +2,7 @@ const { DateTime } = require('luxon');
 const Log = require("../models/Log");
 const User = require("../models/User");
 
-const calculateStreak = async (userId) => {
+const calculateStreak = async (userId, isCurrentStreak) => {
     try {
         const user = await User.findOne({ userId: userId });
         if (!user) {
@@ -22,6 +22,7 @@ const calculateStreak = async (userId) => {
         }
 
         let currentStreak = 0;
+        let currectLongestStreak = 0;
 
         const getAdjustedDay = (timestamp) => {
             const dt = DateTime.fromJSDate(timestamp).setZone(userTimezone);
@@ -63,7 +64,17 @@ const calculateStreak = async (userId) => {
             mostRecentLogTime = currentLogTime;
         }
 
-        return currentStreak;
+        // Checks if the longest streak is smaller then the currect streak
+        if(currectLongestStreak < currentStreak) {
+            currectLongestStreak = currentStreak;
+        }
+
+        // isCurretStreak is a boolean variable that decideds which value to return
+        if(isCurrentStreak){
+            return currentStreak;
+        } else if(!isCurrentStreak) {
+            return currectLongestStreak;
+        }
     } catch (error) {
         console.error("Error calculating streak:", error);
         return 0; // Default to 0 in case of any errors

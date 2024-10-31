@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
     guildId: { type: String, required: true },
     timestamp: {type: Date, required: true },
     streak: {type: Number, required: true, default: 0, min: 0 },
+    longestStreak: {type: Number, required: true, default: 0, min: 0 },
     timezone: { type: String, required: true, default: 'UTC' },
     displayName: {type: String, required: true }
 });
