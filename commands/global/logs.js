@@ -89,7 +89,7 @@ module.exports = {
 **Title**: ${title}
 **Notes**: ${notes !== 'N/A' ? notes : 'No notes provided'}
 **ID**: ${log._id}
-**Backlog**: ${isBacklog}\n`
+**Backlog**: ${isBacklog !== 'N/A' ? isBacklog: "false"}\n`
         });
       });
 
