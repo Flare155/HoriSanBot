@@ -7,6 +7,11 @@ expect.addSnapshotSerializer({
     print: () => `"TIMESTAMP"`,
 });
 
+expect.addSnapshotSerializer({
+    test: (val) => typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val),
+    print: () => `"DATE"`,
+});
+
 // https://typegoose.github.io/mongodb-memory-server/docs/guides/integration-examples/test-runners
 beforeEach(async () => {
     // put your client connection code here, example with mongoose:

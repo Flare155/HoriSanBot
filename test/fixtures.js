@@ -1,35 +1,141 @@
 import Log from '../models/Log';
+import User from '../models/User';
 import { test } from 'vitest';
+import { DateTime } from 'luxon';
 
 export const myTest = test.extend({
     interaction: async ({ }, use) => {
         await use(createMockInteraction());
     },
-    createInteraction: async ({}, use) => await use(createMockInteraction),
-    createLog: async ({}, use) => {
-        return use(async (interaction) => {
+    createUser: async ({ }, use) => {
+        return await use(async ({ userId, guildId, timestamp, streak, timezone, displayName }) => {
+            const user = new User({
+                userId: userId ?? generateRandomId(),
+                guildId: guildId ?? generateRandomId(),
+                timestamp: timestamp ?? new Date(),
+                streak: streak ?? 1,
+                timezone: timezone ?? 'UTC',
+                displayName: displayName ?? 'myUser'
+            });
+            await user.save();
+            return user;
+        });
+    },
+    createInteraction: async ({ }, use) => await use(createMockInteraction),
+    createLog: async ({ createUser }, use) => {
+        return await use(async (interaction, amount) => {
+            const user = await User.findOne({ id: interaction.user.id });
+            if (!user) {
+                await createUser({
+                    userId: interaction.user.id,
+                    guildId: interaction.guild.id
+                });
+            }
+
             const newLog = new Log({
                 userId: interaction.user.id,
                 guildId: interaction.guild.id,
-                timestamp: new Date(),
+                timestamp: new Date().toISOString(),
                 medium: interaction.options.getString('medium'),
                 title: interaction.options.getString('title'),
                 notes: interaction.options.getString('notes'),
                 isBackLog: false,
-                amount: {
-                    totalSeconds: 10,
-                    count: 1,
-                    unit: 'Seconds'
-                },
+                amount,
             });
             await newLog.save();
             return newLog;
         });
     },
     log: async ({ createLog, interaction }, use) => {
-        const log = await createLog(interaction);
+        const log = await createLog(interaction, {
+            totalSeconds: 100,
+            count: 1,
+            unit: 'Seconds'
+        });
         await use(log);
     },
+    listeningLog: async ({ createLog, createInteraction }, use) => {
+        const interaction = createInteraction({
+            medium: 'Listening',
+            title: 'listening test',
+            notes: 'listening note',
+        });
+        const log = await createLog(interaction, {
+            totalSeconds: 10,
+            count: 1,
+            unit: 'Seconds'
+        });
+        await use(log);
+    },
+    watchtimeLog: async ({ createLog, createInteraction }, use) => {
+        const interaction = createInteraction({
+            medium: 'Watchtime',
+            title: 'WatchTime test',
+            notes: 'WatchTime note',
+        });
+        const log = await createLog(interaction, {
+            totalSeconds: 10,
+            count: 1,
+            unit: 'Seconds'
+        });
+        await use(log);
+    },
+    readtimeLog: async ({ createLog, createInteraction }, use) => {
+        const interaction = createInteraction({
+            medium: 'Readtime',
+            amount: '15m',
+            title: 'Readtime test',
+            notes: 'Readtime note',
+        });
+        const log = await createLog(interaction, {
+            totalSeconds: 10,
+            count: 1,
+            unit: 'Seconds'
+        });
+        await use(log);
+    },
+    youTubeLog: async ({ createLog, createInteraction }, use) => {
+        const interaction = createInteraction({
+            medium: 'YouTube',
+            amount: '31m',
+            title: 'YouTube test',
+            notes: 'YouTube note',
+        });
+        const log = await createLog(interaction, {
+            totalSeconds: 10,
+            count: 1,
+            unit: 'Seconds'
+        });
+        await use(log);
+    },
+    mangaLog: async ({ createLog, createInteraction }, use) => {
+        const interaction = createInteraction({
+            medium: 'Manga',
+            amount: '120m',
+            title: 'Manga test',
+            notes: 'Manga note',
+        });
+        const log = await createLog(interaction, {
+            totalSeconds: 10,
+            count: 1,
+            unit: 'Seconds'
+        });
+        await use(log);
+    },
+    animeLog: async ({ createLog, createInteraction }, use) => {
+        const interaction = createInteraction({
+            medium: 'Anime',
+            title: 'Anime test',
+            notes: 'Anime note',
+        });
+        const log = await createLog(interaction, {
+            totalSeconds: 4000,
+            count: 2,
+            unit: 'Episodes',
+            unitLength: 2000
+        });
+        await use(log);
+    }
 });
 
 export function createMockInteraction(options) {
