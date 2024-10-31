@@ -79,6 +79,7 @@ module.exports = {
         const formattedAmount = `${log.amount.totalSeconds} Seconds`; // Needs updating
         const title = log.title || 'N/A';
         const notes = log.notes || 'N/A';
+        const isBacklog = log.isBackLog || 'N/A';
 
         // If I put these tabbed in on mobile looks like crap
         embed.addFields({
@@ -87,7 +88,8 @@ module.exports = {
 **Amount**: ${formattedAmount}
 **Title**: ${title}
 **Notes**: ${notes !== 'N/A' ? notes : 'No notes provided'}
-**ID**: ${log._id}\n`
+**ID**: ${log._id}
+**Backlog**: ${isBacklog !== 'N/A' ? isBacklog: "false"}\n`
         });
       });
 
@@ -100,6 +102,7 @@ module.exports = {
         let formattedAmount = `${log.amount.totalSeconds} Seconds`; // Needs updating
         let title = log.title || 'N/A';
         let notes = log.notes || 'N/A';
+        let isBacklog = log.isBackLog || 'N/A';
 
         // Remove unicode range u1F000-1FFFF (emoji)
         // Remove animated <a:name:id> / regular emojis <name:id>
@@ -114,6 +117,9 @@ module.exports = {
         if (notes != 'N/A') {
           logString += `\nNotes: ${notes_no_emojis}`;
         };
+        if (isBacklog != 'N/A') {
+          logString += `\nBacklog: ${isBacklog}`;
+        }
         logString += `\nID: ${log._id}`;
         return logString;
       });
