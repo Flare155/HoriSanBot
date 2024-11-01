@@ -12,8 +12,8 @@ const logToCommandConverter = (logModel, timezone = 'utc') => {
         command += ` notes: ${logModel.notes}`;
     }
     if (logModel.medium === 'Anime') {
-        const unitLength = logModel.amount.unitLength;
-        command += ` episode_length: ${unitLength}s`;
+        const coefficient = logModel.amount.coefficient;
+        command += ` episode_length: ${coefficient}s`;
     }
 
     return command;

@@ -10,14 +10,18 @@ function buildLogEmbed(interaction, log) {
     const count = log.amount.count;
     const medium = log.medium;
     const notes = log.notes;
+    const coefficient = log.amount.coefficient;
 
+    // Calculate title and description for embed
     const description = unit === "Episodes"
-        ? `${Math.round((unitLength * 10) / 60) / 10} minutes/episode → +${Math.round((totalSeconds * 10) / 60) / 10} points`
+        ? `${Math.round((coefficient * 10) / 60) / 10} minutes/episode → +${Math.round((totalSeconds * 10) / 60) / 10} points`
         : `1 point/min → +${Math.round((totalSeconds * 10) / 60) / 10} points`;
     let embedTitle = `🎉 ${interaction.member.displayName} logged ${count} ${unit} of ${medium}!`;
     if (unit !== "Episodes") {
         embedTitle = `🎉 ${interaction.member.displayName} logged ${Math.round((totalSeconds * 10) / 60) / 10} minutes of ${medium}!`;
     }
+
+
     // Calculate the embed color based on the points
     const embedColor = calculateEmbedColor(totalSeconds);
     // Create footer message

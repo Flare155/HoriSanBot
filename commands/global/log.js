@@ -49,7 +49,7 @@ module.exports = {
             const notes = interaction.options.getString('notes');
             const customEpisodeLength = interaction.options.getString('episode_length');
             let count = null;
-            let unit = "", unitLength = null, totalSeconds = 0;
+            let unit = "", coefficient = null, totalSeconds = 0;
 
             // Regular expressions to match time and episode formats
             const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/i; // Matches input in (Num h, Num m, Num s), excludes 'ep'
@@ -71,8 +71,8 @@ module.exports = {
                     if (timePattern.test(customEpisodeLength)) {
                         // Parse episodes and totalSeconds for custom length anime log, then save data
                         count = parseEpisodes(input, episodePattern);
-                        unitLength = parseTime(customEpisodeLength, timePattern);
-                        totalSeconds = unitLength * count;
+                        coefficient = parseTime(customEpisodeLength, timePattern);
+                        totalSeconds = coefficient * count;
                         unit = "Episodes";
                     } else {
                         // Invalid Input Catch
@@ -80,7 +80,7 @@ module.exports = {
                     }
                 } else {
                     // Set log data for non-custom anime log
-                    unitLength = 1260; // Default episode length: 21 minutes
+                    coefficient = 1260; // Default episode length: 21 minutes
                     count = parseEpisodes(input, episodePattern);
                     unit = "Episodes";
                     totalSeconds = count * 21 * 60;
@@ -111,7 +111,7 @@ module.exports = {
             let isBackLog = false;
 
             // Save the log to the database
-            const log = await saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
+            const log = await saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, coefficient, totalSeconds);
             if (!log) {
                 throw new Error('An error occurred while saving the log. Check the log file');
             }

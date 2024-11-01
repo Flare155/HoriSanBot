@@ -4,7 +4,7 @@ const { calculateEmbedColor } = require('../../utils/formatting/calculateEmbedCo
 const { sendErrorMessage} = require('../../utils/formatting/errorMessageFormatter.js');
 const { saveLog } = require('../../utils/saveLog.js');
 const { DateTime } = require('luxon');
-const User = require('../../models/User');
+const User = require('../../models/User.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -65,7 +65,7 @@ module.exports = {
             let episodes = 0;
             let seconds = 0;
             let count = 0;
-            let unitLength = undefined;
+            let coefficient = undefined;
             let totalSeconds = 0;
 
             // Regular expressions to match time and episode formats
@@ -108,8 +108,8 @@ module.exports = {
                 if (customEpisodeLength) {
                     if (timePattern.test(customEpisodeLength)) {
                         // Parse episode length
-                        unitLength = parseTime(customEpisodeLength);
-                        if (unitLength === null) {
+                        coefficient = parseTime(customEpisodeLength);
+                        if (coefficient === null) {
                             return sendErrorMessage(interaction, "Invalid episode length format. Examples: 45m, 1h30m.");
                         }
                     } else {
@@ -117,12 +117,12 @@ module.exports = {
                     }
                 } else {
                     // Default episode length is 21 minutes (1260 seconds)
-                    unitLength = 1260;
+                    coefficient = 1260;
                 }
 
                 unit = "Episodes";
                 count = episodes;
-                totalSeconds = unitLength * episodes;
+                totalSeconds = coefficient * episodes;
 
             } else if (timePattern.test(input)) {
                 // Handle time-based logs
@@ -154,12 +154,14 @@ module.exports = {
             }
 
             // Calculate title and description for embed
-            const description = unit === "Episodes" ? `${unitLength} seconds/episode → +${totalSeconds} seconds` : `1 point/sec → +${totalSeconds} points`;
+            const description = unit === "Episodes"
+                ? `${Math.round((coefficient * 10) / 60) / 10} minutes/episode → +${Math.round((totalSeconds * 10) / 60) / 10} points`
+                : `1 point/min → +${Math.round((totalSeconds * 10) / 60) / 10} points`;
             let embedTitle;
             if (unit !== "Episodes") {
-                embedTitle = `🎉 ${interaction.user.username} Logged ${Math.round((totalSeconds / 60) * 10) / 10} Minutes of ${medium}!`;
+                embedTitle = `🎉 ${interaction.user.displayName} Logged ${Math.round((totalSeconds / 60) * 10) / 10} Minutes of ${medium}!`;
             } else {
-                embedTitle = `🎉 ${interaction.user.username} Logged ${input} of ${medium}!`;
+                embedTitle = `🎉 ${interaction.user.displayName} Logged ${input} of ${medium}!`;
             }
 
             // Check if the log is in the future
@@ -169,9 +171,9 @@ module.exports = {
 
             const isBackLog = true;
             // Save the log data to the database, including the parsed date
-            await saveLog(interaction, parsedDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
+            await saveLog(interaction, parsedDate, medium, title, notes, isBackLog, unit, count, coefficient, totalSeconds);
             // Send an embed message with the log details
-            await sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes, parsedDate);
+            await sendLogEmbed(interaction, embedTitle, description, medium, input, totalSeconds, title, notes, parsedDate);
         } catch (error) {
             console.log(error);
             return sendErrorMessage(interaction, "An unexpected error occurred executing log command. Please try again later.")
@@ -180,7 +182,7 @@ module.exports = {
 };
 
 // Utility function to create and send the embed message
-async function sendLogEmbed(interaction, embedTitle, description, medium, unit, input, totalSeconds, title, notes, date) {
+async function sendLogEmbed(interaction, embedTitle, description, medium, input, totalSeconds, title, notes, date) {
     // Calculate the embed color based on the points
     const embedColor = calculateEmbedColor(totalSeconds);
     // Create footer message

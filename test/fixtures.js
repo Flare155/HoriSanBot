@@ -132,7 +132,7 @@ export const myTest = test.extend({
             totalSeconds: 4000,
             count: 2,
             unit: 'Episodes',
-            unitLength: 2000
+            coefficient: 2000
         });
         await use(log);
     }
