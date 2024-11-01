@@ -7,6 +7,7 @@ const {
 } = require('discord.js');
 const mongoose = require('mongoose');
 const Log = require('../../models/Log');
+const {buildLogEmbed} = require('../../utils/buildLogEmbed.js');
 
 const MAX_EPISODES = 57;
 const MAX_MINUTES = 1200;
@@ -322,18 +323,20 @@ module.exports = {
                 if (i.customId === 'confirm_edit') {
                     // User confirmed the edit
                     await log.save();
+                    const logEmbed = buildLogEmbed(interaction, log);
                     await i.update({
                         content: `✅ Log: **${log.title}** has been edited successfully.`,
                         components: [],
-                        embeds: [],
+                        embeds: [logEmbed],
                     });
                 } else if (i.customId === 'cancel_edit') {
                     // User canceled the edit
+                    const logEmbed = buildLogEmbed(interaction, log);
                     await i.update({
                         content:
                             '❌ Edit canceled. No changes were made to the log.',
                         components: [],
-                        embeds: [],
+                        embeds: [logEmbed],
                     });
                 }
                 collector.stop();

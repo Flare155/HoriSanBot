@@ -1,8 +1,7 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { footerCreator } = require('../../utils/formatting/logFooterCreator.js');
-const { calculateEmbedColor } = require('../../utils/formatting/calculateEmbedColor.js');
+const { SlashCommandBuilder } = require('discord.js');
 const { sendErrorMessage } = require('../../utils/formatting/errorMessageFormatter.js');
 const { saveLog } = require('../../utils/saveLog.js');
+const { buildLogEmbed } = require('../../utils/buildLogEmbed.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -25,17 +24,17 @@ module.exports = {
             option.setName('amount')
                 .setDescription('Enter a time (e.g., 45m, 1h30m, 2m5s) or number of episodes (e.g., 10ep)')
                 .setRequired(true)
-            )
+        )
         .addStringOption(option =>
             option.setName('title')
                 .setDescription('The title of the media')
                 .setRequired(true)
-            )
+        )
         .addStringOption(option =>
             option.setName('notes')
                 .setDescription('Optional notes')
                 .setRequired(false)
-            )
+        )
         .addStringOption(option =>
             option.setName('episode_length')
                 .setDescription('The length of each episode (e.g., 45m, 1h30m, 2m5s), (default is 21m)')
@@ -107,24 +106,20 @@ module.exports = {
                 return interaction.reply(`Error: The maximum log size is 1200 minutes (20 hours), you entered ${Math.round((totalSeconds * 10) / 60) / 10} minutes.`);
             }
 
-            // Calculate title and description for embed
-            const description = unit === "Episodes"
-                ? `${Math.round((unitLength * 10) / 60) / 10} minutes/episode → +${Math.round((totalSeconds * 10) / 60) / 10} points`
-                : `1 point/min → +${Math.round((totalSeconds * 10) / 60) / 10} points`;
-            let embedTitle = `🎉 ${interaction.member.displayName} logged ${count} ${unit} of ${medium}!`;
-            if (unit !== "Episodes") {
-                embedTitle = `🎉 ${interaction.member.displayName} logged ${Math.round((totalSeconds * 10) / 60) / 10} minutes of ${medium}!`;
-            }
-
             // customDate and isBackLog are used in backlog command
             let customDate = null;
             let isBackLog = false;
 
             // Save the log to the database
-            await saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
+            const log = await saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds);
+            if (!log) {
+                throw new Error('An error occurred while saving the log. Check the log file');
+            }
 
             // Send an embed message with the log details
-            await sendLogEmbed(interaction, embedTitle, description, totalSeconds, title, notes);
+            const logEmbed = buildLogEmbed(interaction, log);
+            // Send the embed
+            await interaction.reply({ embeds: [logEmbed] });
 
             // **Modified Code**: Check for links in the notes and send them as a plain message
             if (notes) {
@@ -140,28 +135,7 @@ module.exports = {
     },
 };
 
-// Utility function to create and send the embed message
-async function sendLogEmbed(interaction, embedTitle, description, totalSeconds, title, notes) {
-    // Calculate the embed color based on the points
-    const embedColor = calculateEmbedColor(totalSeconds);
-    // Create footer message
-    const footer = footerCreator(interaction, totalSeconds);
 
-    const logEmbed = new EmbedBuilder()
-        .setColor(embedColor)
-        .setTitle(embedTitle)
-        .setDescription(description)
-        .setThumbnail(interaction.user.displayAvatarURL())
-        .addFields({ name: '📖 Title', value: title, inline: true })
-        .setTimestamp();
-    if (notes) {
-        logEmbed.addFields({ name: '📝 Notes', value: notes, inline: true });
-    }
-    logEmbed.setFooter(footer);
-
-    // Send the embed
-    await interaction.reply({ embeds: [logEmbed] });
-}
 
 // Utility function to send a message with the link(s)
 async function sendLinkMessage(interaction, links) {
@@ -169,7 +143,7 @@ async function sendLinkMessage(interaction, links) {
     const linkMessage = links.join('\n > ');
 
     // Send the message as a follow-up to ensure it's associated with the interaction
-    await interaction.followUp({ content: `> ${linkMessage}`});
+    await interaction.followUp({ content: `> ${linkMessage}` });
 }
 
 // Utility function to extract links from a string
