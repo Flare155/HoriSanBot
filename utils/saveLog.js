@@ -2,7 +2,7 @@ const User = require("../models/User");
 const Log = require("../models/Log");
 
 // Function to save the log to the database
-async function saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, unitLength, totalSeconds) {
+async function saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, coefficient, totalSeconds) {
     try {
         // Validate required parameters
         if (!interaction || !interaction.user || !interaction.guild) {
@@ -22,9 +22,9 @@ async function saveLog(interaction, customDate, medium, title, notes, isBackLog,
             totalSeconds,
         };
 
-        // Add unitLength if provided
-        if (unitLength) {
-            amount.unitLength = unitLength;
+        // Add coefficient if provided
+        if (coefficient) {
+            amount.coefficient = coefficient;
         }
 
         // Save the log entry

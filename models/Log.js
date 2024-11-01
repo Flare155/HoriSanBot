@@ -11,8 +11,7 @@
         amount: {
             unit: { type: String, required: true, enum: ['Seconds', 'Episodes']},
             count: { type: Number, required: true, min: 0, max: 72000 },
-            unitLength: { type: Number, required: false, min: 60, max: 72000},
-            coefficient: { type: Number, required: false, min: 0, max: 3 },
+            coefficient: { type: Number, required: false, min: 0, max: 72000 },
             totalSeconds: { type: Number, required: true, min: 0, max: 72000},
         }
     });
