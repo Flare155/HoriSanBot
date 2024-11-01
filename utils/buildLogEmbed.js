@@ -2,9 +2,10 @@ const { footerCreator } = require('./formatting/logFooterCreator.js');
 const { calculateEmbedColor } = require('./formatting/calculateEmbedColor.js');
 const { EmbedBuilder } = require('discord.js');
 
-// Utility function to create and send the embed message
-function buildLogEmbed(interaction, log) {
+// Utility function to create the embed message
+function buildLogEmbed(interaction, log, overrides) {
     // Calculate title and description for embed
+    let embedTitle = overrides?.title;
     const unit = log.amount.unit;
     const totalSeconds = log.amount.totalSeconds;
     const count = log.amount.count;
@@ -16,11 +17,12 @@ function buildLogEmbed(interaction, log) {
     const description = unit === "Episodes"
         ? `${Math.round((coefficient * 10) / 60) / 10} minutes/episode → +${Math.round((totalSeconds * 10) / 60) / 10} points`
         : `1 point/min → +${Math.round((totalSeconds * 10) / 60) / 10} points`;
-    let embedTitle = `🎉 ${interaction.member.displayName} logged ${count} ${unit} of ${medium}!`;
-    if (unit !== "Episodes") {
-        embedTitle = `🎉 ${interaction.member.displayName} logged ${Math.round((totalSeconds * 10) / 60) / 10} minutes of ${medium}!`;
+    if (!embedTitle) {
+        embedTitle = `🎉 ${interaction.member.displayName} logged ${count} ${unit} of ${medium}!`;
+        if (unit !== "Episodes") {
+            embedTitle = `🎉 ${interaction.member.displayName} logged ${Math.round((totalSeconds * 10) / 60) / 10} minutes of ${medium}!`;
+        }
     }
-
 
     // Calculate the embed color based on the points
     const embedColor = calculateEmbedColor(totalSeconds);

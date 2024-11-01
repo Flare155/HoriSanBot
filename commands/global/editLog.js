@@ -323,20 +323,21 @@ module.exports = {
                 if (i.customId === 'confirm_edit') {
                     // User confirmed the edit
                     await log.save();
-                    const logEmbed = buildLogEmbed(interaction, log);
+                    const logEmbed = buildLogEmbed(interaction, log, {
+                        title: `✅ Log: **${log.title}** has been edited successfully.`
+                    });
                     await i.update({
-                        content: `✅ Log: **${log.title}** has been edited successfully.`,
+                        content: ``,
                         components: [],
                         embeds: [logEmbed],
                     });
                 } else if (i.customId === 'cancel_edit') {
                     // User canceled the edit
-                    const logEmbed = buildLogEmbed(interaction, log);
                     await i.update({
                         content:
                             '❌ Edit canceled. No changes were made to the log.',
                         components: [],
-                        embeds: [logEmbed],
+                        embeds: [],
                     });
                 }
                 collector.stop();
