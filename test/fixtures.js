@@ -1,6 +1,6 @@
-import Log from '../models/Log';
-import User from '../models/User';
-import { test, vi } from 'vitest';
+import Log from "../models/Log";
+import User from "../models/User";
+import { test, vi } from "vitest";
 // Vitest requires the first parameter to be an object destructuring pattern, even if empty.
 /* eslint-disable no-empty-pattern */
 
@@ -15,8 +15,8 @@ export const myTest = test.extend({
                 guildId: guildId ?? generateRandomId(),
                 timestamp: timestamp ?? new Date(),
                 streak: streak ?? 1,
-                timezone: timezone ?? 'UTC',
-                displayName: displayName ?? 'myUser'
+                timezone: timezone ?? "UTC",
+                displayName: displayName ?? "myUser"
             });
             await user.save();
             return user;
@@ -37,9 +37,9 @@ export const myTest = test.extend({
                 userId: interaction.user.id,
                 guildId: interaction.guild.id,
                 timestamp: new Date().toISOString(),
-                medium: interaction.options.getString('medium'),
-                title: interaction.options.getString('title'),
-                notes: interaction.options.getString('notes'),
+                medium: interaction.options.getString("medium"),
+                title: interaction.options.getString("title"),
+                notes: interaction.options.getString("notes"),
                 isBackLog: false,
                 amount,
             });
@@ -51,88 +51,88 @@ export const myTest = test.extend({
         const log = await createLog(interaction, {
             totalSeconds: 100,
             count: 1,
-            unit: 'Seconds'
+            unit: "Seconds"
         });
         await use(log);
     },
     listeningLog: async ({ createLog, createInteraction }, use) => {
         const interaction = createInteraction({
-            medium: 'Listening',
-            title: 'listening test',
-            notes: 'listening note',
+            medium: "Listening",
+            title: "listening test",
+            notes: "listening note",
         });
         const log = await createLog(interaction, {
             totalSeconds: 10,
             count: 1,
-            unit: 'Seconds'
+            unit: "Seconds"
         });
         await use(log);
     },
     watchtimeLog: async ({ createLog, createInteraction }, use) => {
         const interaction = createInteraction({
-            medium: 'Watchtime',
-            title: 'WatchTime test',
-            notes: 'WatchTime note',
+            medium: "Watchtime",
+            title: "WatchTime test",
+            notes: "WatchTime note",
         });
         const log = await createLog(interaction, {
             totalSeconds: 10,
             count: 1,
-            unit: 'Seconds'
+            unit: "Seconds"
         });
         await use(log);
     },
     readtimeLog: async ({ createLog, createInteraction }, use) => {
         const interaction = createInteraction({
-            medium: 'Readtime',
-            amount: '15m',
-            title: 'Readtime test',
-            notes: 'Readtime note',
+            medium: "Readtime",
+            amount: "15m",
+            title: "Readtime test",
+            notes: "Readtime note",
         });
         const log = await createLog(interaction, {
             totalSeconds: 10,
             count: 1,
-            unit: 'Seconds'
+            unit: "Seconds"
         });
         await use(log);
     },
     youTubeLog: async ({ createLog, createInteraction }, use) => {
         const interaction = createInteraction({
-            medium: 'YouTube',
-            amount: '31m',
-            title: 'YouTube test',
-            notes: 'YouTube note',
+            medium: "YouTube",
+            amount: "31m",
+            title: "YouTube test",
+            notes: "YouTube note",
         });
         const log = await createLog(interaction, {
             totalSeconds: 10,
             count: 1,
-            unit: 'Seconds'
+            unit: "Seconds"
         });
         await use(log);
     },
     mangaLog: async ({ createLog, createInteraction }, use) => {
         const interaction = createInteraction({
-            medium: 'Manga',
-            amount: '120m',
-            title: 'Manga test',
-            notes: 'Manga note',
+            medium: "Manga",
+            amount: "120m",
+            title: "Manga test",
+            notes: "Manga note",
         });
         const log = await createLog(interaction, {
             totalSeconds: 10,
             count: 1,
-            unit: 'Seconds'
+            unit: "Seconds"
         });
         await use(log);
     },
     animeLog: async ({ createLog, createInteraction }, use) => {
         const interaction = createInteraction({
-            medium: 'Anime',
-            title: 'Anime test',
-            notes: 'Anime note',
+            medium: "Anime",
+            title: "Anime test",
+            notes: "Anime note",
         });
         const log = await createLog(interaction, {
             totalSeconds: 4000,
             count: 2,
-            unit: 'Episodes',
+            unit: "Episodes",
             coefficient: 2000
         });
         await use(log);
@@ -141,11 +141,11 @@ export const myTest = test.extend({
 
 export function createMockInteraction(options) {
     const defaultOptions = {
-        medium: 'Watchtime',
-        amount: '120s',
-        title: 'Test Title',
-        notes: 'Some notes here',
-        episode_length: '30',
+        medium: "Watchtime",
+        amount: "120s",
+        title: "Test Title",
+        notes: "Some notes here",
+        episode_length: "30",
     };
 
     options = options ?? defaultOptions;
@@ -157,13 +157,13 @@ export function createMockInteraction(options) {
             options[name] = value;
         },
         member: {
-            displayName: 'test',
-            displayAvatarURL: () => 'http://example.com/image.jpg'
+            displayName: "test",
+            displayAvatarURL: () => "http://example.com/image.jpg"
         },
         user: {
             id: generateRandomId(),
-            displayName: 'test',
-            displayAvatarURL: () => 'http://example.com/image.jpg'
+            displayName: "test",
+            displayAvatarURL: () => "http://example.com/image.jpg"
         },
         guild: {
             id: generateRandomId()
