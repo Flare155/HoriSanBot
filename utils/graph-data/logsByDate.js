@@ -1,13 +1,11 @@
-const mongoose = require('mongoose');
 const Log = require("../../models/Log");
 
 
-const getLogsByDate = async (userId, days, timezone, guildId) => {
+const getLogsByDate = async (userId, days, timezone) => {
     try {
         const endDate = new Date(); // Current date in UTC
         const startDate = new Date();
         startDate.setUTCDate(endDate.getUTCDate() - days); // Calculate the start date in UTC
-        localStartDate = startDate
 
         // Define category mappings based on 'medium'
         const categoryMappings = {

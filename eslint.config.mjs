@@ -12,19 +12,22 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default [...compat.extends("eslint:recommended"), {
-    languageOptions: {
-        globals: {
-            ...globals.browser,
-            ...globals.node,
+export default [
+    ...compat.extends("eslint:recommended"),
+    {
+        languageOptions: {
+            globals: {
+                ...globals.browser,
+                ...globals.node,
+            },
+            ecmaVersion: 12,
+            sourceType: "module",
         },
-
-        ecmaVersion: 12,
-        sourceType: "module",
+        rules: {
+            // Your custom rules here
+        },
     },
-
-    rules: {
-        semi: ["error", "always"],
-        quotes: ["error", "single"],
-    },
-}];
+    {
+        ignores: ["utils/hori-visuals/prod/assets/"]
+    }
+];
