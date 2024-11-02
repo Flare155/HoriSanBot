@@ -35,16 +35,16 @@ module.exports = {
                 details: `Use this command to keep track of your immersion details such as books, movies, or other media.
 Use this command to keep track of your immersion details such as books, movies, or other media.
 * The [amount] field can be in episodes or in raw minutes.
-Examples: `5ep`(21*5=105) `1h15m` (75) `5m30s` (5.5) 
+Examples: \`5ep\`(21*5=105) \`1h15m\` (75) \`5m30s\` (5.5) 
 * Suggested title format: 
-YouTube: `ChannelName Title`
-Anime:    `SeriesName Season`
-Podcast: `Creator PodcastName`
+YouTube: \`ChannelName Title\`
+Anime:    \`SeriesName Season\`
+Podcast: \`Creator PodcastName\`
 etc.
 * Suggested note format:
-YouTube: `[link]`
-Anime:     `eps[start]-[end]`
-Podcast: `Episode [number] | [link]`
+YouTube: \`[link]\`
+Anime:     \`eps[start]-[end]\`
+Podcast: \`Episode [number] | [link]\`
 -# For any additional assistance DM or @ flarenotfound on discord!
                     `
             },
