@@ -1,12 +1,14 @@
 import Log from '../models/Log';
 import User from '../models/User';
 import { test, vi } from 'vitest';
+// Vitest requires the first parameter to be an object destructuring pattern, even if empty.
+/* eslint-disable no-empty-pattern */
 
 export const myTest = test.extend({
-    interaction: async (_, use) => {
+    interaction: async ({ }, use) => {
         await use(createMockInteraction());
     },
-    createUser: async (_, use) => {
+    createUser: async ({ }, use) => {
         return await use(async ({ userId, guildId, timestamp, streak, timezone, displayName }) => {
             const user = new User({
                 userId: userId ?? generateRandomId(),
@@ -20,7 +22,7 @@ export const myTest = test.extend({
             return user;
         });
     },
-    createInteraction: async (_, use) => await use(createMockInteraction),
+    createInteraction: async ({ }, use) => await use(createMockInteraction),
     createLog: async ({ createUser }, use) => {
         return await use(async (interaction, amount) => {
             const user = await User.findOne({ id: interaction.user.id });
