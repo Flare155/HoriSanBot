@@ -17,7 +17,8 @@
     "bun": "bun --watch index.js",
     "test": "vitest",
     "visuals": "cd utils/hori-visuals && npm run dev",
-    "build-visuals": "cd utils/hori-visuals && npm run build"
+    "build-visuals": "cd utils/hori-visuals && npm run build",
+    "eslint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "author": "Flare",
   "license": "ISC",
