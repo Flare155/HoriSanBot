@@ -2,6 +2,7 @@
   "dependencies": {
     "discord.js": "^14.16.1",
     "dotenv": "^16.4.5",
+    "eslint": "^9.14.0",
     "luxon": "^3.5.0",
     "mongodb": "^5.6.0",
     "mongoose": "^7.3.1",
