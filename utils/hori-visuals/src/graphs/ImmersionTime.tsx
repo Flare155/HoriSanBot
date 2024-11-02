@@ -1,5 +1,3 @@
-// src/graphs/ImmersionTime.tsx
-
 import React from 'react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
@@ -16,6 +14,10 @@ interface DataPoint {
 const ImmersionTime: React.FC = () => {
   // Replace this with your actual data source
   const data: DataPoint[] = (window as any).puppeteerData.data;
+
+  // Dynamically calculate the interval for label display based on the data length
+  const maxLabels = 10; // Set the maximum number of labels you want to display
+  const labelInterval = Math.ceil(data.length / maxLabels); // Automatically adjust the label spacing
 
   // Define the series for the bar chart without sanitization
   const series = [
@@ -37,7 +39,8 @@ const ImmersionTime: React.FC = () => {
   const chartOptions: ApexOptions = {
     chart: {
       type: 'bar',
-      height: 350,
+      height: 900,
+      width: 1250, // Set a fixed width
       toolbar: {
         show: false,
       },
@@ -79,17 +82,15 @@ const ImmersionTime: React.FC = () => {
       },
     },
     xaxis: {
-      categories: data.map((point) =>
-        // Display the date label only every 5 days for readability
-        // Adjust as needed based on your data density
-        // Alternatively, display all labels by removing the condition
-        data.indexOf(point) % 5 === 0 ? point.date : ''
+      categories: data.map((point, index) =>
+        // Display the date label only every 'labelInterval' for readability
+        index % labelInterval === 0 ? point.date : ''
       ),
       labels: {
-        rotate: 0,
-        rotateAlways: false,
+        rotate: 0, // No rotation
+        rotateAlways: false, // No forced rotation
         style: {
-          fontSize: '25px',
+          fontSize: '25px', // Keep the font size consistent
           colors: '#ffffff',
         },
       },
@@ -104,7 +105,7 @@ const ImmersionTime: React.FC = () => {
       title: {
         text: 'Minutes',
         style: {
-          fontSize: '30px',
+          fontSize: '30px', // Adjusted for readability
         },
         offsetX: -15,
       },
@@ -127,7 +128,7 @@ const ImmersionTime: React.FC = () => {
     colors: ['#00E396', '#0090FF', '#FF4560'],
     legend: {
       fontSize: '40px',
-      fontWeight: 700, // Using numeric value for font weight
+      fontWeight: 700, // Set consistent font weight
       offsetY: -15,
     },
   };
@@ -138,7 +139,8 @@ const ImmersionTime: React.FC = () => {
         options={chartOptions}
         series={series}
         type="bar"
-        height={800}
+        height={800} // Fixed height
+        width={1250} // Fixed width
       />
     </div>
   );

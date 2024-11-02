@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
+
 const Log = require('../../models/Log');
 const { formatTime } = require('../../utils/formatting/formatTime.js');
 

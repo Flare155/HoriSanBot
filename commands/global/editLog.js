@@ -7,6 +7,7 @@ const {
 } = require('discord.js');
 const mongoose = require('mongoose');
 const Log = require('../../models/Log');
+const {buildLogEmbed} = require('../../utils/buildLogEmbed.js');
 
 const MAX_EPISODES = 57;
 const MAX_MINUTES = 1200;
@@ -154,7 +155,7 @@ module.exports = {
                 let amount = {
                     unit: '',
                     count: 0,
-                    unitLength: undefined,
+                    coefficient: undefined,
                     totalSeconds: 0
                 };
 
@@ -170,13 +171,13 @@ module.exports = {
                         }
                         amount.unit = 'Episodes';
                         amount.count = episodesCount;
-                        // If unitLength is already set, use it; otherwise, default to 1260 seconds (21 minutes)
-                        if (log.amount && log.amount.unitLength) {
-                            amount.unitLength = log.amount.unitLength;
+                        // If coefficient is already set, use it; otherwise, default to 1260 seconds (21 minutes) for anime
+                        if (log.amount && log.amount.coefficient) {
+                            amount.coefficient = log.amount.coefficient;
                         } else {
-                            amount.unitLength = 1260; // 21 minutes in seconds
+                            amount.coefficient = 1260; // 21 minutes in seconds
                         }
-                        amount.totalSeconds = amount.count * amount.unitLength;
+                        amount.totalSeconds = amount.count * amount.coefficient;
                     } else {
                         throw new Error(
                             'For the Anime medium, the amount must be in the format of episodes (e.g., 2ep).'
@@ -322,10 +323,13 @@ module.exports = {
                 if (i.customId === 'confirm_edit') {
                     // User confirmed the edit
                     await log.save();
+                    const logEmbed = buildLogEmbed(interaction, log, {
+                        title: `✅ Log: **${log.title}** has been edited successfully.`
+                    });
                     await i.update({
-                        content: `✅ Log: **${log.title}** has been edited successfully.`,
+                        content: ``,
                         components: [],
-                        embeds: [],
+                        embeds: [logEmbed],
                     });
                 } else if (i.customId === 'cancel_edit') {
                     // User canceled the edit

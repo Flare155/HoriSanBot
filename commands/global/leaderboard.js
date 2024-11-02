@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Log = require('../../models/Log');
-const { testingServerId } = require('../../config.json');
 const { startDateCalculator } = require('../../utils/startDateCalculator');
 const { toPoints } = require('../../utils/formatting/toPoints'); // Import the toPoints function
 
@@ -43,7 +42,6 @@ module.exports = {
         const timePeriod = interaction.options.getString('period');
 
         const startDate = startDateCalculator(timePeriod);
-        console.log(startDate);
         const lowerTimeBoundMatch = {
             $match: {
                 timestamp: { $gte: startDate },
@@ -66,17 +64,8 @@ module.exports = {
             mediumMatch = { $match: {} }; // No medium filter
         }
 
-        // Exclude or include testing server data
-        let testGuildExcludeMatch;
-        if (guildId === testingServerId) {
-            testGuildExcludeMatch = { $match: { guildId: testingServerId } };
-        } else {
-            testGuildExcludeMatch = { $match: { guildId: { $ne: testingServerId } } };
-        }
-
         // Aggregation pipeline to get top users
         const topUsers = await Log.aggregate([
-            testGuildExcludeMatch,
             lowerTimeBoundMatch,
             mediumMatch,
             {
@@ -91,7 +80,6 @@ module.exports = {
 
         // Aggregation to find all users and their positions
         const allUsers = await Log.aggregate([
-            testGuildExcludeMatch,
             lowerTimeBoundMatch,
             mediumMatch,
             {
@@ -112,7 +100,7 @@ module.exports = {
                 discordUser = { username: "Unknown User" };
             }
             return {
-                displayName: discordUser.username,
+                displayName: discordUser.displayName,
                 totalPoints: toPoints(user.totalSeconds) // Convert totalSeconds to points
             };
         }));
@@ -121,7 +109,7 @@ module.exports = {
         const currentUserPosition = allUsers.findIndex(user => user._id === interaction.user.id) + 1;
         const currentUserData = allUsers.find(user => user._id === interaction.user.id);
         const currentUserPoints = currentUserData ? toPoints(currentUserData.totalSeconds) : 0; // Convert to points
-        const currentDisplayName = interaction.user.username;
+        const currentDisplayName = interaction.user.displayName;
 
         // If not in top 10, adjust spacing
         let endspace = "";

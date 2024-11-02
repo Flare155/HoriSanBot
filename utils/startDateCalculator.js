@@ -1,33 +1,31 @@
-// utils/startDateCalculator.js
+const { DateTime } = require('luxon');
 
-const moment = require('moment');
-
-function startDateCalculator(timePeriod) {
-  const now = moment();
-
+function startDateCalculator(timePeriod, userTimezone = 'UTC') {
+  const now = DateTime.now().setZone(userTimezone); // Get the current time in the user's timezone
   let startDate;
 
   switch (timePeriod) {
     case 'All Time':
-      startDate = moment(0); // Unix epoch start
+      startDate = DateTime.fromMillis(0).setZone(userTimezone); // Unix epoch start
       break;
     case 'Yearly':
-      startDate = now.clone().startOf('year');
+      startDate = now.startOf('year'); // Start of the current year
       break;
     case 'Monthly':
-      startDate = now.clone().startOf('month');
+      startDate = now.startOf('month'); // Start of the current month
       break;
     case 'Weekly':
-      startDate = now.clone().startOf('week'); // Start of week (Sunday by default in moment)
+      monday = now.startOf('week'); // Start of the current day
+      startDate = monday.minus({days: 1})
       break;
-    case 'Today':
-      startDate = now.clone().startOf('day');
+    case 'Daily':
+      startDate = now.startOf('day'); // Start of the current day
       break;
     default:
-      startDate = moment(0); // Default to 'All Time' if unrecognized period
+      startDate = DateTime.fromMillis(0).setZone(userTimezone); // Default to Unix epoch if unrecognized period
   }
 
-  return startDate.toDate();
+  return startDate.toJSDate(); // Convert to native JS Date object
 }
 
 module.exports = { startDateCalculator };

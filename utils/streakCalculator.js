@@ -1,20 +1,9 @@
+const { DateTime } = require('luxon');
 const Log = require("../models/Log");
 const User = require("../models/User");
-const moment = require('moment-timezone');
-const { testingServerId } = require('../config.json');
 
-const calculateStreak = async (userId, guildId) => {
+const calculateStreak = async (userId, isCurrentStreak) => {
     try {
-        // Exclude testing server data or main server data based on the guildId
-        let testGuildExcludeMatch;
-        if (guildId === testingServerId) {
-            testGuildExcludeMatch = { guildId: testingServerId };
-        } else {
-            testGuildExcludeMatch = { guildId: { $ne: testingServerId } };
-        }
-
-
-        // Find the user to get their timezone
         const user = await User.findOne({ userId: userId });
         if (!user) {
             return 0; // If user not found, return 0 streak
@@ -22,45 +11,83 @@ const calculateStreak = async (userId, guildId) => {
 
         const userTimezone = user.timezone || 'UTC'; // Default to UTC if timezone is not set
 
-        // Find all logs for the user, sorted by timestamp descending
-        const logs = await Log.find({ userId: userId, ...testGuildExcludeMatch }).sort({ timestamp: -1 });
+        // Exclude logs where isBackLog is true
+        const logs = await Log.find({
+            userId: userId,
+            isBackLog: { $ne: true } // This ensures that isBackLog is not true
+        }).sort({ timestamp: -1 });
 
         if (logs.length === 0) {
             return 0; // No logs mean no streak
         }
 
-        let currentStreak = 0;
-        const today = moment.tz(userTimezone).startOf('day').add(4, 'hours'); // "Start of today" is 4 AM in user's timezone
-        const yesterday = today.clone().subtract(1, 'day'); // "Start of yesterday" is also based on 4 AM
+        const getAdjustedDay = (timestamp) => {
+            const dt = DateTime.fromJSDate(timestamp).setZone(userTimezone);
+            if (dt.hour < 4) {
+                // Before 4 AM, consider it as part of the previous day
+                return dt.minus({ days: 1 }).startOf('day').plus({ hours: 4 });
+            } else {
+                // On or after 4 AM
+                return dt.startOf('day').plus({ hours: 4 });
+            }
+        };
 
-        // Convert the first log's timestamp to the adjusted "day" (4 AM start)
-        let mostRecentLogTime = moment.tz(logs[0].timestamp, userTimezone).startOf('day').add(4, 'hours');
+        // Build an array of adjusted unique days when the user logged
+        const adjustedDays = logs.map(log => getAdjustedDay(log.timestamp));
+        const uniqueDays = [];
 
-        // Check if the most recent log is from today or yesterday (with the 4 AM reset)
-        if (mostRecentLogTime.isSameOrAfter(yesterday)) {
-            currentStreak = 1; // Start streak if most recent log is within today or yesterday's window
-        } else {
-            return 0; // If the most recent log is older than yesterday, reset streak to 0
+        for (let i = 0; i < adjustedDays.length; i++) {
+            if (i === 0 || !adjustedDays[i].hasSame(adjustedDays[i - 1], 'day')) {
+                uniqueDays.push(adjustedDays[i]);
+            }
         }
 
-        // Loop through the remaining logs to check for consecutive "days"
-        for (let i = 1; i < logs.length; i++) {
-            let currentLogTime = moment.tz(logs[i].timestamp, userTimezone).startOf('day').add(4, 'hours');
+        // Initialize variables for longest streak calculation
+        let longestStreak = 1;
+        let tempStreak = 1;
 
-            const daysDifference = mostRecentLogTime.diff(currentLogTime, 'days');
+        for (let i = 1; i < uniqueDays.length; i++) {
+            const daysDifference = uniqueDays[i - 1].diff(uniqueDays[i], 'days').days;
 
-            if (daysDifference === 1) {
-                // Logs are on consecutive days (adjusted for 4 AM window), increment streak
-                currentStreak++;
-            } else if (daysDifference > 1) {
-                // Non-consecutive day found, break the streak
-                break;
+            if (Math.round(daysDifference) === 1) {
+                tempStreak++;
+            } else {
+                tempStreak = 1;
             }
 
-            mostRecentLogTime = currentLogTime;
+            if (tempStreak > longestStreak) {
+                longestStreak = tempStreak;
+            }
         }
 
-        return currentStreak;
+        // Calculate current streak
+        const now = DateTime.now().setZone(userTimezone);
+        const today = getAdjustedDay(now.toJSDate());
+        const yesterday = today.minus({ days: 1 });
+
+        let currentStreak = 0;
+
+        if (uniqueDays[0] >= yesterday) {
+            currentStreak = 1;
+            for (let i = 1; i < uniqueDays.length; i++) {
+                const daysDifference = uniqueDays[i - 1].diff(uniqueDays[i], 'days').days;
+
+                if (Math.round(daysDifference) === 1) {
+                    currentStreak++;
+                } else {
+                    break;
+                }
+            }
+        } else {
+            currentStreak = 0;
+        }
+
+        // Decide which value to return based on isCurrentStreak
+        if (isCurrentStreak) {
+            return currentStreak;
+        } else {
+            return longestStreak;
+        }
     } catch (error) {
         console.error("Error calculating streak:", error);
         return 0; // Default to 0 in case of any errors

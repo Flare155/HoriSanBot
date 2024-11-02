@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const moment = require('moment-timezone');
+const { IANAZone } = require('luxon');
 const User = require("../../models/User");
 
 module.exports = {
@@ -12,21 +12,21 @@ module.exports = {
                 .setAutocomplete(true) // Enable autocomplete
                 .setRequired(true)
         ),
-    
+
     // Handle the command execution
     async execute(interaction) {
         const userId = interaction.user.id;
         const guildId = interaction.guild.id;
         const timezoneInput = interaction.options.getString('timezone');
 
-        // Validate the timezone using moment-timezone
-        if (!moment.tz.zone(timezoneInput)) {
+        // Validate the timezone using Luxon
+        if (!IANAZone.isValidZone(timezoneInput)) {
             return interaction.reply({ content: 'Invalid timezone. Please provide a valid timezone like America/New_York.', ephemeral: true });
         }
 
         try {
             // Find or create user in the database
-            let user = await User.findOne({ userId: userId, guildId: guildId });
+            let user = await User.findOne({ userId: userId });
 
             if (!user) {
                 // Create new user if not found
@@ -35,9 +35,11 @@ module.exports = {
                     guildId: guildId,
                     timestamp: new Date().toISOString(),
                     streak: 0,
-                    timezone: timezoneInput
+                    timezone: timezoneInput,
+                    displayName: interaction.user.displayName,
                 });
             } else {
+                console.log("Updating Timezone");
                 // Update existing user's timezone
                 user.timezone = timezoneInput;
             }
@@ -65,11 +67,11 @@ module.exports = {
 
     // Handle autocomplete interaction
     async autocomplete(interaction) {
-        const focusedValue = interaction.options.getFocused();  // Get the user's current input
-        const allTimezones = moment.tz.names();  // Get the full list of timezones
-        
+        const focusedValue = interaction.options.getFocused().toLowerCase();  // Get the user's current input
+        const allTimezones = Intl.supportedValuesOf('timeZone');  // Get the list of timezones
+
         // Filter timezones based on the user's input
-        const filteredTimezones = allTimezones.filter(zone => zone.toLowerCase().startsWith(focusedValue.toLowerCase())).slice(0, 25); // Return max 25 results
+        const filteredTimezones = allTimezones.filter(zone => zone.toLowerCase().startsWith(focusedValue)).slice(0, 25); // Return max 25 results
 
         // Respond to the autocomplete interaction with the filtered timezone options
         await interaction.respond(

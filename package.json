@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "discord.js": "^14.16.1",
-    "moment-timezone": "^0.5.46",
+    "dotenv": "^16.4.5",
+    "luxon": "^3.5.0",
     "mongodb": "^5.6.0",
     "mongoose": "^7.3.1",
     "puppeteer": "^23.5.3",
@@ -12,12 +13,17 @@
   "description": "immersion tracking bot",
   "main": "index.js",
   "scripts": {
-    "dev": "bun --watch index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "bun": "bun --watch index.js",
+    "test": "vitest",
     "visuals": "cd utils/hori-visuals && npm run dev",
     "build-visuals": "cd utils/hori-visuals && npm run build"
   },
   "author": "Flare",
   "license": "ISC",
-  "keywords": []
+  "keywords": [],
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "mongodb-memory-server": "^10.1.2",
+    "vitest": "^2.1.4"
+  }
 }

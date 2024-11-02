@@ -4,7 +4,8 @@ node_modules
 logs.txt
 bulkRewrite.js
 depreciated
-package-lock.json
 commands/.DS_Store
 bun.lockb
 utils/hori-visuals/bun.lockb
+.env.dev
+.env.prod

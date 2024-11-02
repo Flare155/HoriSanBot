@@ -1,7 +1,18 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { token } = require('./config.json');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { defaultEnv } = require('./config.json');
+const dotenv = require('dotenv');
+
+// Assign envFile based on config settings
+const envFile = defaultEnv === 'development' ? '.env.dev' : '.env.prod';
+
+// Load environment variables from the selected .env file
+const result = dotenv.config({ path: path.join(__dirname, envFile)});
+if (result.error) {
+  console.error(`Failed to load ${envFile}:`, result.error);
+  process.exit(1);  // Exit the application if env file loading fails
+}
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -38,4 +49,4 @@ for (const file of eventFiles) {
 	}
 }
 
-client.login(token);
+client.login(process.env.TOKEN);

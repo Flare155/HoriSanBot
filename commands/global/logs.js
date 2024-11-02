@@ -2,7 +2,6 @@ const fs = require('fs');
 const { AttachmentBuilder, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Log = require('../../models/Log');
 const User = require('../../models/User');  // Import the User model
-const { testingServerId } = require('../../config.json');
 const { localTimeConverter } = require('../../utils/localTimeConverter'); // Import streak utility
 
 module.exports = {
@@ -25,28 +24,33 @@ module.exports = {
           { name: 'Readtime', value: 'Readtime' },
           { name: 'Visual Novel', value: 'Visual Novel' },
           { name: 'Manga', value: 'Manga' },
-        )),
+        ))
+    .addUserOption(option =>
+      option.setName('user')
+        .setDescription('Optionally input a user to see other peoples logs')
+        .setRequired(false)
+    ),
+
   async execute(interaction) {
     await interaction.deferReply();
-
     try {
       const medium = interaction.options.getString('medium');
-
+      const user = interaction.options.getUser('user') || interaction.user;
+      const userId = user.id;
+      
       // Fetch the user's timezone from the database
-      const userData = await User.findOne({ userId: interaction.user.id });
+      const userData = await User.findOne({ userId: userId});
       const userTimezone = userData ? userData.timezone : 'UTC';
 
       // Fetch logs based on the medium filter
       let logs;
       if (medium == "All") {
         logs = await Log.find({
-          userId: interaction.user.id,
-          guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId },
+          userId: userId,
         });
       } else {
         logs = await Log.find({
-          userId: interaction.user.id,
-          guildId: interaction.guild.id === testingServerId ? testingServerId : { $ne: testingServerId },
+          userId: userId,
           medium: medium
         });
       }
@@ -64,8 +68,8 @@ module.exports = {
       // Display the first 3 logs in a detailed embed
       const embed = new EmbedBuilder()
         .setColor('#c3e0e8')
-        .setTitle(`${interaction.user.displayName}'s Recent Logs (${medium})`)
-        .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
+        .setTitle(`${user.displayName}'s Recent Logs (${medium})`)
+        .setThumbnail(user.displayAvatarURL({ dynamic: true }))
         .setFooter({ text: 'Use /undo or /deletelog to remove a log' });
 
       // Iterate over the first three logs
@@ -75,6 +79,7 @@ module.exports = {
         const formattedAmount = `${log.amount.totalSeconds} Seconds`; // Needs updating
         const title = log.title || 'N/A';
         const notes = log.notes || 'N/A';
+        const isBacklog = log.isBackLog || 'N/A';
 
         // If I put these tabbed in on mobile looks like crap
         embed.addFields({
@@ -83,7 +88,8 @@ module.exports = {
 **Amount**: ${formattedAmount}
 **Title**: ${title}
 **Notes**: ${notes !== 'N/A' ? notes : 'No notes provided'}
-**ID**: ${log._id}\n`
+**ID**: ${log._id}
+**Backlog**: ${isBacklog !== 'N/A' ? isBacklog: "false"}\n`
         });
       });
 
@@ -96,14 +102,24 @@ module.exports = {
         let formattedAmount = `${log.amount.totalSeconds} Seconds`; // Needs updating
         let title = log.title || 'N/A';
         let notes = log.notes || 'N/A';
+        let isBacklog = log.isBackLog || 'N/A';
+
+        // Remove unicode range u1F000-1FFFF (emoji)
+        // Remove animated <a:name:id> / regular emojis <name:id>
+        // Remove discord emojis :name:
+        var notes_no_emojis = notes.replace(/[\u{1F000}-\u{1FFFF}]|<a?:\w+:\d+>|:.+?:/gmu, ""); 
+        var title_no_emojis = title.replace(/[\u{1F000}-\u{1FFFF}]|<a?:\w+:\d+>|:.+?:/gmu, ""); 
 
         let logString = `⏤⏤⏤⏤⏤⏤\n${formattedDate}\nMedium: ${log.medium} (${formattedAmount})`;
         if (title != 'N/A') {
-          logString += `\nTitle: ${title}`;
+          logString += `\nTitle: ${title_no_emojis}`;
         };
         if (notes != 'N/A') {
-          logString += `\nNotes: ${notes}`;
+          logString += `\nNotes: ${notes_no_emojis}`;
         };
+        if (isBacklog != 'N/A') {
+          logString += `\nBacklog: ${isBacklog}`;
+        }
         logString += `\nID: ${log._id}`;
         return logString;
       });
