@@ -47,7 +47,7 @@ exports[`should send embed after saving log 1`] = `
             "thumbnail": {
               "url": "http://example.com/image.jpg",
             },
-            "timestamp": "TIMESTAMP",
+            "timestamp": 'TIMESTAMP',
             "title": "🎉 test logged 2 minutes of Watchtime!",
           },
         ],
