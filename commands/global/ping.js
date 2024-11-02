@@ -107,7 +107,7 @@ module.exports = {
                 await interaction.editReply({
                     content: `⚠️ **Sorry, Discord's servers are likely experiencing issues.** Check: [Discord Status](https://discordstatus.com/).
                     \n_Total time: ${processingDelay} ms + ${wsRTDelay !== -1 ? wsRTDelay : 'N/A'} ms_
-                    \n*(Or I\'m just bad at coding)*`,
+                    \n*(Or I'm just bad at coding)*`,
 					embeds: []
                 });
             } else {

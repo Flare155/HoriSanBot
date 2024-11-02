@@ -38,7 +38,6 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
         const medium = interaction.options.getString('medium');
-        const guildId = interaction.guild.id;
         const timePeriod = interaction.options.getString('period');
 
         const startDate = startDateCalculator(timePeriod);

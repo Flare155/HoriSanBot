@@ -114,7 +114,7 @@ const parseTime = (input, timeZone) => {
     const match = input.match(timePattern);
     if (!match) return null;
 
-    let [_, hourStr, minuteStr, period] = match;
+    let [hourStr, minuteStr, period] = match;
     let hour = parseInt(hourStr, 10);
     const minute = parseInt(minuteStr, 10);
 

@@ -143,7 +143,6 @@ module.exports = {
             }
 
             // Collect all new values
-            let updatedInput = constructInputString(log.amount);
             let updatedTitle = log.title;
             let updatedNotes = log.notes;
             let updatedAmount = { ...log.amount };
@@ -216,7 +215,6 @@ module.exports = {
                 } else {
                     try {
                         const amount = recalculateAmount(log.medium, newInput);
-                        updatedInput = newInput;
                         updatedAmount = amount;
                     } catch (err) {
                         await sendErrorMessage(interaction, `Error: ${err.message}`);
