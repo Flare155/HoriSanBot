@@ -1,7 +1,8 @@
 import logCommand from '../../commands/global/log';
 import Log from '../../models/Log';
 import User from '../../models/User';
-import {myTest} from '../fixtures';
+import { myTest } from '../fixtures';
+import { expect } from 'vitest';
 
 myTest('should fail on invalid time pattern', async ({interaction}) => {
     interaction.setOption('medium', 'WatchTime');

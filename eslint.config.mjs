@@ -24,8 +24,16 @@ export default [
             sourceType: "module",
         },
         rules: {
-            // Your custom rules here
-        },
+            'no-unused-vars': [
+                'error',
+                {
+                    vars: 'all',
+                    varsIgnorePattern: '^', // Ignore variables that start with an underscore
+                    args: 'after-used',
+                    argsIgnorePattern: '^' // Ignore function arguments that start with an underscore
+                }
+            ]
+        }
     },
     {
         ignores: ["utils/hori-visuals/prod/assets/"]

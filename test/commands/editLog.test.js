@@ -1,7 +1,7 @@
-import { expect } from 'vitest';
+import { expect, vi } from 'vitest';
 import { execute } from '../../commands/global/editLog';
 import Log from '../../models/Log';
-import {myTest} from '../fixtures';
+import { myTest } from '../fixtures';
 
 myTest('should return error when log not found by id', async ({ interaction }) => {
     await execute(interaction);

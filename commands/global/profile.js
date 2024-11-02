@@ -31,7 +31,6 @@ module.exports = {
         await interaction.deferReply();
         const user = interaction.options.getUser('user') || interaction.user;
         const userId = user.id;
-        const guildId = interaction.guild.id;
         const timePeriod = interaction.options.getString('period');
         const exists = await User.exists({ userId: userId });
         const userData = await User.findOne({ userId: userId});

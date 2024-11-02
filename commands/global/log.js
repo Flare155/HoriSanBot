@@ -149,7 +149,7 @@ async function sendLinkMessage(interaction, links) {
 // Utility function to extract links from a string
 function extractLinks(text) {
     // Regular expression to match URLs
-    const urlPattern = /(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/gi;
+    const urlPattern = /(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)/gi;
     const links = text.match(urlPattern) || [];
     return links;
 }

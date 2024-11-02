@@ -1,12 +1,12 @@
 import Log from '../models/Log';
 import User from '../models/User';
-import { test } from 'vitest';
+import { test, vi } from 'vitest';
 
 export const myTest = test.extend({
-    interaction: async ({ }, use) => {
+    interaction: async (_, use) => {
         await use(createMockInteraction());
     },
-    createUser: async ({ }, use) => {
+    createUser: async (_, use) => {
         return await use(async ({ userId, guildId, timestamp, streak, timezone, displayName }) => {
             const user = new User({
                 userId: userId ?? generateRandomId(),
@@ -20,7 +20,7 @@ export const myTest = test.extend({
             return user;
         });
     },
-    createInteraction: async ({ }, use) => await use(createMockInteraction),
+    createInteraction: async (_, use) => await use(createMockInteraction),
     createLog: async ({ createUser }, use) => {
         return await use(async (interaction, amount) => {
             const user = await User.findOne({ id: interaction.user.id });

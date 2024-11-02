@@ -113,8 +113,7 @@ const parseTime = (input, timeZone) => {
     const timePattern = /^([01]?\d|2[0-3]):([0-5]\d)\s*(AM|PM)?$/i;
     const match = input.match(timePattern);
     if (!match) return null;
-
-    let [hourStr, minuteStr, period] = match;
+    let [_, hourStr, minuteStr, period] = match;
     let hour = parseInt(hourStr, 10);
     const minute = parseInt(minuteStr, 10);
 
