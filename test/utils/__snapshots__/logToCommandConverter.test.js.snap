@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`should convert anime command 1`] = `"/log medium: Anime amount: 2ep title: Anime test notes: Anime note episode_length: 2000s"`;
+
+exports[`should convert listening command 1`] = `"/log medium: Listening amount: 1s title: listening test notes: listening note"`;
+
+exports[`should convert manga command 1`] = `"/log medium: Manga amount: 1s title: Manga test notes: Manga note"`;
+
+exports[`should convert readtime command 1`] = `"/log medium: Readtime amount: 1s title: Readtime test notes: Readtime note"`;
+
+exports[`should convert watchtime command 1`] = `"/log medium: Watchtime amount: 1s title: WatchTime test notes: WatchTime note"`;
+
+exports[`should convert youtube command 1`] = `"/log medium: YouTube amount: 1s title: YouTube test notes: YouTube note"`;

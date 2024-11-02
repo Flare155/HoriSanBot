@@ -1,0 +1,92 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`should not delete when no logs 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      {
+        "embeds": [
+          {
+            "color": 15105570,
+            "footer": {
+              "icon_url": "http://example.com/image.jpg",
+              "text": "test footer",
+            },
+            "timestamp": "TIMESTAMP",
+            "title": "You have no logs to remove.",
+          },
+        ],
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`should not undo log from other user 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      {
+        "embeds": [
+          {
+            "color": 15105570,
+            "footer": {
+              "icon_url": "http://example.com/image.jpg",
+              "text": "test footer",
+            },
+            "timestamp": "TIMESTAMP",
+            "title": "You have no logs to remove.",
+          },
+        ],
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`should undo log 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      {
+        "embeds": [
+          {
+            "color": 3447003,
+            "description": "Execute the following command to add the log again",
+            "fields": [
+              {
+                "name": "command",
+                "value": "/log medium: Watchtime amount: 1s title: Test Title notes: Some notes here",
+              },
+            ],
+            "footer": {
+              "icon_url": "http://example.com/image.jpg",
+              "text": "Keep up the good work!",
+            },
+            "timestamp": "TIMESTAMP",
+            "title": "Your most recent log has been removed",
+          },
+        ],
+      },
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;

@@ -58,6 +58,8 @@ async function saveLog(interaction, customDate, medium, title, notes, isBackLog,
                 await existingUser.save();
             }
         }
+
+        return newLog;
     } catch (error) {
         console.error("Error saving log:", error);
         await interaction.editReply("An error occurred while saving your log.");

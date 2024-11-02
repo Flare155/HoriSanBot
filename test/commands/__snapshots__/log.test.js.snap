@@ -24,8 +24,33 @@ exports[`should send embed after saving log 1`] = `
   "calls": [
     [
       {
-        "content": "\`❌ Invalid input format. Examples: \`2ep\`, \`1h3m\`. See \`/help log\` for more info.\`",
-        "ephemeral": true,
+        "embeds": [
+          {
+            "color": 16252927,
+            "description": "1 point/min → +2 points",
+            "fields": [
+              {
+                "inline": true,
+                "name": "📖 Title",
+                "value": "Test Title",
+              },
+              {
+                "inline": true,
+                "name": "📝 Notes",
+                "value": "Some notes here",
+              },
+            ],
+            "footer": {
+              "icon_url": "http://example.com/image.jpg",
+              "text": "Keep up the great immersion!",
+            },
+            "thumbnail": {
+              "url": "http://example.com/image.jpg",
+            },
+            "timestamp": "TIMESTAMP",
+            "title": "🎉 test logged 2 minutes of Watchtime!",
+          },
+        ],
       },
     ],
   ],
