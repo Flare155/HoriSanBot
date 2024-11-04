@@ -1,57 +1,60 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, time,} = require('discord.js');
+const User = require('../../models/User');
+const { DateTime, Duration } = require("luxon");
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('timer_dev')
-		.setDescription('Start or stop a timer for your immersion!'),
+		.setDescription('Start or stop a timer for your immersion!')
+		.addStringOption(option =>
+            option.setName('timer')
+                .setDescription('What do you want to do with the timer')
+                .setRequired(true)
+                .addChoices(
+                    { name: 'Start', value: 'Start' },
+                    { name: 'Status', value: 'Status' },
+                    { name: 'Stop', value: 'Stop' },
+        )),
 	async execute(interaction) {
-		await interaction.deferReply();
 
-		let startTime = new Date().getTime();
-		let stoppedTime = 0;
-		let immersedTime = 0;
+		// Variable initialization
+		const choice = interaction.options.getString('timer');
+		const user = await User.findOne({ userId: interaction.user.id });
+		const currentTime = DateTime.now().toUTC();
+		const dbTime = await User.findOne({timerTime: user.timerTime});
 
-		// Button for finishing the immersion
-		const row = new ActionRowBuilder().addComponents(
-			new ButtonBuilder()	
-				.setCustomId('finish_immersion')
-				.setLabel('Finish Immersion')
-				.setStyle(ButtonStyle.Danger),
-		);
+		// Caulate the time the user has immersed for
+		let immersionTime = (((currentTime - dbTime.timerTime) / 1000) / 60);
 
-		const embed = new EmbedBuilder()
-                .setTitle('Immersion Timer')
-                .setThumbnail(
-                    interaction.user.displayAvatarURL({ dynamic: true })
-                )
-                .addFields(
-                    { name: 'Timer Has Started!', value: "Click the buttom to stop the timer." },
+		// Checks if user exists - if not, return
+        if (!user) {
+            return 0; 
+        }
 
-        );
-
-		await interaction.editReply({
-			embeds: [embed],
-			components: [row],
-		});
-
-		// Create a collector to handle button interactions
-		const filter = (i) => i.user.id === interaction.user.id;
-		const collector = interaction.channel.createMessageComponentCollector({filter, time: 2147483647});
-
-		collector.on('collect', async (i) => {
-			if (i.customId === 'finish_immersion') {
-				// User finished the immersion time
-				stoppedTime = new Date().getTime();
-
-				immersedTime = (((stoppedTime - startTime) / 1000) / 60).toFixed(2);
-
-				await i.update({
-					content: `You have immersed ${immersedTime} minutes!`,
-					components: [],
-					embeds: [],
-				});
+		// Checks the choice made by the user
+		if(choice == "Start") {
+			if(dbTime.timerTime != null) {
+				return interaction.reply("There is timer already running, please stop it to start a new timer.");
 			}
-			collector.stop();
-		});
-	},
-};
+ 
+			// Update the start time for the timer in the database
+			await User.updateOne({timerTime: currentTime});
+
+			await interaction.reply(`Your time has started at: ${currentTime.toFormat("HH:mm:ss")}!`);
+		} else if(choice == "Status") {
+			if(dbTime.timerTime == null) {
+				return interaction.reply("You have not started a timer yet, please use Start option to start a timer.");
+			}
+
+			await interaction.reply(`You have been immersing for ${immersionTime.toFixed(2)} minutes!`);
+		} else if(choice == "Stop") {
+			if(dbTime.timerTime == null) {
+				return interaction.reply("You have not started a timer yet, please use Start option to start a timer.");
+			}
+
+			await interaction.reply(`You have immersed for ${immersionTime.toFixed(2)} minutes!`);
+
+			await User.updateOne({timerTime: null});
+		}
+	}
+}
