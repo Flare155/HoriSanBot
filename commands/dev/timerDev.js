@@ -33,7 +33,7 @@ module.exports = {
 
 		// Checks the choice made by the user
 		if(choice == "Start") {
-			if(dbTime.timerTime != null) {
+			if(dbTime.timerTime != 0) {
 				return interaction.reply("There is timer already running, please stop it to start a new timer.");
 			}
  
@@ -42,19 +42,19 @@ module.exports = {
 
 			await interaction.reply(`Your time has started at: ${currentTime.toFormat("HH:mm:ss")}!`);
 		} else if(choice == "Status") {
-			if(dbTime.timerTime == null) {
+			if(dbTime.timerTime == 0) {
 				return interaction.reply("You have not started a timer yet, please use Start option to start a timer.");
 			}
 
 			await interaction.reply(`You have been immersing for ${immersionTime.toFixed(2)} minutes!`);
 		} else if(choice == "Stop") {
-			if(dbTime.timerTime == null) {
+			if(dbTime.timerTime == 0) {
 				return interaction.reply("You have not started a timer yet, please use Start option to start a timer.");
 			}
 
 			await interaction.reply(`You have immersed for ${immersionTime.toFixed(2)} minutes!`);
 
-			await User.updateOne({timerTime: null});
+			await User.updateOne({timerTime: 0});
 		}
 	}
 }
