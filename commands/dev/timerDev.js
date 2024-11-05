@@ -18,7 +18,7 @@ module.exports = {
         )),
 	async execute(interaction) {
 
-		if(Timer.userId == null) {
+		if(Timer.findOne({ userId: interaction.user.id }) == null) {
 			await Timer.create({ userId: interaction.user.id });
 		}
 
