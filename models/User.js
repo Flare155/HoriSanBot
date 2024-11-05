@@ -4,7 +4,6 @@ const userSchema = new mongoose.Schema({
     userId: { type: String, required: true },
     guildId: { type: String, required: true },
     timestamp: {type: Date, required: true },
-    timerTime: {type: Number, required: true, default: 0},
     streak: {type: Number, required: true, default: 0, min: 0 },
     longestStreak: {type: Number, required: true, default: 0, min: 0 },
     timezone: { type: String, required: true, default: 'UTC' },

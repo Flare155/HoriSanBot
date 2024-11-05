@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, time,} = require('discord.js');
+const Timer = require('../../models/Timer');
 const User = require('../../models/User');
-const { DateTime, Duration } = require("luxon");
+const { DateTime } = require("luxon");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -17,11 +18,15 @@ module.exports = {
         )),
 	async execute(interaction) {
 
+		if(Timer.userId == null) {
+			await Timer.create({ userId: interaction.user.id });
+		}
+
 		// Variable initialization
 		const choice = interaction.options.getString('timer');
-		const user = await User.findOne({ userId: interaction.user.id });
+		const user = await Timer.findOne({ userId: interaction.user.id });
 		const currentTime = DateTime.now().toUTC();
-		const dbTime = await User.findOne({timerTime: user.timerTime});
+		const dbTime = await Timer.findOne({timerTime: user.timerTime});
 
 		// Caulate the time the user has immersed for
 		let immersionTime = (((currentTime - dbTime.timerTime) / 1000) / 60);
@@ -38,7 +43,7 @@ module.exports = {
 			}
  
 			// Update the start time for the timer in the database
-			await User.updateOne({timerTime: currentTime});
+			await Timer.updateOne({timerTime: currentTime});
 
 			await interaction.reply(`Your time has started at: ${currentTime.toFormat("HH:mm:ss")}!`);
 		} else if(choice == "Status") {
@@ -54,7 +59,7 @@ module.exports = {
 
 			await interaction.reply(`You have immersed for ${immersionTime.toFixed(2)} minutes!`);
 
-			await User.updateOne({timerTime: 0});
+			await Timer.updateOne({timerTime: 0});
 		}
 	}
 }
