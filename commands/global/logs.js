@@ -107,8 +107,9 @@ module.exports = {
         // Remove unicode range u1F000-1FFFF (emoji)
         // Remove animated <a:name:id> / regular emojis <name:id>
         // Remove discord emojis :name:
-        var notes_no_emojis = notes.replace(/[\u{1F000}-\u{1FFFF}]|<a?:\w+:\d+>|:.+?:/gmu, ""); 
-        var title_no_emojis = title.replace(/[\u{1F000}-\u{1FFFF}]|<a?:\w+:\d+>|:.+?:/gmu, ""); 
+        var emoji_finder_regex = /[\u{1F000}-\u{1FFFF}]|<a?:\w+:\d+>/gmu
+        var notes_no_emojis = notes.replace(emoji_finder_regex , "[emoji]"); 
+        var title_no_emojis = title.replace(emoji_finder_regex , "[emoji]"); 
 
         let logString = `⏤⏤⏤⏤⏤⏤\n${formattedDate}\nMedium: ${log.medium} (${formattedAmount})`;
         if (title != 'N/A') {
