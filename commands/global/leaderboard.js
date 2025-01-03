@@ -21,7 +21,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName('medium')
                 .setDescription('The medium of the leaderboard')
-                .setRequired(true)
+                .setRequired(false)
                 .addChoices(
                     { name: 'All', value: 'All' },
                     // Audio
@@ -37,7 +37,7 @@ module.exports = {
                 )),
     async execute(interaction) {
         await interaction.deferReply();
-        const medium = interaction.options.getString('medium');
+        const medium = interaction.options.getString('medium') || 'All';
         const timePeriod = interaction.options.getString('period');
 
         const startDate = startDateCalculator(timePeriod);
