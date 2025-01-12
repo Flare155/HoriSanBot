@@ -4,7 +4,7 @@
         userId: { type: String, required: true },
         guildId: { type: String, required: true },
         timestamp: { type: Date, required: true },
-        medium: { type: String, required: true, enum: ['Listening', 'Watchtime', 'YouTube', 'Anime', 'Readtime', 'Visual Novel', 'Manga']},
+        medium: { type: String, required: true, enum: ['Listening', 'Watchtime', 'YouTube', 'Anime', 'Readtime', 'Visual Novel', 'Manga', 'Speaking', 'Writing']},
         title: { type: String, required: true},
         notes: { type: String, required: false},
         isBackLog: {type: Boolean, required: true, default: false},

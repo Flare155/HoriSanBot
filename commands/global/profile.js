@@ -134,6 +134,8 @@ module.exports = {
             Readtime: "Minutes",
             "Visual Novel": "Minutes",
             Manga: "Minutes",
+            Speaking: "Minutes",
+            Writing: "Minutes",
         };
 
         // Sort logStats based on the defined fieldOrder
@@ -148,10 +150,10 @@ module.exports = {
             const medium = stat._id.medium;
             if (medium === 'Manga') {
                 const minutes = Math.floor(stat.totalSeconds / 60);
-                mangaPages += minutes * 5; // Assume 5 pages per minute
+                mangaPages += minutes * 4; // Assume 4 pages per minute
             } else if (medium === 'Readtime' || medium === 'Visual Novel') {
                 const minutes = Math.floor(stat.totalSeconds / 60);
-                charactersRead += minutes * 500; // Assume 500 characters per minute
+                charactersRead += minutes * 250; // Assume 250 characters per minute
             }
         });
 

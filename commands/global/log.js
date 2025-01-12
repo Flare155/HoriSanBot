@@ -19,6 +19,8 @@ module.exports = {
                     { name: 'Readtime', value: 'Readtime' },       // Reading
                     { name: 'Visual Novel', value: 'Visual Novel' },
                     { name: 'Manga', value: 'Manga' },
+                    { name: 'Speaking', value: 'Speaking' },          // Output
+                    { name: 'Writing', value: 'Writing' },
                 ))
         .addStringOption(option =>
             option.setName('amount')

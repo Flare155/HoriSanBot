@@ -1,5 +1,6 @@
 const { DateTime } = require('luxon');
 
+// Takes a log and converts it to the slash command you would use to create that log
 const logToCommandConverter = (logModel, timezone = 'utc') => {
     const todayUTC = DateTime.utc().toFormat('yyyy-MM-dd');
     const logDateWithTimezone = DateTime.fromJSDate(logModel.timestamp, { zone: timezone }).toFormat('yyyy-MM-dd');

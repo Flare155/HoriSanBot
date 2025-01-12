@@ -14,16 +14,15 @@ module.exports = {
         .setRequired(true)
         .addChoices(
           { name: 'All', value: 'All' },
-          // Audio
-          { name: 'Listening', value: 'Listening' },
-          // Audio-Visual
-          { name: 'Watchtime', value: 'Watchtime' },
+          { name: 'Listening', value: 'Listening' },     // Audio
+          { name: 'Watchtime', value: 'Watchtime' },     // Audio-Visual
           { name: 'YouTube', value: 'YouTube' },
           { name: 'Anime', value: 'Anime' },
-          // Reading
-          { name: 'Readtime', value: 'Readtime' },
+          { name: 'Readtime', value: 'Readtime' },       // Reading
           { name: 'Visual Novel', value: 'Visual Novel' },
           { name: 'Manga', value: 'Manga' },
+          { name: 'Speaking', value: 'Speaking' },          // Output
+          { name: 'Writing', value: 'Writing' },
         ))
     .addUserOption(option =>
       option.setName('user')
