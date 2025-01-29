@@ -25,7 +25,7 @@ export const myTest = test.extend({
     createInteraction: async ({ }, use) => await use(createMockInteraction),
     createLog: async ({ createUser }, use) => {
         return await use(async (interaction, amount) => {
-            const user = await User.findOne({ id: interaction.user.id });
+            const user = await User.findOne({ userId: interaction.user.id });
             if (!user) {
                 await createUser({
                     userId: interaction.user.id,
