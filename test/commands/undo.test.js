@@ -16,6 +16,9 @@ myTest('should undo log', async ({ log, interaction }) => {
 });
 
 myTest('should undo only most recent log', async ({createLog, interaction }) => {
+    // Add this line so this test always uses a unique user ID:
+    interaction.user.id = `unique-user-${Date.now()}`;
+
     const oldLog = await createLog(interaction, {
         totalSeconds: 1000,
         count: 1,
