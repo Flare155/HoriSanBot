@@ -48,6 +48,7 @@ async function saveLog(interaction, customDate, medium, title, notes, isBackLog,
                 userId: interaction.user.id,
                 guildId: interaction.guild.id,
                 timestamp: new Date().toISOString(),
+                streak: 0,
                 displayName: interaction.user.displayName,
             });
             await newUser.save();
