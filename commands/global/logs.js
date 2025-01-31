@@ -11,7 +11,7 @@ module.exports = {
     .addStringOption(option =>
       option.setName('medium')
         .setDescription('Medium for filtering')
-        .setRequired(true)
+        .setRequired(false)
         .addChoices(
           { name: 'All', value: 'All' },
           { name: 'Listening', value: 'Listening' },     // Audio
@@ -33,7 +33,7 @@ module.exports = {
   async execute(interaction) {
     await interaction.deferReply();
     try {
-      const medium = interaction.options.getString('medium');
+      const medium = interaction.options.getString('medium') || 'All';
       const user = interaction.options.getUser('user') || interaction.user;
       const userId = user.id;
       

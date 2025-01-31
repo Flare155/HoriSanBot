@@ -33,10 +33,9 @@ module.exports = {
                 description: 'Log your immersion with a medium, title, amount, and notes.',
                 usage: '/log [medium] [title] [amount] [notes] [episode length=21]',
                 details: `Use this command to keep track of your immersion details such as books, movies, or other media.
-Use this command to keep track of your immersion details such as books, movies, or other media.
 * The [amount] field can be in episodes or in raw minutes.
-Examples: \`5ep\`(21*5=105) \`1h15m\` (75) \`5m30s\` (5.5) 
-* Suggested title format: 
+Examples: \`5ep\`(105 minutes) \`1h15m\` (75 minutes) \`5m30s\` (5.5 minutes) 
+* Suggested title field format:
 YouTube: \`ChannelName Title\`
 Anime:    \`SeriesName Season\`
 Podcast: \`Creator PodcastName\`
@@ -45,7 +44,6 @@ etc.
 YouTube: \`[link]\`
 Anime:     \`eps[start]-[end]\`
 Podcast: \`Episode [number] | [link]\`
--# For any additional assistance DM or @ flarenotfound on discord!
                     `
             },
             logs: {
@@ -56,7 +54,7 @@ Podcast: \`Episode [number] | [link]\`
             },
             undo: {
                 title: '↩️ Undo Command',
-                description: 'Undo the last log you created. **Irreversible!**',
+                description: 'Undo the most recent log. **Irreversible!**',
                 usage: '/undo',
                 details: 'This will remove your last logged entry. Be careful, as this action cannot be undone.'
             },
@@ -72,17 +70,13 @@ Podcast: \`Episode [number] | [link]\`
                 usage: '/profile',
                 details: 'Shows you an overview of your total immersion activities, including time spent on different media.'
             },
-            graph: {
-                title: '📊 Graph Command',
-                description: 'Visualize your immersion with a graph.',
-                usage: '/graph [time period]',
-                details: 'Generates a graph to visualize your immersion history over time.'
-            },
             selftimeout: {
                 title: '⏱️ Self Timeout Command',
                 description: 'Time yourself out so you can focus on your immersion!',
-                usage: '/selftimeout [minutes]',
-                details: 'Blocks you from interacting with the bot for a set amount of time to help you focus on your immersion.'
+                usage: '/selftimeout [duration] [activation time] [repeat count]',
+                details: `* You can schedule it to activate at a certain time of day and set it to repeat a certain number of times.
+* Example: \`/selftimeout 6h 10:30 PM 3\`
+- This will time you out for **6 hours** at **10:30 PM** for **3 days**.`
             }
         };
 
@@ -112,7 +106,6 @@ Podcast: \`Episode [number] | [link]\`
                     { name: '↩️ `/undo`', value: 'Undo the last log you created. **Irreversible!**', inline: false },
                     { name: '❌ `/deletelog`', value: 'Delete a specific log by its ID. **Irreversible!**', inline: false },
                     { name: '👤 `/profile`', value: 'Display an overview of all your logged immersion', inline: false },
-                    { name: '📊 `/graph`', value: 'Visualize your immersion with a graph.', inline: false },
                     { name: '⏱️ `/selftimeout`', value: 'Time yourself out so you can focus on your immersion!', inline: false }
                 )
                 .setFooter({ text: 'For any additional assistance DM or @ flarenotfound on discord!' });
