@@ -71,7 +71,7 @@ This project is currently private. Please do not use or distribute any part of H
 
 *The global leaderboard for monthly filterable by medium and time period*
 
-![Profile View Example](https://github.com/user-attachments/assets/f77be04e-dd98-49e4-b4c7-09885cb90431)
+![Profile View Example](https://github.com/user-attachments/assets/8244902f-a886-45fa-96c0-101a1f9d4dbe)
 
 *What a log looks like currently (tie-ins with anilist and other media databases expected in the future)*
 
