@@ -3,7 +3,7 @@ const {
     EmbedBuilder,
     ActionRowBuilder,
     ButtonBuilder,
-    ButtonStyle
+    ButtonStyle,
   } = require('discord.js');
   const { DateTime } = require('luxon');
   const Log = require('../../models/Log');
@@ -28,6 +28,17 @@ const {
       )
       .addStringOption((option) =>
         option
+          .setName('scope')
+          .setDescription('What users to include in the leaderboard')
+          .setRequired(true)
+          .addChoices(
+            { name: 'Global', value: 'Global' },
+            { name: 'This Server', value: 'Server' },
+            { name: 'Friends', value: 'Friends' },
+          )
+      )
+      .addStringOption((option) =>
+        option
           .setName('medium')
           .setDescription('The medium of the leaderboard')
           .setRequired(false)
@@ -48,11 +59,12 @@ const {
     async execute(interaction) {
       await interaction.deferReply();
   
-      // 1. Gather options
-      const medium = interaction.options.getString('medium') || 'All';
+      // Gather inputs
       const timePeriod = interaction.options.getString('period');
+      const scope = interaction.options.getString('scope');
+      const medium = interaction.options.getString('medium') || 'All';
   
-      // We'll maintain a Luxon DateTime to track the current time reference
+      // Luxon DateTime to track the current time reference
       let referenceDate = DateTime.local();
   
       // Helper to shift reference date by 1 period
@@ -131,10 +143,23 @@ const {
         } else if (medium !== 'All') {
           mediumMatch.medium = medium;
         }
+
+        // get all user IDs for users in this server
+        const scopeMatch = {};
+        if (scope === 'Server') {
+          const members = await interaction.guild.members.fetch();
+          const userIdsInServer = members.map(member => member.user.id);
+          scopeMatch.userId = { $in: userIdsInServer };
+        } else if (scope === 'Friends') {
+          // Friends feature is not implemented yet.
+          await interaction.editReply("Friends feature coming soon");
+          return []; // Return an empty array to stop further processing.
+        }
   
         const pipeline = [
           { $match: timeMatch },
           { $match: mediumMatch },
+          { $match: scopeMatch },
           {
             $group: {
               _id: '$userId',

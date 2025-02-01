@@ -35,9 +35,8 @@ module.exports = {
         } else {
             const embed = new EmbedBuilder()
                 .setColor(Colors.Orange)
-                .setTimestamp()
                 .setFooter({
-                    text: `test footer`,
+                    text: `Use /log to get started!`,
                     iconURL
                 })
                 .setTitle('You have no logs to remove.');
