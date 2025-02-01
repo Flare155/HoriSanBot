@@ -10,9 +10,8 @@ exports[`should not delete when no logs 1`] = `
             "color": 15105570,
             "footer": {
               "icon_url": "http://example.com/image.jpg",
-              "text": "test footer",
+              "text": "Use /log to get started!",
             },
-            "timestamp": 'TIMESTAMP',
             "title": "You have no logs to remove.",
           },
         ],
@@ -38,9 +37,8 @@ exports[`should not undo log from other user 1`] = `
             "color": 15105570,
             "footer": {
               "icon_url": "http://example.com/image.jpg",
-              "text": "test footer",
+              "text": "Use /log to get started!",
             },
-            "timestamp": 'TIMESTAMP',
             "title": "You have no logs to remove.",
           },
         ],
