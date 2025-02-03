@@ -1,3 +1,6 @@
+// TODO: Check if user is admin before scheduling timeout
+
+
 const { SlashCommandBuilder } = require('discord.js');
 const { sendErrorMessage } = require('../../utils/formatting/errorMessageFormatter.js');
 const { DateTime } = require('luxon');
