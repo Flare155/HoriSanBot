@@ -52,6 +52,7 @@ module.exports = {
             const customEpisodeLength = interaction.options.getString('episode_length');
             let count = null;
             let unit = "", coefficient = null, totalSeconds = 0;
+            console.log(interaction.options);
 
             // Regular expressions to match time and episode formats
             const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/i; // Matches input in (Num h, Num m, Num s), excludes 'ep'

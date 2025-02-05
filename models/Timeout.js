@@ -4,12 +4,12 @@ const timeoutSchema = new mongoose.Schema({
     userId: { type: String, required: true },
     displayName: { type: String, required: true },
     guildId: { type: String, required: true },
-    timeoutDuration: { type: Number, required: true },            // Store in milliseconds
-    activationTime: { type: Date, required: true },               // When the timeout should start
+    timeoutDuration: { type: Number, required: true },
+    activationTime: { type: Date, required: true },
     repeatCount: { type: Number, required: true, default: 0 },
 });
 
-timeoutSchema.index({ activationTime: 1 });  // To efficiently find timeouts ready to activate
+timeoutSchema.index({ activationTime: 1 });
 
 const Timeout = mongoose.models.Timeout || mongoose.model('Timeout', timeoutSchema);
 module.exports = Timeout;
