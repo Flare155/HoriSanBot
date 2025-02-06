@@ -9,7 +9,7 @@ const User = require('../../models/User');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('selftimeout')
+        .setName('self_timeout')
         .setDescription('Use this command to time yourself out!')
         .addStringOption(option =>
             option.setName('duration')

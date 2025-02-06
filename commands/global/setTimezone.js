@@ -4,7 +4,7 @@ const User = require("../../models/User");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('settimezone')
+        .setName('set_timezone')
         .setDescription('Sets your timezone for streak tracking.')
         .addStringOption(option =>
             option.setName('timezone')
