@@ -21,7 +21,7 @@ myTest('should save log', async ({interaction}) => {
     interaction.setOption('amount', `${amount}s`);
     await logCommand.execute(interaction);
     const createdLog = await Log.findOne({ userId: interaction.user.id, guildId: interaction.guild.id });
-    expect(createdLog).not.toBeNull('No log could be find. It probably was not created');
+    expect(createdLog).not.toBeNull('No log could be found. It probably was not created');
     expect(createdLog._doc).toEqual(
         expect.objectContaining({
             amount: {
