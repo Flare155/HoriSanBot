@@ -4,11 +4,6 @@ import { expect, beforeEach } from 'vitest';
 import Log from '../../models/Log';
 import User from '../../models/User';
 
-// Clear relevant collections before each test
-beforeEach(async () => {
-  await Log.deleteMany({}); // Clear all logs
-  await User.deleteMany({}); // Clear all users
-});
 
 myTest('should not delete when no logs', async ({ interaction }) => {
   await execute(interaction);

@@ -44,6 +44,7 @@ export const myTest = test.extend({
                 amount,
             });
             await newLog.save();
+            console.log('New Log ID:', newLog._id); // Log the generated ID
             return newLog;
         });
     },

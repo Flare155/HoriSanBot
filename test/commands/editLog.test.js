@@ -16,8 +16,12 @@ myTest('should edit log', async ({ log, interaction, createInteraction }) => {
     editInteraction.user = interaction.user;
     editInteraction.guild = interaction.guild;
 
+    console.log("poop");
     await execute(editInteraction);
+    console.log("pee");
     await confirmEdit(editInteraction);
+    console.log("pizzle");
+    console.log("log id pre edit is: ", log._id);
     const editedLog = await Log.findById(log._id);
     expect(editedLog.title).toBe('new title');
 });
