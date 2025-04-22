@@ -9,7 +9,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName('timezone')
                 .setDescription('Start typing to find your timezone! (Continent/City OR City)')
-                .setAutocomplete(true) // Enable autocomplete
+                .setAutocomplete(true)
                 .setRequired(true)
         ),
 

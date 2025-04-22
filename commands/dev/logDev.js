@@ -5,26 +5,26 @@ const { buildLogEmbed } = require('../../utils/buildLogEmbed.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('log')
+        .setName('log_dev')
         .setDescription('Log your immersion!')
         .addStringOption(option =>
             option.setName('medium')
                 .setDescription('The type of material you immersed in')
                 .setRequired(true)
                 .addChoices(
-                    { name: 'Listening', value: 'Listening' },     // Audio
-                    { name: 'Watchtime', value: 'Watchtime' },     // Audio-Visual
+                    { name: 'Listening', value: 'Listening' },
+                    { name: 'Watchtime', value: 'Watchtime' },
                     { name: 'YouTube', value: 'YouTube' },
                     { name: 'Anime', value: 'Anime' },
-                    { name: 'Readtime', value: 'Readtime' },       // Reading
+                    { name: 'Readtime', value: 'Readtime' },
                     { name: 'Visual Novel', value: 'Visual Novel' },
                     { name: 'Manga', value: 'Manga' },
-                    { name: 'Speaking', value: 'Speaking' },          // Output
+                    { name: 'Speaking', value: 'Speaking' },
                     { name: 'Writing', value: 'Writing' },
                 ))
         .addStringOption(option =>
             option.setName('amount')
-                .setDescription('Enter a time (e.g., 45m, 1h30m, 2m5s) or number of episodes (e.g., 10ep)')
+                .setDescription('Duration (e.g., 45m, 1h30m, 2m5s) | Episodes (e.g., 10ep, 2ep/45m for 2 episodes of 45m).')
                 .setRequired(true)
         )
         .addStringOption(option =>
@@ -33,63 +33,83 @@ module.exports = {
                 .setRequired(true)
         )
         .addStringOption(option =>
+            option.setName('advanced_logging')
+                .setDescription('Enter pages (e.g., 100pg) or characters (e.g., 2000char)')
+                .setRequired(false)
+        )
+        .addStringOption(option =>
             option.setName('notes')
                 .setDescription('Optional notes')
                 .setRequired(false)
         )
         .addStringOption(option =>
             option.setName('episode_length')
-                .setDescription('The length of each episode (e.g., 45m, 1h30m, 2m5s), (default is 21m)')
+                .setDescription('The length of each episode (e.g., 45m, 1h30m, 2m5s), default is 21m')
                 .setRequired(false)
         ),
     async execute(interaction) {
         try {
-            // Retrieve the inputs and set variables
+            // Retrieve inputs and set variables
             const medium = interaction.options.getString('medium');
             const input = interaction.options.getString('amount');
             const title = interaction.options.getString('title');
             const notes = interaction.options.getString('notes');
             const customEpisodeLength = interaction.options.getString('episode_length');
+            const advancedLogging = interaction.options.getString('advanced_logging');
+
+            // Parse advanced logging if provided (pages or characters)
+            let pages = null;
+            let characters = null;
+            if (advancedLogging) {
+                try {
+                    const advResult = parseAdvancedLogging(advancedLogging);
+                    if (advResult.type === "pages") {
+                        pages = advResult.value;
+                    } else if (advResult.type === "characters") {
+                        characters = advResult.value;
+                    }
+                } catch (error) {
+                    return sendErrorMessage(interaction, error.message);
+                }
+            }
+            
             let count = null;
-            let unit = "", coefficient = null, totalSeconds = 0;
-            console.log(interaction.options);
+            let unit = "";
+            let coefficient = null;
+            let totalSeconds = 0;
+            const defaultEpisodeLength = 1260; // 21 minutes in seconds
 
             // Regular expressions to match time and episode formats
-            const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/i; // Matches input in (Num h, Num m, Num s), excludes 'ep'
-            const episodePattern = /^(?!.*[hms])(\d+)ep$/i; // Matches input in (Num ep) format, excludes h, m, s
+            const timePattern = /^(?!.*ep)(?=.*[hms])(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/i;
+            const episodePattern = /^(?!.*[hms])(\d+)ep$/i;
 
-            // Calculate log information based on input
+            // Validate the amount input
             if (!episodePattern.test(input) && !timePattern.test(input)) {
                 return sendErrorMessage(interaction, "Invalid input format. Examples: `2ep`, `1h3m`. See `/help log` for more info.");
             }
 
-            // Handle episodes logic here
-            if (episodePattern.test(input)) {
-                // Ensure only Anime can be logged as Episodes
+            // Determine which format we're working with
+            const isEpisode = episodePattern.test(input);
+            const isTime = timePattern.test(input);
+
+            if (isEpisode) {
                 if (medium !== "Anime") {
                     return sendErrorMessage(interaction, "You can only log Anime as Episodes. See `/help log` for more info.");
                 }
-                // If the user enters a custom episode length
+                count = parseEpisodes(input, episodePattern);
+                unit = "Episodes";
+
                 if (customEpisodeLength) {
                     if (timePattern.test(customEpisodeLength)) {
-                        // Parse episodes and totalSeconds for custom length anime log, then save data
-                        count = parseEpisodes(input, episodePattern);
                         coefficient = parseTime(customEpisodeLength, timePattern);
-                        totalSeconds = coefficient * count;
-                        unit = "Episodes";
                     } else {
-                        // Invalid Input Catch
                         return sendErrorMessage(interaction, "Invalid episode length format. Examples: `45m`, `1h30m`. See `/help log` for more info.");
                     }
                 } else {
-                    // Set log data for non-custom anime log
-                    coefficient = 1260; // Default episode length: 21 minutes
-                    count = parseEpisodes(input, episodePattern);
-                    unit = "Episodes";
-                    totalSeconds = count * 21 * 60;
+                    coefficient = defaultEpisodeLength;
                 }
-            } else if (timePattern.test(input)) {
-                // Handle time
+                totalSeconds = coefficient * count;
+            } else if (isTime) {
                 if (medium === "Anime") {
                     return sendErrorMessage(interaction, "For custom anime episode lengths, use `episode_length`. See `/help log` for more info.");
                 }
@@ -97,11 +117,10 @@ module.exports = {
                 unit = "Seconds";
                 totalSeconds = count;
             } else {
-                // Invalid Input Catch
                 return sendErrorMessage(interaction, "Invalid input format. Examples: `2ep`, `1h3m`. See `/help log` for more info.");
             }
 
-            // Error handling for invalid log amounts
+            // Validate log size
             if (totalSeconds < 60) {
                 return interaction.reply(`Error: The minimum log size is 1 minute, you entered ${totalSeconds} seconds.`);
             }
@@ -113,18 +132,17 @@ module.exports = {
             let customDate = null;
             let isBackLog = false;
 
-            // Save the log to the database
-            const log = await saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, coefficient, totalSeconds);
+            // Save the log (pages and characters are passed as additional arguments)
+            const log = await saveLog(interaction, customDate, medium, title, notes, isBackLog, unit, count, coefficient, totalSeconds, pages, characters);
             if (!log) {
                 throw new Error('An error occurred while saving the log. Check the log file');
             }
 
-            // Send an embed message with the log details
+            // Build and send the log embed
             const logEmbed = buildLogEmbed(interaction, log);
-            // Send the embed
             await interaction.reply({ embeds: [logEmbed] });
 
-            // **Modified Code**: Check for links in the notes and send them as a plain message
+            // Check for links in the notes and send them as a plain message
             if (notes) {
                 const links = extractLinks(notes);
                 if (links.length > 0) {
@@ -138,23 +156,16 @@ module.exports = {
     },
 };
 
-
-
 // Utility function to send a message with the link(s)
 async function sendLinkMessage(interaction, links) {
-    // Combine all links into one message
     const linkMessage = links.join('\n > ');
-
-    // Send the message as a follow-up to ensure it's associated with the interaction
     await interaction.followUp({ content: `> ${linkMessage}` });
 }
 
 // Utility function to extract links from a string
 function extractLinks(text) {
-    // Regular expression to match URLs
     const urlPattern = /(?:http[s]?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)/gi;
-    const links = text.match(urlPattern) || [];
-    return links;
+    return text.match(urlPattern) || [];
 }
 
 // Utility function to parse time strings
@@ -172,4 +183,16 @@ function parseEpisodes(input, episodePattern) {
     const match = input.match(episodePattern);
     if (!match) return null;
     return parseInt(match[1], 10);
+}
+
+// Utility function to parse advanced logging (pages or characters) using regex
+function parseAdvancedLogging(input) {
+    const regex = /^(\d+)(pg|char)$/i;
+    const match = input.match(regex);
+    if (!match) {
+        throw new Error("Invalid advanced logging format. Use a value ending in 'pg' or 'char'.");
+    }
+    const value = parseInt(match[1], 10);
+    const type = match[2].toLowerCase() === 'pg' ? "pages" : "characters";
+    return { type, value };
 }

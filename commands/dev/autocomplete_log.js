@@ -5,23 +5,14 @@ const { buildLogEmbed } = require('../../utils/buildLogEmbed.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('log')
+        .setName('autocomplete_log')
         .setDescription('Log your immersion!')
         .addStringOption(option =>
             option.setName('medium')
                 .setDescription('The type of material you immersed in')
                 .setRequired(true)
-                .addChoices(
-                    { name: 'Listening', value: 'Listening' },     // Audio
-                    { name: 'Watchtime', value: 'Watchtime' },     // Audio-Visual
-                    { name: 'YouTube', value: 'YouTube' },
-                    { name: 'Anime', value: 'Anime' },
-                    { name: 'Readtime', value: 'Readtime' },       // Reading
-                    { name: 'Visual Novel', value: 'Visual Novel' },
-                    { name: 'Manga', value: 'Manga' },
-                    { name: 'Speaking', value: 'Speaking' },          // Output
-                    { name: 'Writing', value: 'Writing' },
-                ))
+                .setAutocomplete(true)
+            )
         .addStringOption(option =>
             option.setName('amount')
                 .setDescription('Enter a time (e.g., 45m, 1h30m, 2m5s) or number of episodes (e.g., 10ep)')
@@ -136,7 +127,19 @@ module.exports = {
             return sendErrorMessage(interaction, "An unexpected error occurred executing the log command. Please try again later.");
         }
     },
+
+    // Handle autocomplete interaction
+    async autocomplete(interaction) {
+        const focusedValue = interaction.options.getFocused().toLowerCase();  // Get the user's current input
+		const choices = ['Anime', 'Manga', 'Youtube'];
+		const filtered = choices.filter(choice => choice.startsWith(focusedValue));
+		await interaction.respond(
+			filtered.map(choice => ({ name: choice, value: choice })),
+        );
+    },
 };
+
+
 
 
 
