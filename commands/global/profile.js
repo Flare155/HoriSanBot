@@ -21,6 +21,7 @@ module.exports = {
                     { name: 'Yearly', value: 'Yearly' },
                     { name: 'Monthly', value: 'Monthly' },
                     { name: 'Weekly', value: 'Weekly' },
+                    { name: 'Daily', value: 'Daily' },
                 ))
         .addUserOption(option =>
             option.setName('user')
